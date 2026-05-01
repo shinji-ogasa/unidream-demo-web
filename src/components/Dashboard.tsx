@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { ANNUALIZATION, sortedAscending } from "@/lib/aggregate";
 import { fmtPercent, fmtTime, fmtUSD, pnlPercent } from "@/lib/format";
@@ -144,14 +144,37 @@ export function Dashboard({ initial }: DashboardProps) {
     };
   }, []);
 
-  const handleRangeChange = (next: Range) => {
-    setRange((prev) => {
-      if (prev && prev.startIndex === next.startIndex && prev.endIndex === next.endIndex) {
-        return prev;
+  // Brush fires onChange continuously while dragging. Coalesce to one render
+  // per animation frame so recharts isn't redrawing the 4500-point path on
+  // every mousemove event — that's what made the slider feel choppy.
+  const rafRef = useRef<number | null>(null);
+  const pendingRangeRef = useRef<Range | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (rafRef.current != null) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
       }
-      return next;
+    };
+  }, []);
+
+  const handleRangeChange = useCallback((next: Range) => {
+    pendingRangeRef.current = next;
+    if (rafRef.current != null) return;
+    rafRef.current = requestAnimationFrame(() => {
+      rafRef.current = null;
+      const r = pendingRangeRef.current;
+      pendingRangeRef.current = null;
+      if (!r) return;
+      setRange((prev) => {
+        if (prev && prev.startIndex === r.startIndex && prev.endIndex === r.endIndex) {
+          return prev;
+        }
+        return r;
+      });
     });
-  };
+  }, []);
 
   const metrics = useMemo(() => {
     if (sortedSnapshots.length === 0) return computeMetrics([], trades, ANNUALIZATION);

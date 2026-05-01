@@ -34,10 +34,10 @@ export function PositionGauge({
   const sparkSpanLabel = sparkSpan(sparkBars);
 
   return (
-    <div className="panel p-5 flex flex-col gap-4">
+    <div className="panel p-4 flex flex-col gap-2">
       <div className="label">Position</div>
-      <div className="flex items-center gap-5">
-        <div className="relative w-[140px] h-[140px] shrink-0">
+      <div className="flex items-center gap-4">
+        <div className="relative w-[124px] h-[124px] shrink-0">
           <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">
             <circle cx="50" cy="50" r={r} stroke="#222831" strokeWidth="9" fill="none" />
             <circle
@@ -56,10 +56,10 @@ export function PositionGauge({
             <div className={`text-2xl font-mono leading-none ${labelTone}`}>
               {(fraction * 100).toFixed(0)}%
             </div>
-            <div className={`text-xs tracking-[0.22em] mt-1.5 ${labelTone}`}>{labelText}</div>
+            <div className={`text-[11px] tracking-[0.22em] mt-1 ${labelTone}`}>{labelText}</div>
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-x-3 gap-y-1.5 text-sm font-mono w-full">
+        <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-sm font-mono w-full">
           <div className="text-zinc-500">target</div>
           <div className="text-right text-zinc-200">{position.toFixed(3)}</div>
           <div className="text-zinc-500">cash</div>
@@ -70,14 +70,14 @@ export function PositionGauge({
           <div className="text-right text-white">{fmtUSD(equity)}</div>
         </div>
       </div>
-      <div className="pt-3 border-t border-[#1a1d23] flex flex-col gap-2">
+      <div className="pt-2 border-t border-[#1a1d23] flex flex-col gap-1.5">
         <div className="flex items-center justify-between text-xs">
           <span className="uppercase tracking-[0.18em] text-zinc-500">
             position history
           </span>
           <span className="font-mono text-zinc-500">{sparkSpanLabel}</span>
         </div>
-        <svg viewBox="0 0 100 30" preserveAspectRatio="none" className="w-full h-12">
+        <svg viewBox="0 0 100 30" preserveAspectRatio="none" className="w-full h-9">
           <line
             x1="0"
             y1="2"
