@@ -14,8 +14,10 @@ import {
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-const SNAPSHOT_LIMIT = 192;
-const TRADES_LIMIT = 20;
+// Allow large backfills (~5760 rows for 60d / 15m, ~35k for a year). Cap at
+// 50k to keep the initial payload bounded; raise if/when needed.
+const SNAPSHOT_HARD_LIMIT = 50_000;
+const TRADES_LIMIT = 200;
 
 function getServerClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -43,19 +45,19 @@ async function loadInitial() {
       .from("equity_snapshots")
       .select("*")
       .eq("run_id", RUN_ID)
-      .order("timestamp", { ascending: false })
-      .limit(SNAPSHOT_LIMIT),
+      .order("timestamp", { ascending: true })
+      .limit(SNAPSHOT_HARD_LIMIT),
     supabase
       .from("trades")
       .select("*")
       .eq("run_id", RUN_ID)
-      .order("created_at", { ascending: false })
+      .order("timestamp", { ascending: false })
       .limit(TRADES_LIMIT),
   ]);
 
   const prediction = (predRes.data?.[0] as Prediction | undefined) ?? null;
   const state = (stateRes.data as StrategyState | null) ?? null;
-  const snapshots = ((snapsRes.data ?? []) as EquitySnapshot[]).slice().reverse();
+  const snapshots = (snapsRes.data ?? []) as EquitySnapshot[];
   const trades = (tradesRes.data ?? []) as Trade[];
   return { prediction, state, snapshots, trades };
 }

@@ -26,3 +26,23 @@ export function fmtTime(ts: string | null | undefined): string {
 export function pnlPercent(equity: number, initial: number): number {
   return ((equity - initial) / initial) * 100;
 }
+
+export function fmtPercent(p: number, digits = 2, signed = false): string {
+  if (!Number.isFinite(p)) return "—";
+  const v = (p * 100).toFixed(digits);
+  if (signed && p > 0) return `+${v}%`;
+  return `${v}%`;
+}
+
+export function fmtSigned(n: number, digits = 2, suffix = ""): string {
+  if (!Number.isFinite(n)) return "—";
+  const v = n.toFixed(digits);
+  return `${n > 0 ? "+" : ""}${v}${suffix}`;
+}
+
+export function fmtSeconds(secs: number): string {
+  if (!Number.isFinite(secs) || secs < 0) return "00:00";
+  const m = Math.floor(secs / 60);
+  const s = Math.floor(secs % 60);
+  return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+}
