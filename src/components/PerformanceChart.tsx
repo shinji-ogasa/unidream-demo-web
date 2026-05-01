@@ -14,21 +14,17 @@ import {
   YAxis,
 } from "recharts";
 
-import { tickLabel, TF_OPTIONS, type Tf } from "@/lib/aggregate";
+import { tickLabel } from "@/lib/aggregate";
 import { fmtUSD } from "@/lib/format";
 import { INITIAL_EQUITY, type EquitySnapshot, type Trade } from "@/lib/types";
 
 type Range = { startIndex: number; endIndex: number };
 
 type Props = {
-  // snapshots is expected to be already aggregated to the chosen TF and
-  // sorted ascending. Aggregation lives in Dashboard so metrics and chart
-  // share the same source.
+  // snapshots is expected to be sorted ascending at 15m granularity.
   snapshots: EquitySnapshot[];
   trades: Trade[];
-  tf: Tf;
   range: Range | null;
-  onTfChange: (tf: Tf) => void;
   onRangeChange: (range: Range) => void;
 };
 
@@ -41,14 +37,7 @@ type Row = {
   sellMarker: number | null;
 };
 
-export function PerformanceChart({
-  snapshots,
-  trades,
-  tf,
-  range,
-  onTfChange,
-  onRangeChange,
-}: Props) {
+export function PerformanceChart({ snapshots, trades, range, onRangeChange }: Props) {
   const data: Row[] = useMemo(() => {
     if (snapshots.length === 0) return [];
     const firstPrice = snapshots[0].price > 0 ? snapshots[0].price : 1;
@@ -75,7 +64,7 @@ export function PerformanceChart({
       prevT = t;
       rows.push({
         t,
-        label: tickLabel(t, tf),
+        label: tickLabel(t),
         equity: s.equity,
         bnh: (s.price / firstPrice) * INITIAL_EQUITY,
         buyMarker,
@@ -83,7 +72,7 @@ export function PerformanceChart({
       });
     }
     return rows;
-  }, [snapshots, trades, tf]);
+  }, [snapshots, trades]);
 
   const lastIdx = Math.max(0, data.length - 1);
   const safeStart = range
@@ -99,22 +88,7 @@ export function PerformanceChart({
         <div className="text-base font-semibold tracking-tight text-zinc-200">
           Performance vs Buy &amp; Hold
         </div>
-        <div className="flex items-center gap-1 text-sm font-mono">
-          {TF_OPTIONS.map((opt) => (
-            <button
-              key={opt}
-              type="button"
-              onClick={() => onTfChange(opt)}
-              className={`px-3 py-1.5 rounded border transition-colors ${
-                opt === tf
-                  ? "bg-emerald-400/10 border-emerald-400/50 text-emerald-300"
-                  : "bg-transparent border-[#222831] text-zinc-400 hover:text-zinc-100"
-              }`}
-            >
-              {opt}
-            </button>
-          ))}
-        </div>
+        <div className="text-sm font-mono text-zinc-500">15m bars</div>
       </div>
       <div className="h-[480px]">
         {data.length === 0 ? (

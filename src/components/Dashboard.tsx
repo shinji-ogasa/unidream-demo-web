@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
-import { aggregateSnapshots, ANNUALIZATION, type Tf } from "@/lib/aggregate";
+import { ANNUALIZATION, sortedAscending } from "@/lib/aggregate";
 import { fmtPercent, fmtTime, fmtUSD, pnlPercent } from "@/lib/format";
 import { computeMetrics } from "@/lib/metrics";
 import { getSupabase } from "@/lib/supabase";
@@ -27,6 +27,7 @@ import { StatCard } from "./StatCard";
 import { TradesTable } from "./TradesTable";
 
 const TRADES_LIMIT = 50;
+const POSITION_HISTORY_BARS = 96; // 24h at 15m
 
 const SIGNAL_TONE: Record<string, "good" | "bad" | "warn" | "default"> = {
   overweight: "good",
@@ -55,25 +56,18 @@ export function Dashboard({ initial }: DashboardProps) {
   const [state, setState] = useState<StrategyState | null>(initial.state);
   const [snapshots, setSnapshots] = useState<EquitySnapshot[]>(initial.snapshots);
   const [trades, setTrades] = useState<Trade[]>(initial.trades);
-  const [tf, setTf] = useState<Tf>("15m");
-  const aggregated = useMemo(() => aggregateSnapshots(snapshots, tf), [snapshots, tf]);
+  const sortedSnapshots = useMemo(() => sortedAscending(snapshots), [snapshots]);
   const [range, setRange] = useState<Range | null>(() =>
-    fullRange(aggregateSnapshots(initial.snapshots, "15m").length),
+    fullRange(sortedAscending(initial.snapshots).length),
   );
-  const lastTfRef = useRef<Tf>("15m");
 
-  // Reset the brush window on TF change to "show all aggregated bars"; on data
-  // growth, follow the right edge if the user was already there, otherwise
-  // leave their browsed position untouched.
+  // On data growth, follow the right edge if the user was already there;
+  // otherwise leave the browsed position untouched.
   useEffect(() => {
     setRange((prev) => {
-      const len = aggregated.length;
+      const len = sortedSnapshots.length;
       if (len === 0) return null;
       const lastIdx = len - 1;
-      if (lastTfRef.current !== tf) {
-        lastTfRef.current = tf;
-        return fullRange(len);
-      }
       if (!prev) return fullRange(len);
       if (prev.endIndex >= lastIdx - 1) {
         const span = prev.endIndex - prev.startIndex;
@@ -81,7 +75,7 @@ export function Dashboard({ initial }: DashboardProps) {
       }
       return prev;
     });
-  }, [tf, aggregated.length]);
+  }, [sortedSnapshots.length]);
 
   useEffect(() => {
     const supabase = getSupabase();
@@ -160,15 +154,18 @@ export function Dashboard({ initial }: DashboardProps) {
   };
 
   const metrics = useMemo(() => {
-    if (aggregated.length === 0) {
-      return computeMetrics([], trades, ANNUALIZATION[tf]);
-    }
-    const lastIdx = aggregated.length - 1;
+    if (sortedSnapshots.length === 0) return computeMetrics([], trades, ANNUALIZATION);
+    const lastIdx = sortedSnapshots.length - 1;
     const start = Math.max(0, Math.min(range?.startIndex ?? 0, lastIdx));
     const end = Math.max(start, Math.min(range?.endIndex ?? lastIdx, lastIdx));
-    const slice = aggregated.slice(start, end + 1);
-    return computeMetrics(slice, trades, ANNUALIZATION[tf]);
-  }, [aggregated, trades, tf, range]);
+    const slice = sortedSnapshots.slice(start, end + 1);
+    return computeMetrics(slice, trades, ANNUALIZATION);
+  }, [sortedSnapshots, trades, range]);
+
+  const positionHistory = useMemo(
+    () => sortedSnapshots.slice(-POSITION_HISTORY_BARS).map((s) => s.position),
+    [sortedSnapshots],
+  );
 
   const equity = state?.equity ?? INITIAL_EQUITY;
   const cash = state?.cash ?? INITIAL_EQUITY;
@@ -183,7 +180,7 @@ export function Dashboard({ initial }: DashboardProps) {
   const signalTone = SIGNAL_TONE[signalKey] ?? "default";
 
   return (
-    <div className="max-w-6xl mx-auto px-6 py-10 flex flex-col gap-7">
+    <div className="max-w-6xl mx-auto px-6 py-10 flex flex-col gap-5">
       <header className="flex flex-col gap-3">
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div className="flex items-baseline gap-4">
@@ -231,6 +228,7 @@ export function Dashboard({ initial }: DashboardProps) {
           equity={equity}
           cash={cash}
           assetQty={assetQty}
+          positionHistory={positionHistory}
         />
         <div className="md:col-span-2 flex flex-col gap-4">
           <MetricsRow metrics={metrics} />
@@ -244,16 +242,14 @@ export function Dashboard({ initial }: DashboardProps) {
 
       <section className="flex flex-col gap-2">
         <PerformanceChart
-          snapshots={aggregated}
+          snapshots={sortedSnapshots}
           trades={trades}
-          tf={tf}
           range={range}
-          onTfChange={setTf}
           onRangeChange={handleRangeChange}
         />
         <div className="text-sm font-mono text-zinc-500">
-          Metrics computed over the visible window ({metrics.bars} {tf} bars · {metrics.trades}{" "}
-          trades). Drag the slider to see older data.
+          Metrics computed over the visible window ({metrics.bars} bars · {metrics.trades} trades).
+          Drag the slider to see older data.
         </div>
       </section>
 
@@ -264,7 +260,9 @@ export function Dashboard({ initial }: DashboardProps) {
 
       <section className="panel p-5 flex flex-col gap-3">
         <div className="text-sm text-zinc-300">
-          研究本体と HF Space の推論サーバはオープンソース。コードと bundle は誰でも見れる。
+          Both the research codebase and the inference server behind this demo are open source.
+          The trained model bundle is published alongside the code, so anyone can reproduce or
+          extend the same experiments end to end.
         </div>
         <div className="flex flex-wrap gap-x-6 gap-y-2 font-mono text-sm">
           <a
@@ -286,7 +284,7 @@ export function Dashboard({ initial }: DashboardProps) {
         </div>
       </section>
 
-      <footer className="text-sm text-zinc-500 mt-2">
+      <footer className="text-sm text-zinc-500 mt-1">
         Data: Binance public API · Inference: UniDream HF Space · Storage &amp; realtime: Supabase ·
         Last inference {fmtTime(prediction?.created_at)} · Alpha (excess) ={" "}
         {fmtPercent(metrics.alphaEx, 2, true)}
