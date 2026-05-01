@@ -107,14 +107,25 @@ async function fetchCandles(target: number): Promise<Candle[]> {
   }));
 }
 
+function shortModelVersion(run: Record<string, unknown> | null | undefined): string | null {
+  if (!run || typeof run !== "object") return null;
+  const explicit = run.name ?? run.run_id;
+  if (typeof explicit === "string" && explicit.length > 0) return explicit;
+  const dir = run.checkpoint_dir;
+  if (typeof dir === "string" && dir.length > 0) {
+    const base = dir.split(/[\\/]/).filter(Boolean).pop() ?? dir;
+    const fold = run.fold;
+    return typeof fold === "number" ? `${base}@fold${fold}` : base;
+  }
+  return null;
+}
+
 async function fetchModelVersion(spaceUrl: string): Promise<string | null> {
   try {
     const resp = await fetch(`${spaceUrl.replace(/\/+$/, "")}/health`);
     if (!resp.ok) return null;
     const data = await resp.json() as { run?: Record<string, unknown> };
-    const run = data.run ?? {};
-    const name = (run as Record<string, unknown>).name ?? (run as Record<string, unknown>).run_id;
-    return typeof name === "string" ? name : JSON.stringify(run);
+    return shortModelVersion(data.run);
   } catch {
     return null;
   }

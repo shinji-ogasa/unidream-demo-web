@@ -3,10 +3,12 @@ node_modules
 out
 .env
 .env.local
+.env.backfill
 .env.*.local
 *.log
 .DS_Store
 .vercel
 .turbo
+*.tsbuildinfo
 supabase/.temp
 supabase/.branches

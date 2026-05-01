@@ -42,6 +42,8 @@ supabase/
   functions/
     run-unidream-inference/
       index.ts                  Deno Edge Function
+scripts/
+  backfill-history.ts           ローカル実行用の過去データ replay スクリプト
 ```
 
 ## テーブル
@@ -145,6 +147,56 @@ select cron.schedule(
 ```
 
 Authorization ヘッダの渡し方はプロジェクトでの service role key の見せ方に合わせて調整。Edge Function 側は JWT を要求しない。
+
+## 過去データの backfill
+
+ライブ Cron だけだと履歴が空のままなので、初回だけローカルから過去 60 日ぶんの 15m candles を replay して `predictions` / `trades` / `equity_snapshots` / `strategy_state` を埋める用のスクリプトを用意した。
+
+[scripts/backfill-history.ts](scripts/backfill-history.ts) は Edge Function と同じシミュレーションロジックをそのまま再利用する（`run_id = unidream_btcusdt_15m_main`, `INITIAL_CASH = 10_000`, `FEE_RATE = 0`, `ALLOW_SHORT = false`）。
+
+セットアップ:
+
+```powershell
+# 1. .env.backfill を作る (gitignore 済み)
+copy .env.backfill.example .env.backfill
+# 中身を埋める:
+#   PROJECT_URL
+#   PROJECT_SECRET_KEY        ← service-role / sb_secret_...
+#   HF_SPACE_URL
+#   HF_INFERENCE_API_KEY
+
+# 2. 依存をインストール (tsx と dotenv)
+npm install
+```
+
+実行:
+
+```powershell
+# 既存履歴をクリアして 60 日ぶんを最初から replay
+npm run backfill -- --reset
+
+# 範囲を狭めたいときは --days
+npm run backfill -- --reset --days 30
+
+# 動作確認だけしたいときは --max-steps
+npm run backfill -- --reset --max-steps 200
+```
+
+スクリプトの動き:
+
+1. `--reset` 指定時は run_id に紐づく `predictions` / `trades` / `equity_snapshots` を削除し、`strategy_state` を初期値で再シード
+2. Binance public klines から ~60 日ぶん（~5760 本）の 15m candles を取得（1000 本制限を端から端まで巻き戻して取得 → openTime で重複除去 → 昇順ソート）
+3. **Probe フェーズ**: replay 範囲から 20 個の index を均等サンプリングして HF `/predict` を叩き、`target_position` の unique 値をログに出す。全部 `1.0` だった場合は「trades 履歴は増えない」と warn を出す
+4. **Replay フェーズ**: warmup（1504 本）以降の各 step で、直近最大 1800 本の candle を /predict に POST。クランプ後の target_position をもとに前回 state から仮想 fill を計算して、`predictions` / `equity_snapshots` / `trades` をバッファして 200 行ごとに flush
+5. すべて終わったら `strategy_state` を最終 state で upsert（以降のライブ Cron はその続きから動く）
+
+注意:
+
+- HF Spaces は 1 リクエスト数秒かかるので、60 日ぶんで体感 1〜2 時間。所要時間は probe フェーズの平均レイテンシから推定値を表示する
+- 同じ candle を二重処理しないよう `latest.openTimeMs <= strategy_state.last_timestamp` の step はスキップ
+- `predictions.created_at` を bar 時刻で上書きするので、チャート上で snapshots と整合する。ライブ Cron 側は `now()` のままなので backfill 行 → ライブ行の順序は保たれる
+- 途中で Ctrl+C しても直前の flush 分までは DB に入っている。再開したいときは `--reset` を付けずにもう一度叩けば、`last_timestamp` 以降だけ続きから処理される
+- ライブ Cron が動いている最中に backfill を走らせると `strategy_state` の取り合いになるので、Cron は止めてから流すこと
 
 ## Vercel デプロイ
 
