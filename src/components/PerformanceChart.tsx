@@ -14,16 +14,22 @@ import {
   YAxis,
 } from "recharts";
 
-import { aggregateSnapshots, bucketLabel, TF_OPTIONS, type Tf } from "@/lib/aggregate";
+import { tickLabel, TF_OPTIONS, type Tf } from "@/lib/aggregate";
 import { fmtUSD } from "@/lib/format";
 import { INITIAL_EQUITY, type EquitySnapshot, type Trade } from "@/lib/types";
 
+type Range = { startIndex: number; endIndex: number };
+
 type Props = {
+  // snapshots is expected to be already aggregated to the chosen TF and
+  // sorted ascending. Aggregation lives in Dashboard so metrics and chart
+  // share the same source.
   snapshots: EquitySnapshot[];
   trades: Trade[];
   tf: Tf;
+  range: Range | null;
   onTfChange: (tf: Tf) => void;
-  onVisibleChange?: (range: { startIndex: number; endIndex: number }) => void;
+  onRangeChange: (range: Range) => void;
 };
 
 type Row = {
@@ -35,21 +41,24 @@ type Row = {
   sellMarker: number | null;
 };
 
-const INITIAL_BRUSH_WINDOW = 100;
-
-export function PerformanceChart({ snapshots, trades, tf, onTfChange, onVisibleChange }: Props) {
-  const aggregated = useMemo(() => aggregateSnapshots(snapshots, tf), [snapshots, tf]);
-
+export function PerformanceChart({
+  snapshots,
+  trades,
+  tf,
+  range,
+  onTfChange,
+  onRangeChange,
+}: Props) {
   const data: Row[] = useMemo(() => {
-    if (aggregated.length === 0) return [];
-    const firstPrice = aggregated[0].price > 0 ? aggregated[0].price : 1;
+    if (snapshots.length === 0) return [];
+    const firstPrice = snapshots[0].price > 0 ? snapshots[0].price : 1;
     const sortedTrades = [...trades].sort(
       (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime(),
     );
     let tIdx = 0;
     let prevT = -Infinity;
     const rows: Row[] = [];
-    for (const s of aggregated) {
+    for (const s of snapshots) {
       const t = new Date(s.timestamp).getTime();
       let buyMarker: number | null = null;
       let sellMarker: number | null = null;
@@ -64,36 +73,42 @@ export function PerformanceChart({ snapshots, trades, tf, onTfChange, onVisibleC
         tIdx += 1;
       }
       prevT = t;
-      const bnh = (s.price / firstPrice) * INITIAL_EQUITY;
       rows.push({
         t,
-        label: bucketLabel(t, tf),
+        label: tickLabel(t, tf),
         equity: s.equity,
-        bnh,
+        bnh: (s.price / firstPrice) * INITIAL_EQUITY,
         buyMarker,
         sellMarker,
       });
     }
     return rows;
-  }, [aggregated, trades, tf]);
+  }, [snapshots, trades, tf]);
 
-  const initialEnd = data.length === 0 ? 0 : data.length - 1;
-  const initialStart = Math.max(0, data.length - INITIAL_BRUSH_WINDOW);
+  const lastIdx = Math.max(0, data.length - 1);
+  const safeStart = range
+    ? Math.max(0, Math.min(range.startIndex, lastIdx))
+    : 0;
+  const safeEnd = range
+    ? Math.max(safeStart, Math.min(range.endIndex, lastIdx))
+    : lastIdx;
 
   return (
-    <div className="panel p-4 flex flex-col gap-3">
-      <div className="flex items-center justify-between">
-        <div className="label">Performance vs Buy & Hold</div>
-        <div className="flex items-center gap-1 text-xs font-mono">
+    <div className="panel p-5 flex flex-col gap-4">
+      <div className="flex items-center justify-between flex-wrap gap-2">
+        <div className="text-base font-semibold tracking-tight text-zinc-200">
+          Performance vs Buy &amp; Hold
+        </div>
+        <div className="flex items-center gap-1 text-sm font-mono">
           {TF_OPTIONS.map((opt) => (
             <button
               key={opt}
               type="button"
               onClick={() => onTfChange(opt)}
-              className={`px-2 py-1 rounded border transition-colors ${
+              className={`px-3 py-1.5 rounded border transition-colors ${
                 opt === tf
-                  ? "bg-emerald-400/10 border-emerald-400/40 text-emerald-300"
-                  : "bg-transparent border-[#222831] text-zinc-400 hover:text-zinc-200"
+                  ? "bg-emerald-400/10 border-emerald-400/50 text-emerald-300"
+                  : "bg-transparent border-[#222831] text-zinc-400 hover:text-zinc-100"
               }`}
             >
               {opt}
@@ -101,36 +116,38 @@ export function PerformanceChart({ snapshots, trades, tf, onTfChange, onVisibleC
           ))}
         </div>
       </div>
-      <div className="h-96">
+      <div className="h-[480px]">
         {data.length === 0 ? (
-          <div className="h-full flex items-center justify-center text-zinc-500 text-sm">
+          <div className="h-full flex items-center justify-center text-zinc-500 text-base">
             No equity history yet. Run the backfill or trigger the Edge Function.
           </div>
         ) : (
           <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart key={tf} data={data} margin={{ top: 8, right: 16, bottom: 4, left: 8 }}>
+            <ComposedChart data={data} margin={{ top: 12, right: 24, bottom: 8, left: 12 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#222831" />
               <XAxis
                 dataKey="label"
-                tick={{ fill: "#8b95a5", fontSize: 10 }}
+                tick={{ fill: "#a1a8b3", fontSize: 12 }}
                 stroke="#222831"
                 interval="preserveStartEnd"
-                minTickGap={32}
+                minTickGap={48}
               />
               <YAxis
-                tick={{ fill: "#8b95a5", fontSize: 11 }}
+                tick={{ fill: "#a1a8b3", fontSize: 13 }}
                 stroke="#222831"
                 domain={["auto", "auto"]}
                 tickFormatter={(v: number) => `$${Math.round(v).toLocaleString()}`}
+                width={72}
               />
               <Tooltip
                 contentStyle={{
                   background: "#13161b",
                   border: "1px solid #222831",
                   color: "#e5e7eb",
-                  fontSize: 12,
+                  fontSize: 13,
+                  padding: "8px 12px",
                 }}
-                labelStyle={{ color: "#8b95a5" }}
+                labelStyle={{ color: "#8b95a5", fontSize: 12 }}
                 formatter={(v: number, name: string) => {
                   if (name === "buyMarker") return [fmtUSD(v), "buy"];
                   if (name === "sellMarker") return [fmtUSD(v), "sell"];
@@ -173,19 +190,18 @@ export function PerformanceChart({ snapshots, trades, tf, onTfChange, onVisibleC
               />
               <Brush
                 dataKey="label"
-                height={22}
+                height={28}
                 stroke="#3a4150"
                 fill="#0f1115"
-                travellerWidth={8}
-                startIndex={initialStart}
-                endIndex={initialEnd}
-                onChange={(range) => {
+                travellerWidth={10}
+                startIndex={safeStart}
+                endIndex={safeEnd}
+                onChange={(r) => {
                   if (
-                    onVisibleChange &&
-                    typeof range?.startIndex === "number" &&
-                    typeof range?.endIndex === "number"
+                    typeof r?.startIndex === "number" &&
+                    typeof r?.endIndex === "number"
                   ) {
-                    onVisibleChange({ startIndex: range.startIndex, endIndex: range.endIndex });
+                    onRangeChange({ startIndex: r.startIndex, endIndex: r.endIndex });
                   }
                 }}
               />
@@ -193,7 +209,7 @@ export function PerformanceChart({ snapshots, trades, tf, onTfChange, onVisibleC
           </ResponsiveContainer>
         )}
       </div>
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] font-mono text-zinc-400">
+      <div className="flex flex-wrap items-center gap-x-5 gap-y-1 text-sm font-mono text-zinc-400">
         <LegendSwatch color="#6ee7b7" label="strategy" />
         <LegendSwatch color="#5b6573" label="B&H" />
         <LegendTriangle color="#60a5fa" label="buy" up />
@@ -205,8 +221,8 @@ export function PerformanceChart({ snapshots, trades, tf, onTfChange, onVisibleC
 
 function LegendSwatch({ color, label }: { color: string; label: string }) {
   return (
-    <span className="flex items-center gap-1.5">
-      <span className="inline-block w-4 h-[2px]" style={{ background: color }} />
+    <span className="flex items-center gap-2">
+      <span className="inline-block w-5 h-[3px] rounded" style={{ background: color }} />
       <span>{label}</span>
     </span>
   );
@@ -214,12 +230,12 @@ function LegendSwatch({ color, label }: { color: string; label: string }) {
 
 function LegendTriangle({ color, label, up }: { color: string; label: string; up?: boolean }) {
   return (
-    <span className="flex items-center gap-1.5">
-      <svg width={10} height={10} viewBox="0 0 10 10" aria-hidden="true">
+    <span className="flex items-center gap-2">
+      <svg width={12} height={12} viewBox="0 0 12 12" aria-hidden="true">
         {up ? (
-          <polygon points="5,1 1,9 9,9" fill={color} />
+          <polygon points="6,1 1,11 11,11" fill={color} />
         ) : (
-          <polygon points="5,9 1,1 9,1" fill={color} />
+          <polygon points="6,11 1,1 11,1" fill={color} />
         )}
       </svg>
       <span>{label}</span>
@@ -236,7 +252,7 @@ type ShapeProps = {
 function UpTriangle(props: ShapeProps) {
   const { cx, cy, fill } = props;
   if (cx == null || cy == null) return <g />;
-  const size = 5;
+  const size = 6;
   return (
     <polygon
       points={`${cx},${cy - size} ${cx - size},${cy + size} ${cx + size},${cy + size}`}
@@ -250,7 +266,7 @@ function UpTriangle(props: ShapeProps) {
 function DownTriangle(props: ShapeProps) {
   const { cx, cy, fill } = props;
   if (cx == null || cy == null) return <g />;
-  const size = 5;
+  const size = 6;
   return (
     <polygon
       points={`${cx},${cy + size} ${cx - size},${cy - size} ${cx + size},${cy - size}`}

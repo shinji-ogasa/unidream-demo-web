@@ -31,10 +31,10 @@ function Cell({
   tone?: Tone;
 }) {
   return (
-    <div className="panel p-3 flex flex-col gap-1">
+    <div className="panel p-4 flex flex-col gap-1.5">
       <div className="label">{label}</div>
-      <div className={`text-lg font-mono ${TONE_CLASS[t]}`}>{value}</div>
-      {hint && <div className="text-[10px] font-mono text-zinc-500">{hint}</div>}
+      <div className={`text-2xl font-mono leading-tight ${TONE_CLASS[t]}`}>{value}</div>
+      {hint && <div className="text-sm font-mono text-zinc-500 leading-snug">{hint}</div>}
     </div>
   );
 }

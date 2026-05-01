@@ -27,8 +27,9 @@ body {
 }
 
 .label {
-  font-size: 11px;
-  letter-spacing: 0.08em;
+  font-size: 12px;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: #8b95a5;
+  font-weight: 500;
 }

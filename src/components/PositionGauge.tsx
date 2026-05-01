@@ -19,10 +19,10 @@ export function PositionGauge({ position, equity, cash, assetQty }: Props) {
   const labelText = isFlat ? "FLAT" : isLong ? "LONG" : "SHORT";
 
   return (
-    <div className="panel p-4 flex flex-col">
+    <div className="panel p-5 flex flex-col gap-3">
       <div className="label">Position</div>
-      <div className="flex items-center gap-4 mt-2">
-        <div className="relative w-[112px] h-[112px] shrink-0">
+      <div className="flex items-center gap-5 mt-1">
+        <div className="relative w-[140px] h-[140px] shrink-0">
           <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">
             <circle cx="50" cy="50" r={r} stroke="#222831" strokeWidth="9" fill="none" />
             <circle
@@ -38,13 +38,13 @@ export function PositionGauge({ position, equity, cash, assetQty }: Props) {
             />
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <div className={`text-xl font-mono leading-none ${labelTone}`}>
+            <div className={`text-2xl font-mono leading-none ${labelTone}`}>
               {(fraction * 100).toFixed(0)}%
             </div>
-            <div className={`text-[10px] tracking-[0.2em] mt-1 ${labelTone}`}>{labelText}</div>
+            <div className={`text-xs tracking-[0.22em] mt-1.5 ${labelTone}`}>{labelText}</div>
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-[11px] font-mono w-full">
+        <div className="grid grid-cols-2 gap-x-3 gap-y-1.5 text-sm font-mono w-full">
           <div className="text-zinc-500">target</div>
           <div className="text-right text-zinc-200">{position.toFixed(3)}</div>
           <div className="text-zinc-500">cash</div>

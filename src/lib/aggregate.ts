@@ -10,25 +10,24 @@ const BUCKET_MS: Record<Tf, number> = {
   "1D": 24 * 60 * 60 * 1000,
 };
 
-// bars-per-year for each timeframe — used to annualize Sharpe.
+// Bars per year for each TF — used by Sharpe annualization.
 export const ANNUALIZATION: Record<Tf, number> = {
   "15m": 96 * 365,
   "1h": 24 * 365,
   "1D": 365,
 };
 
-// Group snapshots into buckets and keep the most-recent snapshot per bucket so
-// the equity curve at coarser timeframes uses the closing equity of each
-// bucket. Snapshots are assumed to come from the 15m source table.
+// Group 15m snapshots into the requested TF buckets and keep the most recent
+// snapshot in each bucket so the equity at coarser TFs uses end-of-bar values.
+// 15m passes through unchanged (just sorted ascending).
 export function aggregateSnapshots(snapshots: EquitySnapshot[], tf: Tf): EquitySnapshot[] {
-  if (tf === "15m") {
-    return [...snapshots].sort(
-      (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime(),
-    );
-  }
+  const sorted = [...snapshots].sort(
+    (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime(),
+  );
+  if (tf === "15m") return sorted;
   const bucket = BUCKET_MS[tf];
   const grouped = new Map<number, EquitySnapshot>();
-  for (const s of snapshots) {
+  for (const s of sorted) {
     const ts = new Date(s.timestamp).getTime();
     const key = Math.floor(ts / bucket);
     const prev = grouped.get(key);
@@ -41,9 +40,14 @@ export function aggregateSnapshots(snapshots: EquitySnapshot[], tf: Tf): EquityS
   );
 }
 
-export function bucketLabel(ts: number, tf: Tf): string {
-  const d = new Date(ts);
-  const iso = d.toISOString();
-  if (tf === "1D") return iso.slice(0, 10);
-  return iso.slice(2, 16).replace("T", " ");
+export function tickLabel(ts: number, tf: Tf): string {
+  const iso = new Date(ts).toISOString();
+  switch (tf) {
+    case "1D":
+      return iso.slice(0, 10); // YYYY-MM-DD
+    case "1h":
+      return iso.slice(2, 13).replace("T", " "); // YY-MM-DD HH
+    default:
+      return iso.slice(2, 16).replace("T", " "); // YY-MM-DD HH:MM
+  }
 }
