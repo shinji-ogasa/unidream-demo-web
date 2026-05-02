@@ -55,7 +55,7 @@ function AnimateInView({
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <p className="text-sm font-semibold tracking-[0.12em] text-[#8a93a3] mb-3">{children}</p>
+    <p className="text-base font-semibold tracking-[0.12em] text-[#8a93a3] mb-3">{children}</p>
   );
 }
 
@@ -99,7 +99,7 @@ function MetricCard({ label, value, sub, color }: { label: string; value: string
   return (
     <div className="card p-6">
       <p className="label">{label}</p>
-      <p className={`mt-2 text-3xl font-semibold tracking-[-0.04em] ${color}`}>{value}</p>
+      <p className={`mt-2 text-2xl font-semibold tracking-[-0.04em] ${color}`}>{value}</p>
       <p className="mt-2 text-sm font-medium text-[#8a93a3]">{sub}</p>
     </div>
   );
