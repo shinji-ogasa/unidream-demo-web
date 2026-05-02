@@ -22,10 +22,10 @@ import { FaGithub, FaLinkedin, FaXTwitter, FaYoutube } from "react-icons/fa6";
 const NAV_ITEMS = ["プロダクト", "研究成果", "技術", "研究", "会社情報"];
 
 const METRICS = [
-  { label: "AlphaEx (safe)", value: "+0.89 pt/yr", sub: "Phase 8 · BTCUSDT 15m", color: "text-[#02b8cc]" },
-  { label: "MaxDDΔ (safe)", value: "-1.58 pt", sub: "vs Buy & Hold", color: "text-[#4ade80]" },
-  { label: "AlphaEx (3fold)", value: "+12.97 pt", sub: "AC再学習 · test平均", color: "text-[#5266eb]" },
-  { label: "Backtest", value: "2018-2024", sub: "6yr · BTCUSDT · 15m bars", color: "text-[#8b5cf6]" },
+  { label: "Market", value: "BTCUSDT · 15m", sub: "2018–2024 の実データで検証", color: "text-[#02b8cc]" },
+  { label: "Benchmark", value: "Buy & Hold", sub: "単純保有に対する超過性能を測定", color: "text-[#8a93a3]" },
+  { label: "Production Candidate", value: "Safe Baseline", sub: "DD抑制を重視した安定運用モデル", color: "text-[#4ade80]" },
+  { label: "Research Upside", value: "3fold AC Retrain", sub: "再学習による性能上限を探索", color: "text-[#5266eb]" },
 ];
 
 const SOCIAL_LINKS = [
@@ -169,7 +169,7 @@ export default function HomepagePage() {
       {/* hero */}
       <section className="relative min-h-[760px] flex items-center">
         <div className="hero-visual-bg" />
-        <div className="relative z-10 container-site py-20 md:py-28 pl-4 md:pl-6">
+        <div className="relative z-10 max-w-[1200px] mx-4 md:mx-8 lg:mx-auto py-20 md:py-28">
           <div className="max-w-[600px]">
             <motion.span
               initial={{ opacity: 0, y: 12 }}
@@ -183,7 +183,7 @@ export default function HomepagePage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.15 }}
-              className="text-[clamp(2.5rem,4.5vw,4rem)] font-semibold tracking-[-0.06em] leading-[0.95] text-[#f4f7fb]"
+              className="text-[clamp(2.8rem,5vw,4.5rem)] font-semibold tracking-[-0.06em] leading-[0.95] text-[#f4f7fb]"
             >
               市場の見えない構造を、<br />世界モデルで読む。
             </motion.h1>
@@ -294,17 +294,17 @@ export default function HomepagePage() {
 
       {/* vision */}
       <section className="container-site py-16 md:py-24">
-        <div className="grid items-start gap-12 lg:grid-cols-[1fr_1.1fr]">
-          <div className="order-2 lg:order-1">
-            <SectionLabel>VISION</SectionLabel>
-            <h2 className="text-[2.5rem] md:text-[3.5rem] font-semibold tracking-[-0.05em] leading-[1.0] text-[#f4f7fb]">価格予測を超えた市場理解へ</h2>
-            <div className="mt-6 space-y-4 text-base leading-7 text-[#8a93a3]">
-              <p>金融市場は、価格だけで動いているわけではありません。投資家心理、流動性、リスク、ニュース、制度、そして時間とともに変化する市場状態。</p>
-              <p>UniDreamは、世界モデルと強化学習によって、そうした<span className="font-semibold text-[#02b8cc]">見えない市場構造を学習</span>し、いま市場で何が起きているのか、どの行動がリスクに対して合理的なのかを判断するAIを目指します。</p>
-            </div>
-          </div>
-          <div className="order-1 lg:order-2 rounded-card overflow-hidden border border-[rgba(255,255,255,0.08)] shadow-panel">
-            <Image src="/VISION_img.png" alt="UniDream pipeline diagram" width={2400} height={1350} className="w-full h-auto" />
+        <div className="mb-10">
+          <SectionLabel>VISION</SectionLabel>
+          <h2 className="text-[2.5rem] md:text-[3.5rem] font-semibold tracking-[-0.05em] leading-[1.0] text-[#f4f7fb]">価格予測を超えた市場理解へ</h2>
+        </div>
+        <div className="rounded-card overflow-hidden border border-[rgba(255,255,255,0.08)] shadow-panel mb-10">
+          <Image src="/VISION_img.png" alt="UniDream pipeline diagram" width={2400} height={1350} className="w-full h-auto" />
+        </div>
+        <div className="max-w-[680px]">
+          <div className="space-y-4 text-base leading-7 text-[#8a93a3]">
+            <p>金融市場は、価格だけで動いているわけではありません。投資家心理、流動性、リスク、ニュース、制度、そして時間とともに変化する市場状態。</p>
+            <p>UniDreamは、世界モデルと強化学習によって、そうした<span className="font-semibold text-[#02b8cc]">見えない市場構造を学習</span>し、いま市場で何が起きているのか、どの行動がリスクに対して合理的なのかを判断するAIを目指します。</p>
           </div>
         </div>
       </section>
