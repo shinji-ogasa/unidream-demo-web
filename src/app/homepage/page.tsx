@@ -133,7 +133,7 @@ function Footer() {
             ))}
           </div>
         </div>
-        <div className="mt-10 pt-5 border-t border-[rgba(255,255,255,0.08)] flex flex-wrap justify-between gap-4 text-xs text-[#626b7a]">
+        <div className="mt-16 pt-5 border-t border-[rgba(255,255,255,0.08)] flex flex-wrap justify-between gap-6 text-xs text-[#626b7a]">
           <p>© 2026 WorldForge AI</p>
           <div className="flex gap-6"><span>Privacy</span><span>Terms</span></div>
         </div>
@@ -157,7 +157,7 @@ export default function HomepagePage() {
           <nav className="hidden items-center gap-8 text-sm font-medium text-[#8a93a3] lg:flex">
             {NAV_ITEMS.map((item) => (<a key={item} href="#" className="transition hover:text-[#f4f7fb]">{item}</a>))}
           </nav>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-6">
             <Link href="/" className="text-sm font-medium text-[#8a93a3] transition hover:text-[#f4f7fb]">デモ</Link>
             <button type="button" className="btn-primary text-sm py-2 px-5">問い合わせ</button>
           </div>
@@ -168,7 +168,7 @@ export default function HomepagePage() {
       <section className="relative min-h-[1140px] flex items-center">
         <div className="hero-visual-bg" />
         <div className="relative z-10 px-[20%] py-20 md:py-28">
-          <div className="max-w-[600px]">
+          <div className="max-w-[900px]">
             <motion.span
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
@@ -189,7 +189,7 @@ export default function HomepagePage() {
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.25 }}
-              className="mt-6 max-w-[680px] text-lg leading-8 text-[#8a93a3]"
+              className="mt-6 max-w-[1020px] text-lg leading-8 text-[#8a93a3]"
             >
               UniDreamはOHLCVと特徴量から市場状態を学習し、想像ロールアウトと検証セレクタでB&Hを超える意思決定を探索する研究開発プロダクトです。
             </motion.p>
@@ -197,7 +197,7 @@ export default function HomepagePage() {
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.35 }}
-              className="mt-10 flex flex-wrap gap-4"
+              className="mt-16 flex flex-wrap gap-6"
             >
               <CtaButton href="/">デモを見る</CtaButton>
               <CtaButton variant="secondary">研究概要を読む</CtaButton>
@@ -207,8 +207,8 @@ export default function HomepagePage() {
       </section>
 
       {/* metrics strip */}
-      <section className="container-site relative z-10 -mt-10 pb-12 md:pb-20">
-        <div className="grid gap-4 md:grid-cols-4">
+      <section className="container-site relative z-10 -mt-16 pb-12 md:pb-20">
+        <div className="grid gap-6 md:grid-cols-4">
           {METRICS.map((m) => (
             <AnimateInView key={m.label} y={16}>
               <MetricCard {...m} />
@@ -218,32 +218,32 @@ export default function HomepagePage() {
       </section>
 
       {/* evidence / scorecard (DESIGN.md §9-5) */}
-      <section className="container-site py-16 md:py-24">
-        <div className="mb-10 max-w-[680px]">
+      <section className="container-site py-24 md:py-36">
+        <div className="mb-16 max-w-[1020px]">
           <SectionLabel>EVIDENCE</SectionLabel>
-          <h2 className="text-[2.5rem] md:text-[3.5rem] font-semibold tracking-[-0.05em] leading-[1.0] text-[#f4f7fb]">実データによる検証結果</h2>
+          <h2 className="text-[3.75rem] md:text-[5.25rem] font-semibold tracking-[-0.05em] leading-[1.0] text-[#f4f7fb]">実データによる検証結果</h2>
           <p className="mt-4 text-lg text-[#8a93a3]">BTCUSDT 15m · 2018-2024。全指標B&H比較。</p>
         </div>
-        <div className="grid gap-5 lg:grid-cols-[1.3fr_1fr]">
-          <AnimateInView className="card p-8 md:p-10 border-[rgba(94,106,210,0.36)]" x={-20} y={0}>
+        <div className="grid gap-8 lg:grid-cols-[1.3fr_1fr]">
+          <AnimateInView className="card p-12 md:p-16 border-[rgba(94,106,210,0.36)]" x={-20} y={0}>
             <div className="flex items-start gap-3 mb-6">
               <div className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-[rgba(82,102,235,0.16)]"><Zap className="h-5 w-5 text-[#5266eb]" strokeWidth={2} /></div>
               <div><p className="text-base font-semibold text-[#f4f7fb]">3fold AC再学習</p><p className="text-sm text-[#8a93a3]">selector v2 strict · test平均</p></div>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-6">
               <div><p className="label">AlphaEx</p><p className="mt-1 text-4xl font-semibold text-[#5266eb]">+12.97 pt</p></div>
               <div><p className="label">SharpeΔ</p><p className="mt-1 text-4xl font-semibold text-[#8b5cf6]">+0.033</p></div>
               <div><p className="label">MaxDDΔ</p><p className="mt-1 text-4xl font-semibold text-[#4ade80]">-0.30 pt</p></div>
             </div>
             <p className="mt-5 text-sm text-[#626b7a] leading-5">B&H比でリターン増加、Sharpe微増、DD改善。※ strict条件でvalidation全fold acceptは未達。</p>
           </AnimateInView>
-          <AnimateInView className="card p-8 md:p-10 flex flex-col justify-between" x={20} y={0} delay={0.15}>
+          <AnimateInView className="card p-12 md:p-16 flex flex-col justify-between" x={20} y={0} delay={0.15}>
             <div>
               <div className="flex items-center gap-3 mb-6">
                 <div className="grid h-10 w-10 place-items-center rounded-lg bg-[rgba(74,222,128,0.12)]"><ShieldCheck className="h-5 w-5 text-[#4ade80]" strokeWidth={2} /></div>
                 <div><p className="text-base font-semibold text-[#f4f7fb]">Safe Baseline</p><p className="text-sm text-[#8a93a3]">Phase 8</p></div>
               </div>
-              <div className="grid grid-cols-2 gap-5">
+              <div className="grid grid-cols-2 gap-8">
                 <div><p className="label">AlphaEx</p><p className="mt-1 text-3xl font-semibold text-[#02b8cc]">+0.89 pt/yr</p></div>
                 <div><p className="label">MaxDDΔ</p><p className="mt-1 text-3xl font-semibold text-[#4ade80]">-1.58 pt</p></div>
               </div>
@@ -254,14 +254,14 @@ export default function HomepagePage() {
       </section>
 
       {/* product (DESIGN.md §9-4) */}
-      <section className="container-site py-16 md:py-24">
-        <div className="mb-10 max-w-[680px]">
+      <section className="container-site py-24 md:py-36">
+        <div className="mb-16 max-w-[1020px]">
           <SectionLabel>PRODUCT</SectionLabel>
-          <h2 className="text-[2.5rem] md:text-[3.5rem] font-semibold tracking-[-0.05em] leading-[1.0] text-[#f4f7fb]">市場理解のためのAI</h2>
+          <h2 className="text-[3.75rem] md:text-[5.25rem] font-semibold tracking-[-0.05em] leading-[1.0] text-[#f4f7fb]">市場理解のためのAI</h2>
           <p className="mt-4 text-lg text-[#8a93a3]">価格予測を超え、市場状態・リスク・行動を一貫してモデリング。</p>
         </div>
-        <div className="grid gap-4 md:grid-cols-3">
-          <AnimateInView y={20} className="md:col-span-2 md:row-span-2 card p-8 md:p-10">
+        <div className="grid gap-6 md:grid-cols-3">
+          <AnimateInView y={20} className="md:col-span-2 md:row-span-2 card p-12 md:p-16">
             <div className="grid h-12 w-12 place-items-center rounded-xl bg-[rgba(82,102,235,0.16)]"><Globe2 className="h-6 w-6 text-[#5266eb]" strokeWidth={1.8} /></div>
             <h3 className="mt-5 text-2xl font-semibold tracking-[-0.03em] text-[#f4f7fb]">Transformer World Model</h3>
             <p className="mt-3 text-base leading-6 text-[#8a93a3]">価格・流動性・リスク・ニュースから潜在市場状態を学習。将来の価格予測ではなく、市場の構造的理解を目的とするコアモデル。</p>
@@ -290,16 +290,16 @@ export default function HomepagePage() {
       </section>
 
       {/* vision */}
-      <section className="container-site py-16 md:py-24">
-        <div className="mb-10">
+      <section className="container-site py-24 md:py-36">
+        <div className="mb-16">
           <SectionLabel>PIPELINE</SectionLabel>
         </div>
         <div className="rounded-card overflow-hidden border border-[rgba(255,255,255,0.08)] shadow-panel mb-12">
           <Image src="/VISION_img.png" alt="UniDream pipeline diagram" width={2400} height={1350} className="w-full h-auto" />
         </div>
-        <div className="max-w-[680px]">
+        <div className="max-w-[1020px]">
           <SectionLabel>VISION</SectionLabel>
-          <h2 className="text-[2.5rem] md:text-[3.5rem] font-semibold tracking-[-0.05em] leading-[1.0] text-[#f4f7fb]">価格予測を超えた市場理解へ</h2>
+          <h2 className="text-[3.75rem] md:text-[5.25rem] font-semibold tracking-[-0.05em] leading-[1.0] text-[#f4f7fb]">価格予測を超えた市場理解へ</h2>
           <div className="mt-6 space-y-4 text-base leading-7 text-[#8a93a3]">
             <p>金融市場は、価格だけで動いているわけではありません。投資家心理、流動性、リスク、ニュース、制度、そして時間とともに変化する市場状態。</p>
             <p>UniDreamは、世界モデルと強化学習によって、そうした<span className="font-semibold text-[#02b8cc]">見えない市場構造を学習</span>し、いま市場で何が起きているのか、どの行動がリスクに対して合理的なのかを判断するAIを目指します。</p>
@@ -308,12 +308,12 @@ export default function HomepagePage() {
       </section>
 
       {/* live demo (DESIGN.md §9-4) */}
-      <section className="container-site py-16 md:py-24">
-        <div className="mb-10 max-w-[680px]">
+      <section className="container-site py-24 md:py-36">
+        <div className="mb-16 max-w-[1020px]">
           <SectionLabel>LIVE DEMO</SectionLabel>
-          <h2 className="text-[2.5rem] md:text-[3.5rem] font-semibold tracking-[-0.05em] leading-[1.0] text-[#f4f7fb]">推論ダッシュボード</h2>
+          <h2 className="text-[3.75rem] md:text-[5.25rem] font-semibold tracking-[-0.05em] leading-[1.0] text-[#f4f7fb]">推論ダッシュボード</h2>
           <p className="mt-4 text-lg text-[#8a93a3]">リアルタイムで動作する研究デモ。エクイティ・ポジション・市場状態を一画面で。</p>
-          <div className="mt-5 flex items-center gap-4 text-sm text-[#8a93a3]">
+          <div className="mt-5 flex items-center gap-6 text-sm text-[#8a93a3]">
             <span className="flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-[#4ade80]" />Live · next inference in ~15m</span>
             <span className="flex items-center gap-2"><ArrowRight className="h-3 w-3 text-[#02b8cc]" />BTCUSDT · 15m</span>
           </div>
@@ -329,7 +329,7 @@ export default function HomepagePage() {
 
       {/* CTA (DESIGN.md §9-8) */}
       <section className="container-site pb-24 md:pb-32">
-        <div className="card border-[rgba(255,255,255,0.08)] p-10 md:p-14">
+        <div className="card border-[rgba(255,255,255,0.08)] p-16 md:p-20">
           <div className="grid gap-8 md:grid-cols-[1.5fr_1fr] items-center">
             <div>
               <p className="label">CONTACT</p>
