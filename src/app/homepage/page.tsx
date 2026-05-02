@@ -167,7 +167,7 @@ export default function HomepagePage() {
       {/* hero */}
       <section className="relative min-h-[760px] flex items-center">
         <div className="hero-visual-bg" />
-        <div className="relative z-10 px-[25%] py-20 md:py-28">
+        <div className="relative z-10 px-[15%] py-20 md:py-28">
           <div className="max-w-[600px]">
             <motion.span
               initial={{ opacity: 0, y: 12 }}
