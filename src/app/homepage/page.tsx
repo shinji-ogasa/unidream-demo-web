@@ -7,7 +7,6 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { motion } from "framer-motion";
 import {
   ArrowRight,
   BarChart3,
@@ -194,139 +193,17 @@ function PremiumIcon({ icon: Icon }: { icon: React.ElementType }) {
   );
 }
 
-function HeroMetric({
-  title,
-  value,
-  tone,
-}: {
-  title: string;
-  value: string;
-  tone: "blue" | "emerald" | "violet";
-}) {
-  const toneMap = {
-    blue: "border-blue-300/20 bg-blue-400/10 text-blue-100",
-    emerald: "border-emerald-300/20 bg-emerald-400/10 text-emerald-100",
-    violet: "border-violet-300/20 bg-violet-400/10 text-violet-100",
-  } as const;
-
-  return (
-    <div className="rounded-[24px] border border-white/10 bg-white/[0.08] p-4 shadow-lg shadow-black/20 backdrop-blur-xl">
-      <p className="text-[10px] font-semibold tracking-[0.18em] text-white/45">{title}</p>
-      <p className={`mt-2 rounded-full border px-3 py-1 text-center text-sm font-semibold ${toneMap[tone]}`}>
-        {value}
-      </p>
-    </div>
-  );
-}
-
 function HeroVisual() {
   return (
-    <div className="relative mx-auto h-[480px] md:h-[560px] w-full max-w-[660px]">
-      <div className="absolute -inset-8 rounded-[64px] bg-gradient-to-br from-blue-500/15 via-violet-500/10 to-emerald-400/10 blur-3xl" />
-      <motion.div
-        initial={{ opacity: 0, y: 18, rotateX: 8 }}
-        animate={{ opacity: 1, y: 0, rotateX: 0 }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
-        className="relative h-full overflow-hidden rounded-[44px] border border-white/15 bg-slate-950 shadow-2xl shadow-blue-950/25"
-      >
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              "radial-gradient(circle at 20% 12%, rgba(56,189,248,0.34), transparent 28%), radial-gradient(circle at 78% 16%, rgba(168,85,247,0.28), transparent 30%), radial-gradient(circle at 50% 88%, rgba(16,185,129,0.18), transparent 34%), #020617",
-          }}
-        />
-        <div
-          className="absolute inset-0 opacity-[0.14]"
-          style={{
-            backgroundImage:
-              "linear-gradient(to right, rgba(255,255,255,0.22) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.22) 1px, transparent 1px)",
-            backgroundSize: "44px 44px",
-          }}
-        />
-        <div className="absolute left-6 right-6 top-6 z-20 flex items-center justify-between rounded-[28px] border border-white/10 bg-white/[0.08] px-5 py-4 shadow-2xl shadow-black/20 backdrop-blur-xl">
-          <div>
-            <p className="text-xs font-semibold tracking-[0.24em] text-blue-100/60">
-              WORLD MODEL CORE
-            </p>
-            <p className="mt-1 text-lg font-semibold tracking-[-0.035em] text-white">
-              Market Intelligence Engine
-            </p>
-          </div>
-          <div className="flex items-center gap-2 rounded-full border border-emerald-300/20 bg-emerald-400/10 px-3 py-1 text-xs font-semibold text-emerald-200">
-            <span className="h-2 w-2 rounded-full bg-emerald-300 shadow-[0_0_16px_rgba(110,231,183,0.9)]" />
-            LIVE STATE
-          </div>
-        </div>
-        <div className="absolute left-1/2 top-[112px] md:top-[132px] z-10 h-[220px] w-[220px] md:h-[260px] md:w-[260px] -translate-x-1/2">
-          <div className="absolute inset-0 rounded-full bg-blue-500/25 blur-3xl" />
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ repeat: Infinity, duration: 28, ease: "linear" }}
-            className="absolute inset-0 rounded-full border border-cyan-300/30"
-          />
-          <motion.div
-            animate={{ rotate: -360 }}
-            transition={{ repeat: Infinity, duration: 36, ease: "linear" }}
-            className="absolute inset-8 rounded-full border border-violet-300/25"
-          />
-          <div className="absolute inset-12 rounded-[42px] border border-white/15 bg-white/[0.08] backdrop-blur-2xl rotate-45 shadow-[0_0_80px_rgba(96,165,250,0.36)]" />
-          <div className="absolute inset-[68px] md:inset-[82px] rounded-[26px] bg-gradient-to-br from-cyan-300 via-blue-500 to-violet-500 rotate-45 opacity-90 shadow-[0_0_60px_rgba(59,130,246,0.7)]" />
-          <div className="absolute left-1/2 top-1/2 h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white shadow-[0_0_40px_rgba(255,255,255,0.9)]" />
-        </div>
-        <svg
-          className="absolute left-6 right-6 md:left-8 md:right-8 top-[245px] md:top-[285px] z-0 h-36 md:h-44 w-[calc(100%-3rem)] md:w-[610px] opacity-95"
-          viewBox="0 0 610 180"
-          preserveAspectRatio="none"
-          fill="none"
-          aria-hidden="true"
-        >
-          <path
-            d="M4 132C72 48 130 34 198 84C274 140 354 150 462 64C512 24 556 28 606 44"
-            stroke="url(#heroStrategy)"
-            strokeWidth="3.7"
-            strokeLinecap="round"
-          />
-          <path
-            d="M4 142C90 118 157 116 245 119C363 123 462 98 606 112"
-            stroke="rgba(226,232,240,0.38)"
-            strokeWidth="2.4"
-            strokeLinecap="round"
-          />
-          <path
-            d="M4 132C72 48 130 34 198 84C274 140 354 150 462 64C512 24 556 28 606 44L606 180H4Z"
-            fill="url(#heroFill)"
-          />
-          <defs>
-            <linearGradient id="heroStrategy" x1="4" y1="132" x2="606" y2="44">
-              <stop stopColor="#34D399" />
-              <stop offset="0.48" stopColor="#60A5FA" />
-              <stop offset="1" stopColor="#C084FC" />
-            </linearGradient>
-            <linearGradient id="heroFill" x1="305" y1="44" x2="305" y2="180">
-              <stop stopColor="#38BDF8" stopOpacity="0.26" />
-              <stop offset="1" stopColor="#38BDF8" stopOpacity="0" />
-            </linearGradient>
-          </defs>
-        </svg>
-        <div className="absolute left-6 top-[120px] md:top-[138px] z-20 rounded-2xl border border-white/10 bg-white/[0.10] px-3 md:px-4 py-2 md:py-3 text-xs font-semibold text-white shadow-xl shadow-black/20 backdrop-blur-xl">
-          <span className="mr-2 text-cyan-200">↗</span>市場状態
-        </div>
-        <div className="absolute right-6 top-[132px] md:top-[152px] z-20 rounded-2xl border border-white/10 bg-white/[0.10] px-3 md:px-4 py-2 md:py-3 text-xs font-semibold text-white shadow-xl shadow-black/20 backdrop-blur-xl">
-          <span className="mr-2 text-violet-200">◇</span>リスク
-        </div>
-        <div className="absolute left-6 bottom-[112px] md:bottom-[132px] z-20 rounded-2xl border border-white/10 bg-white/[0.10] px-3 md:px-4 py-2 md:py-3 text-xs font-semibold text-white shadow-xl shadow-black/20 backdrop-blur-xl">
-          <span className="mr-2 text-emerald-200">∿</span>不確実性
-        </div>
-        <div className="absolute right-6 bottom-[116px] md:bottom-[136px] z-20 rounded-2xl border border-white/10 bg-white/[0.10] px-3 md:px-4 py-2 md:py-3 text-xs font-semibold text-white shadow-xl shadow-black/20 backdrop-blur-xl">
-          <span className="mr-2 text-blue-200">▥</span>B&H比較
-        </div>
-        <div className="absolute bottom-6 left-6 right-6 z-20 grid grid-cols-3 gap-3">
-          <HeroMetric title="AlphaEx" value="+0.9 pt/yr" tone="blue" />
-          <HeroMetric title="MaxDDΔ" value="-1.6 pt" tone="emerald" />
-          <HeroMetric title="Signal" value="LONG" tone="violet" />
-        </div>
-      </motion.div>
+    <div className="relative mx-auto w-full max-w-[660px]">
+      <Image
+        src="/hero-bg.png"
+        alt=""
+        width={1320}
+        height={1120}
+        className="w-full h-auto rounded-[44px] shadow-2xl shadow-blue-950/25"
+        priority
+      />
     </div>
   );
 }
@@ -362,268 +239,30 @@ function FeatureCard({ icon: Icon, title, text }: CardItem) {
   );
 }
 
-function Metric({
-  label,
-  value,
-  sub,
-  green,
-  orange,
-}: {
-  label: string;
-  value: string;
-  sub: string;
-  green?: boolean;
-  orange?: boolean;
-}) {
-  return (
-    <div className="min-w-0 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
-      <p className="mb-2 truncate text-[10px] font-semibold tracking-widest text-slate-500">
-        {label}
-      </p>
-      <p
-        className={`truncate text-2xl font-semibold tracking-[-0.04em] ${
-          green ? "text-emerald-500" : orange ? "text-orange-500" : "text-slate-950"
-        }`}
-      >
-        {value}
-      </p>
-      <p className="mt-2 truncate text-xs font-medium text-slate-500">{sub}</p>
-    </div>
-  );
-}
-
-function TradeRow({
-  label,
-  value,
-  accent,
-}: {
-  label: string;
-  value: string;
-  accent?: boolean;
-}) {
-  return (
-    <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-      <span className="text-xs font-semibold tracking-widest text-slate-400">{label}</span>
-      <span className={`font-semibold ${accent ? "text-emerald-500" : "text-slate-700"}`}>
-        {value}
-      </span>
-    </div>
-  );
-}
-
-function ChartGrid() {
-  return (
-    <div
-      className="absolute inset-0"
-      style={{
-        backgroundImage:
-          "linear-gradient(to right, rgba(148,163,184,0.22) 1px, transparent 1px), linear-gradient(to bottom, rgba(148,163,184,0.22) 1px, transparent 1px)",
-        backgroundSize: "86px 54px",
-      }}
-    />
-  );
-}
-
 function DemoDashboard() {
   return (
-    <div className="rounded-[34px] border border-slate-100 bg-white p-4 shadow-2xl shadow-blue-100/70 md:p-6">
-      <div className="mb-5 flex flex-wrap items-start justify-between gap-4 border-b border-slate-100 pb-4">
-        <div>
-          <div className="flex flex-wrap items-center gap-3">
-            <h3 className="text-2xl font-semibold tracking-[-0.04em] text-slate-950">
-              UniDream Demo
-            </h3>
-            <span className="rounded-full bg-slate-50 px-3 py-1 text-xs font-semibold text-slate-500">
-              BTCUSDT ・ 15m
-            </span>
-          </div>
-          <p className="mt-2 text-xs font-semibold text-orange-500">
-            Research demo only. Not financial advice. Virtual paper-trading only.
-          </p>
-        </div>
-        <div className="flex items-center gap-2 rounded-full bg-emerald-50 px-4 py-2 text-xs font-semibold text-emerald-600">
-          <span className="h-2 w-2 rounded-full bg-emerald-500" />
-          LIVE
-          <span className="text-slate-400">next in 13:46</span>
-        </div>
-      </div>
-      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <Metric label="EQUITY" value="$10,942.77" sub="PnL +9.43%" green />
-        <Metric label="CASH" value="$0.00" sub="asset_qty 0.139808" />
-        <Metric label="LAST PRICE" value="$78,270.21" sub="2026-05-02 UTC" />
-        <Metric label="LATEST SIGNAL" value="benchmark" sub="raw position 1.000" orange />
-      </div>
-      <div className="mt-3 grid gap-3 xl:grid-cols-[0.72fr_1.28fr]">
-        <div className="rounded-3xl border border-slate-100 p-5">
-          <p className="mb-5 text-xs font-semibold tracking-widest text-slate-500">POSITION</p>
-          <div className="flex items-center gap-5">
-            <div className="grid h-24 w-24 shrink-0 place-items-center rounded-full border-[12px] border-emerald-400 text-center">
-              <div>
-                <p className="text-xl font-semibold tracking-[-0.04em] text-emerald-500">100%</p>
-                <p className="text-xs font-semibold text-emerald-600">LONG</p>
-              </div>
-            </div>
-            <div className="grid flex-1 grid-cols-2 gap-y-2 text-sm">
-              <span className="text-slate-500">target</span>
-              <b className="text-right font-semibold">1.000</b>
-              <span className="text-slate-500">cash</span>
-              <b className="text-right font-semibold">$0.00</b>
-              <span className="text-slate-500">qty</span>
-              <b className="text-right font-semibold">0.139808</b>
-              <span className="text-slate-500">equity</span>
-              <b className="text-right font-semibold">$10,942.77</b>
-            </div>
-          </div>
-        </div>
-        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          <Metric label="ALPHA (EXCESS)" value="+0.00%" sub="strat +9.43% ・ B&H +9.43%" />
-          <Metric label="SHARPE Δ" value="+1.86" sub="strat 1.86 ・ B&H 1.86" />
-          <Metric label="MAXDD Δ" value="-0.00%" sub="strat 13.58% ・ B&H 13.58%" />
-          <Metric label="TURNOVER" value="0.99x" sub="1 trades ・ 4554 bars" />
-        </div>
-      </div>
-      <div className="mt-3 rounded-3xl border border-slate-100 p-5">
-        <div className="mb-3 flex items-center justify-between">
-          <p className="text-xs font-semibold tracking-widest text-slate-500">
-            LONG / SHORT / FLAT
-          </p>
-          <span className="text-xs font-medium text-slate-400">visible window: 4554 bars</span>
-        </div>
-        <div className="h-4 overflow-hidden rounded-full bg-slate-100">
-          <div className="h-full w-full rounded-full bg-emerald-400" />
-        </div>
-        <div className="mt-4 grid grid-cols-3 text-sm font-semibold">
-          <div>
-            <p className="text-emerald-600">long</p>
-            <p>100.0%</p>
-          </div>
-          <div>
-            <p className="text-slate-400">flat</p>
-            <p>0.0%</p>
-          </div>
-          <div>
-            <p className="text-rose-500">short</p>
-            <p>0.0%</p>
-          </div>
-        </div>
-      </div>
-      <div className="mt-3 grid gap-3 xl:grid-cols-[1.65fr_0.95fr]">
-        <div className="rounded-3xl border border-slate-100 p-5">
-          <div className="mb-4 flex justify-between">
-            <h4 className="font-semibold tracking-[-0.03em] text-slate-900">
-              Performance vs Buy & Hold
-            </h4>
-            <span className="text-xs font-medium text-slate-500">15m bars</span>
-          </div>
-          <div className="relative h-72 overflow-hidden rounded-2xl bg-gradient-to-b from-slate-50 to-white">
-            <ChartGrid />
-            <svg
-              className="absolute inset-0 h-full w-full"
-              viewBox="0 0 700 260"
-              preserveAspectRatio="none"
-              fill="none"
-              aria-hidden="true"
-            >
-              <polyline
-                points="0,175 25,95 55,115 85,130 115,190 145,160 175,170 205,210 235,190 265,150 295,185 325,175 355,145 385,105 415,125 445,90 475,75 505,35 535,80 565,58 595,82 625,64 655,96 700,52"
-                stroke="#34d399"
-                strokeWidth="4"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <polyline
-                points="0,178 55,170 115,174 175,180 235,178 295,168 355,162 415,150 475,142 535,135 595,127 655,122 700,116"
-                stroke="#cbd5e1"
-                strokeWidth="3"
-                strokeLinecap="round"
-              />
-            </svg>
-            <div className="absolute bottom-4 left-4 flex flex-wrap gap-5 text-xs font-semibold text-slate-500">
-              <span className="text-emerald-500">━ strategy</span>
-              <span>━ B&H</span>
-              <span className="text-blue-500">▲ buy</span>
-              <span className="text-rose-500">▼ sell</span>
-            </div>
-          </div>
-        </div>
-        <div className="rounded-3xl border border-slate-100 p-5">
-          <h4 className="mb-4 font-semibold tracking-[-0.03em] text-slate-900">RECENT TRADES</h4>
-          <div className="space-y-3 text-sm">
-            <TradeRow label="TIME" value="2026-03-15 13:15 UTC" />
-            <TradeRow label="FROM" value="0.000" />
-            <TradeRow label="TO" value="1.000" accent />
-            <TradeRow label="PRICE" value="$71,526.90" />
-            <TradeRow label="NOTIONAL" value="10,000.00" />
-          </div>
-          <div className="mt-5 rounded-2xl bg-slate-50 p-4 text-xs leading-6 text-slate-500">
-            このデモは研究目的のものであり、投資助言ではありません。
-          </div>
-        </div>
-      </div>
+    <div className="rounded-[34px] overflow-hidden shadow-2xl shadow-blue-100/70">
+      <Image
+        src="/dashboard-preview.png"
+        alt="UniDream Demo dashboard preview"
+        width={1400}
+        height={900}
+        className="w-full h-auto"
+      />
     </div>
   );
 }
 
 function VisionVisual() {
   return (
-    <div className="relative h-[320px] md:h-[360px] overflow-hidden rounded-[36px] border border-white/60 bg-slate-950 shadow-2xl shadow-blue-950/15">
-      <div
-        className="absolute inset-0"
-        style={{
-          background:
-            "radial-gradient(circle at 42% 42%, rgba(59,130,246,0.36), transparent 30%), radial-gradient(circle at 62% 68%, rgba(139,92,246,0.28), transparent 32%), radial-gradient(circle at 32% 78%, rgba(16,185,129,0.16), transparent 34%), #020617",
-        }}
+    <div className="relative overflow-hidden rounded-[36px] shadow-2xl shadow-blue-950/15">
+      <Image
+        src="/vision-illustration.png"
+        alt="Market structure visualization"
+        width={840}
+        height={720}
+        className="w-full h-auto"
       />
-      <svg className="absolute inset-0 h-full w-full" viewBox="0 0 420 360" fill="none" aria-hidden="true">
-        <defs>
-          <linearGradient id="visionOrbit" x1="60" y1="40" x2="330" y2="280">
-            <stop stopColor="#22D3EE" />
-            <stop offset="0.55" stopColor="#6366F1" />
-            <stop offset="1" stopColor="#A855F7" />
-          </linearGradient>
-          <radialGradient
-            id="visionGlow"
-            cx="0"
-            cy="0"
-            r="1"
-            gradientUnits="userSpaceOnUse"
-            gradientTransform="translate(210 160) rotate(90) scale(145 145)"
-          >
-            <stop stopColor="#60A5FA" stopOpacity="0.55" />
-            <stop offset="1" stopColor="#60A5FA" stopOpacity="0" />
-          </radialGradient>
-        </defs>
-        <circle cx="210" cy="160" r="145" fill="url(#visionGlow)" />
-        <ellipse cx="210" cy="160" rx="148" ry="58" stroke="url(#visionOrbit)" strokeWidth="2.5" opacity="0.86" />
-        <ellipse cx="210" cy="160" rx="72" ry="132" stroke="url(#visionOrbit)" strokeWidth="2.5" opacity="0.76" />
-        <ellipse cx="210" cy="160" rx="126" ry="132" stroke="#93C5FD" strokeWidth="1.6" opacity="0.35" />
-        <path d="M72 160H348" stroke="#93C5FD" strokeOpacity="0.38" strokeWidth="1.5" />
-        <path d="M210 35V285" stroke="#C4B5FD" strokeOpacity="0.38" strokeWidth="1.5" />
-        <circle cx="210" cy="160" r="9" fill="#FFFFFF" />
-        <circle cx="210" cy="160" r="18" stroke="#60A5FA" strokeOpacity="0.66" strokeWidth="2" />
-        <circle cx="122" cy="108" r="5" fill="#38BDF8" />
-        <circle cx="304" cy="202" r="6" fill="#34D399" />
-        <circle cx="260" cy="70" r="5" fill="#A78BFA" />
-        <circle cx="152" cy="247" r="5" fill="#818CF8" />
-        {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
-          <rect
-            key={i}
-            x={46 + i * 34}
-            y={292 - [42, 88, 62, 124, 76, 108, 54, 138][i]}
-            width="16"
-            height={[42, 88, 62, 124, 76, 108, 54, 138][i]}
-            rx="8"
-            fill={i % 2 ? "#818CF8" : "#38BDF8"}
-            opacity="0.42"
-          />
-        ))}
-      </svg>
-      <div className="absolute bottom-6 left-6 right-6 rounded-3xl border border-white/10 bg-white/[0.08] p-5 text-white backdrop-blur-xl">
-        <p className="text-xs font-semibold tracking-[0.22em] text-blue-100/60">MARKET STRUCTURE</p>
-        <p className="mt-2 text-lg font-semibold tracking-[-0.04em]">
-          Hidden regimes, liquidity, risk, and behavior.
-        </p>
-      </div>
     </div>
   );
 }
