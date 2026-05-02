@@ -268,7 +268,7 @@ export default function HomepagePage() {
       </section>
 
       {/* results */}
-      <motion.section {...fadeUp} className="mx-auto max-w-7xl px-4 md:px-6 py-12 md:py-16">
+      <section className="mx-auto max-w-7xl px-4 md:px-6 py-12 md:py-16">
         <div className="mb-8 max-w-xl">
           <SectionLabel>RESEARCH</SectionLabel>
           <h2 className="text-3xl md:text-4xl font-semibold tracking-[-0.055em] text-white">実データによる検証結果</h2>
@@ -313,10 +313,10 @@ export default function HomepagePage() {
             <p className="mt-5 text-sm text-slate-600 leading-5">最も堅牢なベースライン。B&H比でリターンを維持しつつ最大ドローダウンを低減。</p>
           </motion.div>
         </div>
-      </motion.section>
+      </section>
 
       {/* product — bento */}
-      <motion.section {...fadeUp} className="mx-auto max-w-7xl px-4 md:px-6 py-12 md:py-16">
+      <section className="mx-auto max-w-7xl px-4 md:px-6 py-12 md:py-16">
         <div className="mb-8 max-w-xl">
           <SectionLabel>PRODUCT</SectionLabel>
           <h2 className="text-3xl md:text-4xl font-semibold tracking-[-0.055em] text-white">市場理解のためのAI</h2>
@@ -358,10 +358,10 @@ export default function HomepagePage() {
             </motion.div>
           ))}
         </div>
-      </motion.section>
+      </section>
 
       {/* vision */}
-      <motion.section {...fadeUp} className="mx-auto max-w-7xl px-4 md:px-6 py-12 md:py-16">
+      <section className="mx-auto max-w-7xl px-4 md:px-6 py-12 md:py-16">
         <div className="mb-8 max-w-3xl">
           <SectionLabel>VISION</SectionLabel>
           <h2 className="text-3xl md:text-4xl font-semibold tracking-[-0.055em] text-white">価格予測を超えた市場理解へ</h2>
@@ -373,10 +373,10 @@ export default function HomepagePage() {
         <div className="rounded-2xl overflow-hidden border border-slate-800 shadow-2xl shadow-black/30">
           <Image src="/VISION_img.png" alt="UniDream pipeline diagram" width={2400} height={1350} className="w-full h-auto" />
         </div>
-      </motion.section>
+      </section>
 
       {/* LIVE DEMO */}
-      <motion.section {...fadeUp} className="mx-auto max-w-7xl px-4 md:px-6 py-12 md:py-16">
+      <section className="mx-auto max-w-7xl px-4 md:px-6 py-12 md:py-16">
         <div className="mb-8 max-w-xl">
           <SectionLabel>LIVE DEMO</SectionLabel>
           <h2 className="text-3xl md:text-4xl font-semibold tracking-[-0.055em] text-white">推論ダッシュボード</h2>
@@ -393,10 +393,10 @@ export default function HomepagePage() {
             <Image src="/dashboard-preview.png" alt="UniDream Demo dashboard" width={1400} height={900} className="w-full h-auto" />
           </div>
         </div>
-      </motion.section>
+      </section>
 
       {/* final CTA */}
-      <motion.section {...fadeUp} className="mx-auto max-w-7xl px-4 md:px-6 pb-16 md:pb-20">
+      <section className="mx-auto max-w-7xl px-4 md:px-6 pb-16 md:pb-20">
         <div className="rounded-2xl border border-slate-800 bg-slate-900/40 p-8 md:p-12">
           <div className="grid gap-8 md:grid-cols-[1.5fr_1fr] items-center">
             <div>
@@ -411,7 +411,7 @@ export default function HomepagePage() {
             </div>
           </div>
         </div>
-      </motion.section>
+      </section>
 
       <Footer />
     </main>
