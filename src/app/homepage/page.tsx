@@ -265,7 +265,7 @@ export default function HomepagePage() {
               transition={{ duration: 0.6, delay: 0.15 }}
               className="text-5xl md:text-7xl font-semibold tracking-[-0.075em] leading-[0.96] text-white"
             >
-              市場の見えない構造を、<br />世界モデルで読む。
+              市場の見えない構造を、世界モデルで読む。
             </motion.h1>
             <motion.p
               initial={{ opacity: 0, y: 16 }}
@@ -312,13 +312,13 @@ export default function HomepagePage() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
-            className="rounded-2xl border border-blue-500/20 bg-gradient-to-br from-slate-900 to-blue-950/30 p-8 md:p-10"
+            className="rounded-2xl border border-blue-500/20 bg-gradient-to-br from-slate-900 to-blue-950/30 p-6 md:p-10"
           >
-            <div className="flex items-center gap-3 mb-6">
-              <div className="grid h-10 w-10 place-items-center rounded-lg bg-blue-500/10"><Zap className="h-5 w-5 text-blue-400" strokeWidth={2} /></div>
+            <div className="flex items-start gap-3 mb-6">
+              <div className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-blue-500/10"><Zap className="h-5 w-5 text-blue-400" strokeWidth={2} /></div>
               <div><p className="text-base font-semibold text-white">3fold AC再学習</p><p className="text-sm text-slate-500">selector v2 strict · test平均</p></div>
             </div>
-            <div className="grid grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
               <div><p className="text-sm font-semibold tracking-widest text-slate-500">AlphaEx</p><p className="mt-1 text-4xl font-semibold text-blue-400">+12.97 pt</p></div>
               <div><p className="text-sm font-semibold tracking-widest text-slate-500">SharpeΔ</p><p className="mt-1 text-4xl font-semibold text-indigo-400">+0.033</p></div>
               <div><p className="text-sm font-semibold tracking-widest text-slate-500">MaxDDΔ</p><p className="mt-1 text-4xl font-semibold text-emerald-400">-0.30 pt</p></div>
@@ -330,7 +330,7 @@ export default function HomepagePage() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.15 }}
-            className="rounded-2xl border border-slate-800 bg-slate-900/60 p-8 md:p-10 flex flex-col justify-between"
+            className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6 md:p-10 flex flex-col justify-between"
           >
             <div>
               <div className="flex items-center gap-3 mb-6">
