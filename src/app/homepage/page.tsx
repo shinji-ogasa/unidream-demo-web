@@ -175,7 +175,7 @@ export default function HomepagePage() {
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
-              className="mb-6 inline-flex rounded-full border border-[rgba(82,102,235,0.3)] bg-[rgba(82,102,235,0.12)] px-5 py-1.5 text-sm font-semibold text-[#5266eb]"
+              className="mb-8 inline-flex rounded-full border border-[rgba(82,102,235,0.3)] bg-[rgba(82,102,235,0.12)] px-5 py-1.5 text-sm font-semibold text-[#5266eb]"
             >
               UniDream · WorldForge AI
             </motion.span>
@@ -183,7 +183,7 @@ export default function HomepagePage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.15 }}
-              className="text-[clamp(2.2rem,4vw,3.5rem)] font-semibold tracking-[-0.06em] leading-[1.15] text-[#f4f7fb]"
+              className="text-[clamp(2.2rem,4vw,3.5rem)] font-semibold tracking-[-0.06em] leading-[1.35] text-[#f4f7fb]"
             >
               市場の見えない構造を、<br />世界モデルで読む。
             </motion.h1>
@@ -191,7 +191,7 @@ export default function HomepagePage() {
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.25 }}
-              className="mt-6 max-w-[680px] text-lg leading-8 text-[#8a93a3]"
+              className="mt-8 max-w-[680px] text-lg leading-8 text-[#8a93a3]"
             >
               UniDreamはOHLCVと特徴量から市場状態を学習し、想像ロールアウトと検証セレクタでB&Hを超える意思決定を探索する研究開発プロダクトです。
             </motion.p>
@@ -199,7 +199,7 @@ export default function HomepagePage() {
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.35 }}
-              className="mt-8 flex flex-wrap gap-4"
+              className="mt-10 flex flex-wrap gap-6"
             >
               <CtaButton href="/">デモを見る</CtaButton>
               <CtaButton variant="secondary" href="/homepage/contact">PoC導入を相談する</CtaButton>
