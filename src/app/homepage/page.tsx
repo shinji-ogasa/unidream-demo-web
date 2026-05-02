@@ -112,7 +112,7 @@ function Footer() {
     ["会社", "会社概要", "採用情報", "お問い合わせ"],
   ];
   return (
-    <footer className="border-t border-[rgba(255,255,255,0.08)] py-16">
+    <footer className="border-t border-[rgba(255,255,255,0.08)] py-12">
       <div className="container-site">
         <div className="flex flex-wrap justify-between items-start gap-10">
           <div className="max-w-xs">
@@ -167,7 +167,7 @@ export default function HomepagePage() {
       {/* hero */}
       <section className="relative min-h-[1140px] flex items-center">
         <div className="hero-visual-bg" />
-        <div className="relative z-10 max-w-[1200px] mx-auto px-6 md:px-8 py-20 md:py-28">
+        <div className="relative z-10 max-w-[1200px] mx-auto px-6 md:px-8 py-14 md:py-20">
           <div className="max-w-[900px]">
             <motion.span
               initial={{ opacity: 0, y: 12 }}
@@ -197,7 +197,7 @@ export default function HomepagePage() {
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.35 }}
-              className="mt-10 flex flex-wrap gap-4"
+              className="mt-8 flex flex-wrap gap-4"
             >
               <CtaButton href="/">デモを見る</CtaButton>
               <CtaButton variant="secondary">研究概要を読む</CtaButton>
@@ -207,7 +207,7 @@ export default function HomepagePage() {
       </section>
 
       {/* metrics strip */}
-      <section className="container-site relative z-10 -mt-6 pb-12 md:pb-20">
+      <section className="container-site relative z-10 -mt-6 pb-8 md:pb-12">
         <div className="grid gap-4 md:grid-cols-4">
           {METRICS.map((m) => (
             <AnimateInView key={m.label} y={16}>
@@ -218,11 +218,11 @@ export default function HomepagePage() {
       </section>
 
       {/* evidence / scorecard (DESIGN.md §9-5) */}
-      <section className="container-site py-16 md:py-24">
-        <div className="mb-10 max-w-[680px]">
+      <section className="container-site py-12 md:py-16">
+        <div className="mb-6 max-w-[680px]">
           <SectionLabel>EVIDENCE</SectionLabel>
           <h2 className="text-[clamp(2rem,3.5vw,3rem)] font-semibold tracking-[-0.05em] leading-[1.05] text-[#f4f7fb]">実データによる検証結果</h2>
-          <p className="mt-6 text-lg leading-8 text-[#8a93a3]">BTCUSDT 15m · 2018-2024。全指標B&H比較。</p>
+          <p className="mt-4 text-lg leading-8 text-[#8a93a3]">BTCUSDT 15m · 2018-2024。全指標B&H比較。</p>
         </div>
         <div className="grid gap-5 lg:grid-cols-[1.3fr_1fr]">
           <AnimateInView className="card p-8 md:p-10 border-[rgba(94,106,210,0.36)]" x={-20} y={0}>
@@ -254,11 +254,11 @@ export default function HomepagePage() {
       </section>
 
       {/* product (DESIGN.md §9-4) */}
-      <section className="container-site py-16 md:py-24">
-        <div className="mb-10 max-w-[680px]">
+      <section className="container-site py-12 md:py-16">
+        <div className="mb-6 max-w-[680px]">
           <SectionLabel>PRODUCT</SectionLabel>
           <h2 className="text-[clamp(2rem,3.5vw,3rem)] font-semibold tracking-[-0.05em] leading-[1.05] text-[#f4f7fb]">市場理解のためのAI</h2>
-          <p className="mt-6 text-lg leading-8 text-[#8a93a3]">価格予測を超え、市場状態・リスク・行動を一貫してモデリング。</p>
+          <p className="mt-4 text-lg leading-8 text-[#8a93a3]">価格予測を超え、市場状態・リスク・行動を一貫してモデリング。</p>
         </div>
         <div className="grid gap-4 md:grid-cols-3">
           <AnimateInView y={20} className="md:col-span-2 md:row-span-2 card p-8 md:p-10">
@@ -290,8 +290,8 @@ export default function HomepagePage() {
       </section>
 
       {/* vision */}
-      <section className="container-site py-16 md:py-24">
-        <div className="mb-10">
+      <section className="container-site py-12 md:py-16">
+        <div className="mb-6">
           <SectionLabel>PIPELINE</SectionLabel>
         </div>
         <div className="rounded-card overflow-hidden border border-[rgba(255,255,255,0.08)] shadow-panel mb-12">
@@ -308,16 +308,16 @@ export default function HomepagePage() {
       </section>
 
       {/* live demo (DESIGN.md §9-4) */}
-      <section className="container-site py-16 md:py-24">
-        <div className="mb-10 max-w-[680px]">
+      <section className="container-site py-12 md:py-16">
+        <div className="mb-6 max-w-[680px]">
           <SectionLabel>LIVE DEMO</SectionLabel>
           <h2 className="text-[clamp(2rem,3.5vw,3rem)] font-semibold tracking-[-0.05em] leading-[1.05] text-[#f4f7fb]">推論ダッシュボード</h2>
-          <p className="mt-6 text-lg leading-8 text-[#8a93a3]">リアルタイムで動作する研究デモ。エクイティ・ポジション・市場状態を一画面で。</p>
+          <p className="mt-4 text-lg leading-8 text-[#8a93a3]">リアルタイムで動作する研究デモ。エクイティ・ポジション・市場状態を一画面で。</p>
           <div className="mt-5 flex items-center gap-4 text-sm text-[#8a93a3]">
             <span className="flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-[#4ade80]" />Live · next inference in ~15m</span>
             <span className="flex items-center gap-2"><ArrowRight className="h-3 w-3 text-[#02b8cc]" />BTCUSDT · 15m</span>
           </div>
-          <div className="mt-8"><CtaButton href="/">デモを起動</CtaButton></div>
+          <div className="mt-6"><CtaButton href="/">デモを起動</CtaButton></div>
         </div>
         <div className="relative">
           <div className="absolute -inset-4 rounded-3xl bg-gradient-to-r from-[rgba(82,102,235,0.10)] via-[rgba(2,184,204,0.08)] to-[rgba(139,92,246,0.08)] blur-2xl" />
@@ -328,13 +328,13 @@ export default function HomepagePage() {
       </section>
 
       {/* CTA (DESIGN.md §9-8) */}
-      <section className="container-site pb-24 md:pb-32">
+      <section className="container-site pb-16 md:pb-24">
         <div className="card border-[rgba(255,255,255,0.08)] p-10 md:p-14">
           <div className="grid gap-8 md:grid-cols-[1.5fr_1fr] items-center">
             <div>
               <p className="label">CONTACT</p>
               <h2 className="text-[clamp(2rem,3.5vw,3rem)] font-semibold tracking-[-0.05em] leading-[1.05] text-[#f4f7fb]">共同検証・PoCのご相談</h2>
-              <p className="mt-6 text-lg leading-8 text-[#8a93a3] max-w-md">研究段階のプロダクトです。PoC導入、共同研究、デモの試用など、目的に合わせてご連絡ください。</p>
+              <p className="mt-4 text-lg leading-8 text-[#8a93a3] max-w-md">研究段階のプロダクトです。PoC導入、共同研究、デモの試用など、目的に合わせてご連絡ください。</p>
             </div>
             <div className="flex flex-col gap-3">
               <CtaButton href="/">デモを試す</CtaButton>
