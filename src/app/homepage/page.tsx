@@ -10,16 +10,18 @@ import {
   LockKeyhole,
   Network,
   Radar,
+  ShieldCheck,
+  Zap,
 } from "lucide-react";
 import { FaGithub, FaLinkedin, FaXTwitter, FaYoutube } from "react-icons/fa6";
 
-const NAV_ITEMS = ["プロダクト", "技術", "ユースケース", "研究", "会社情報"];
+const NAV_ITEMS = ["プロダクト", "研究成果", "技術", "研究", "会社情報"];
 
 const METRICS = [
-  { label: "AlphaEx", value: "+0.9 pt/yr", sub: "vs Buy & Hold", color: "text-cyan-400" },
-  { label: "Sharpe Δ", value: "+1.86", sub: "strat 1.86 · B&H 1.86", color: "text-blue-400" },
-  { label: "MaxDD Δ", value: "-1.6 pt", sub: "strat 13.6% · B&H 15.2%", color: "text-emerald-400" },
-  { label: "Backtest", value: "6 yr", sub: "BTCUSDT · 15m bars", color: "text-indigo-400" },
+  { label: "AlphaEx (safe)", value: "+0.89 pt/yr", sub: "Phase 8 · BTCUSDT 15m", color: "text-cyan-400" },
+  { label: "MaxDDΔ (safe)", value: "-1.58 pt", sub: "vs Buy & Hold", color: "text-emerald-400" },
+  { label: "AlphaEx (3fold)", value: "+12.97 pt", sub: "AC再学習 · test平均", color: "text-blue-400" },
+  { label: "Backtest", value: "2018-2024", sub: "6yr · BTCUSDT · 15m bars", color: "text-indigo-400" },
 ];
 
 const PRODUCT_CARDS = [
@@ -103,15 +105,18 @@ function CtaButton({ children, variant = "primary", href }: ButtonProps) {
 
 function Logo() {
   return (
-    <Link href="/homepage" className="flex items-center" aria-label="WorldForge AI">
-      <Image
-        src="/worldforge-ai-logo.png"
-        alt="WorldForge AI"
-        height={56}
-        width={224}
-        priority
-        className="h-10 md:h-14 w-auto"
-      />
+    <Link href="/homepage" className="flex items-center shrink-0" aria-label="WorldForge AI">
+      <div className="relative h-10 md:h-14 w-auto" style={{ filter: "brightness(0) invert(0.92) contrast(0.8)" }}>
+        <Image
+          src="/worldforge-ai-logo.png"
+          alt="WorldForge AI"
+          height={56}
+          width={224}
+          priority
+          unoptimized
+          className="h-full w-auto"
+        />
+      </div>
     </Link>
   );
 }
@@ -195,6 +200,22 @@ function SmallCard({
       </div>
       <h3 className="mb-2 mt-4 font-semibold tracking-[-0.03em] text-white">{title}</h3>
       <p className="text-xs leading-6 text-slate-400">{text}</p>
+    </div>
+  );
+}
+
+function BrowserFrame({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="rounded-3xl overflow-hidden border border-slate-800 shadow-2xl shadow-black/40 bg-slate-900/80">
+      <div className="flex items-center gap-2 px-5 py-4 border-b border-slate-800">
+        <div className="flex gap-2">
+          <div className="h-3 w-3 rounded-full bg-red-500/70" />
+          <div className="h-3 w-3 rounded-full bg-yellow-500/70" />
+          <div className="h-3 w-3 rounded-full bg-emerald-500/70" />
+        </div>
+        <span className="ml-4 text-xs text-slate-500 font-mono">UniDream Dashboard — Live Inference</span>
+      </div>
+      {children}
     </div>
   );
 }
@@ -338,12 +359,81 @@ export default function HomepagePage() {
         </div>
       </section>
 
+      <section className="mx-auto max-w-7xl px-4 md:px-6 py-16 md:py-24">
+        <div className="mx-auto mb-12 max-w-2xl text-center">
+          <SectionLabel>RESEARCH RESULTS</SectionLabel>
+          <h2 className="mt-4 text-3xl md:text-4xl font-semibold tracking-[-0.055em] text-white">
+            成果
+          </h2>
+          <p className="mt-4 text-slate-400">
+            実データによる検証結果。全ての戦略はB&H（Buy & Hold）との比較で評価。
+          </p>
+        </div>
+        <div className="grid gap-6 lg:grid-cols-[1fr_1fr]">
+          <div className="rounded-3xl border border-slate-800 bg-slate-900/40 p-8">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="grid h-10 w-10 place-items-center rounded-xl bg-emerald-500/10 ring-1 ring-emerald-500/20">
+                <ShieldCheck className="h-5 w-5 text-emerald-400" strokeWidth={1.8} />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-white">Safe Baseline</p>
+                <p className="text-xs text-slate-500">Phase 8 · BTCUSDT 15m · 2018-2024</p>
+              </div>
+            </div>
+            <div className="mt-6 grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-xs font-semibold tracking-widest text-slate-500">AlphaEx</p>
+                <p className="mt-1 text-2xl font-semibold text-cyan-400">+0.89 pt/yr</p>
+              </div>
+              <div>
+                <p className="text-xs font-semibold tracking-widest text-slate-500">MaxDDΔ</p>
+                <p className="mt-1 text-2xl font-semibold text-emerald-400">-1.58 pt</p>
+              </div>
+            </div>
+            <p className="mt-4 text-xs leading-6 text-slate-500">
+              B&H比でリターンを維持しつつ最大ドローダウンを低減。最も堅牢なベースライン。
+            </p>
+          </div>
+          <div className="rounded-3xl border border-slate-800 bg-gradient-to-br from-slate-900/60 via-slate-900/40 to-blue-950/30 p-8">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="grid h-10 w-10 place-items-center rounded-xl bg-blue-500/10 ring-1 ring-blue-500/20">
+                <Zap className="h-5 w-5 text-blue-400" strokeWidth={1.8} />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-white">3fold AC再学習</p>
+                <p className="text-xs text-slate-500">selector v2 strict · test平均</p>
+              </div>
+            </div>
+            <div className="mt-6 grid grid-cols-3 gap-4">
+              <div>
+                <p className="text-xs font-semibold tracking-widest text-slate-500">AlphaEx</p>
+                <p className="mt-1 text-2xl font-semibold text-blue-400">+12.97 pt</p>
+              </div>
+              <div>
+                <p className="text-xs font-semibold tracking-widest text-slate-500">SharpeΔ</p>
+                <p className="mt-1 text-2xl font-semibold text-indigo-400">+0.033</p>
+              </div>
+              <div>
+                <p className="text-xs font-semibold tracking-widest text-slate-500">MaxDDΔ</p>
+                <p className="mt-1 text-2xl font-semibold text-emerald-400">-0.30 pt</p>
+              </div>
+            </div>
+            <p className="mt-4 text-xs leading-6 text-slate-500">
+              B&H比でリターン増加、Sharpe微増、DD改善。検証中の有望な結果。
+            </p>
+          </div>
+        </div>
+        <p className="mt-6 text-center text-xs text-slate-600">
+          ※ strict条件では validation 全fold accept 未達。Plan7既存ACとの同条件比較と danger率検証で再現性を確認中。
+        </p>
+      </section>
+
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-slate-950 via-slate-900/50 to-slate-950" />
         <div className="relative mx-auto max-w-7xl px-4 md:px-6 py-16 md:py-24">
           <div className="grid items-center gap-10 md:gap-16 lg:grid-cols-[1fr_1fr]">
             <div className="relative">
-              <div className="rounded-3xl overflow-hidden border border-slate-800 shadow-2xl shadow-black/30">
+              <div className="rounded-3xl overflow-hidden border border-slate-800 shadow-2xl shadow-black/30 bg-slate-900/60">
                 <Image
                   src="/vision-illustration.png"
                   alt="Market structure visualization"
@@ -351,6 +441,13 @@ export default function HomepagePage() {
                   height={720}
                   className="w-full h-auto"
                 />
+              </div>
+              <div className="absolute -bottom-4 -right-4 rounded-2xl border border-slate-700 bg-slate-900/90 p-4 backdrop-blur shadow-lg">
+                <p className="text-[10px] font-semibold tracking-widest text-slate-500">LATENT STATE</p>
+                <div className="mt-2 flex gap-4">
+                  <div><span className="text-xs text-slate-400">regime</span><p className="text-sm font-semibold text-cyan-300">bear → neutral</p></div>
+                  <div><span className="text-xs text-slate-400">risk</span><p className="text-sm font-semibold text-emerald-300">low</p></div>
+                </div>
               </div>
             </div>
             <div>
@@ -398,14 +495,16 @@ export default function HomepagePage() {
           </div>
           <div className="relative">
             <div className="absolute -inset-4 rounded-[46px] bg-gradient-to-r from-cyan-500/10 via-blue-500/10 to-indigo-500/10 blur-2xl" />
-            <div className="relative rounded-3xl overflow-hidden border border-slate-800 shadow-2xl shadow-black/30">
-              <Image
-                src="/dashboard-preview.png"
-                alt="UniDream Demo dashboard"
-                width={1400}
-                height={900}
-                className="w-full h-auto"
-              />
+            <div className="relative">
+              <BrowserFrame>
+                <Image
+                  src="/dashboard-preview.png"
+                  alt="UniDream Demo dashboard"
+                  width={1400}
+                  height={900}
+                  className="w-full h-auto"
+                />
+              </BrowserFrame>
             </div>
           </div>
         </div>
