@@ -167,7 +167,7 @@ function Footer() {
   return (
     <footer className="border-t border-slate-800/60 py-12">
       <div className="mx-auto max-w-7xl px-6">
-        <div className="flex flex-wrap justify-between gap-10">
+        <div className="flex flex-wrap gap-12 md:gap-20">
           <div className="max-w-xs">
             <Logo />
             <p className="mt-4 text-sm leading-6 text-slate-500">Transformer world modelと強化学習で市場状態を理解する。</p>
