@@ -57,7 +57,7 @@ function AnimateInView({
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <p className="label mb-3">{children}</p>
+    <p className="text-sm font-semibold tracking-[0.12em] text-[#8a93a3] mb-3">{children}</p>
   );
 }
 
