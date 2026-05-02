@@ -165,7 +165,7 @@ export default function HomepagePage() {
       </motion.header>
 
       {/* hero */}
-      <section className="relative min-h-[1140px] flex items-center">
+      <section className="relative flex items-center">
         <div className="hero-visual-bg" />
         <div className="relative z-10 max-w-[1200px] mx-auto px-6 md:px-8 py-14 md:py-20">
           <div className="max-w-[900px]">
