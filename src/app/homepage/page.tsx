@@ -169,8 +169,8 @@ export default function HomepagePage() {
       {/* hero */}
       <section className="relative min-h-[760px] flex items-center">
         <div className="hero-visual-bg" />
-        <div className="relative z-10 container-site py-20 md:py-28">
-          <div className="max-w-[760px]">
+        <div className="relative z-10 container-site py-20 md:py-28 pl-4 md:pl-6">
+          <div className="max-w-[600px]">
             <motion.span
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
@@ -183,7 +183,7 @@ export default function HomepagePage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.15 }}
-              className="text-[clamp(3.6rem,7vw,6.5rem)] font-semibold tracking-[-0.06em] leading-[0.95] text-[#f4f7fb]"
+              className="text-[clamp(2.5rem,4.5vw,4rem)] font-semibold tracking-[-0.06em] leading-[0.95] text-[#f4f7fb]"
             >
               市場の見えない構造を、<br />世界モデルで読む。
             </motion.h1>
@@ -262,11 +262,11 @@ export default function HomepagePage() {
           <h2 className="text-[2.5rem] md:text-[3.5rem] font-semibold tracking-[-0.05em] leading-[1.0] text-[#f4f7fb]">市場理解のためのAI</h2>
           <p className="mt-4 text-lg text-[#8a93a3]">価格予測を超え、市場状態・リスク・行動を一貫してモデリング。</p>
         </div>
-        <div className="grid grid-cols-12 gap-4">
-          <AnimateInView y={20} className="col-span-12 lg:col-span-7 row-span-2 card p-8 md:p-10">
+        <div className="grid gap-4 md:grid-cols-3">
+          <AnimateInView y={20} className="md:col-span-2 md:row-span-2 card p-8 md:p-10">
             <div className="grid h-12 w-12 place-items-center rounded-xl bg-[rgba(82,102,235,0.16)]"><Globe2 className="h-6 w-6 text-[#5266eb]" strokeWidth={1.8} /></div>
             <h3 className="mt-5 text-2xl font-semibold tracking-[-0.03em] text-[#f4f7fb]">Transformer World Model</h3>
-            <p className="mt-3 max-w-lg text-base leading-6 text-[#8a93a3]">価格・流動性・リスク・ニュースから潜在市場状態を学習。将来の価格予測ではなく、市場の構造的理解を目的とするコアモデル。</p>
+            <p className="mt-3 text-base leading-6 text-[#8a93a3]">価格・流動性・リスク・ニュースから潜在市場状態を学習。将来の価格予測ではなく、市場の構造的理解を目的とするコアモデル。</p>
             <div className="mt-6 flex flex-wrap gap-2">
               {["latent state", "regime detection", "risk estimation"].map((t) => (
                 <span key={t} className="rounded-full border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] px-4 py-1.5 text-sm text-[#8a93a3]">{t}</span>
@@ -274,62 +274,21 @@ export default function HomepagePage() {
             </div>
           </AnimateInView>
           {[
-            { icon: BrainCircuit, title: "強化学習方策", text: "世界モデルが認識した状態を基に、リスク調整リターンを最大化。", span: "col-span-12 sm:col-span-6 lg:col-span-2" },
-            { icon: Radar, title: "市場状態推定", text: "レジーム・ボラティリティ・テールリスクをリアルタイムに推定。", span: "col-span-12 sm:col-span-6 lg:col-span-3" },
-            { icon: BarChart3, title: "バックテスト評価", text: "2018–2024実データ。B&H比較。", span: "col-span-12 sm:col-span-4 lg:col-span-2" },
-            { icon: LineChart, title: "ダッシュボード", text: "リアルタイム推論可視化。", span: "col-span-12 sm:col-span-4 lg:col-span-2" },
-            { icon: DatabaseZap, title: "模倣学習", text: "教師方策から安定初期化。", span: "col-span-12 sm:col-span-4 lg:col-span-2" },
-            { icon: LockKeyhole, title: "リスク制御", text: "DD抑制と安全な意思決定。", span: "col-span-12 sm:col-span-6 lg:col-span-3" },
+            { icon: BrainCircuit, title: "強化学習方策", text: "世界モデルが認識した状態を基にリスク調整リターンを最大化。" },
+            { icon: Radar, title: "市場状態推定", text: "レジーム・ボラティリティ・テールリスクをリアルタイムに推定。" },
+            { icon: BarChart3, title: "バックテスト評価", text: "2018–2024実データ。全指標B&H比較。" },
+            { icon: LineChart, title: "ダッシュボード", text: "リアルタイム推論可視化。" },
+            { icon: DatabaseZap, title: "模倣学習", text: "教師方策から安定初期化。" },
+            { icon: LockKeyhole, title: "リスク制御", text: "DD抑制と安全な意思決定。" },
           ].map((card, i) => (
-            <AnimateInView key={card.title} y={16} delay={0.06 * i} className={`${card.span} card ${i < 2 ? 'p-7' : 'p-6'}`}>
-              <div className={`grid place-items-center ${i < 2 ? 'h-10 w-10' : 'h-8 w-8'} rounded-xl bg-[rgba(82,102,235,0.12)]`}>
-                <card.icon className={`text-[#5266eb] ${i < 2 ? 'h-5 w-5' : 'h-4 w-4'}`} strokeWidth={1.8} />
+            <AnimateInView key={card.title} y={16} delay={0.06 * i} className="card p-6">
+              <div className="grid h-10 w-10 place-items-center rounded-xl bg-[rgba(82,102,235,0.12)]">
+                <card.icon className="h-5 w-5 text-[#5266eb]" strokeWidth={1.8} />
               </div>
-              <h3 className={`mt-4 font-semibold text-[#f4f7fb] ${i < 2 ? 'text-lg' : 'text-base'}`}>{card.title}</h3>
+              <h3 className="mt-4 text-lg font-semibold text-[#f4f7fb]">{card.title}</h3>
               <p className="mt-2 text-sm text-[#8a93a3]">{card.text}</p>
             </AnimateInView>
           ))}
-        </div>
-      </section>
-
-      {/* how it works / pipeline (DESIGN.md §9-3) */}
-      <section className="container-site py-16 md:py-24">
-        <div className="mb-10 max-w-[680px]">
-          <SectionLabel>HOW IT WORKS</SectionLabel>
-          <h2 className="text-[2.5rem] md:text-[3.5rem] font-semibold tracking-[-0.05em] leading-[1.0] text-[#f4f7fb]">パイプライン</h2>
-          <p className="mt-4 text-lg text-[#8a93a3]">データから意思決定までの一貫したモデルパイプライン。</p>
-        </div>
-        <div className="rounded-card border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.025)] p-6 md:p-10">
-          <div className="w-full overflow-x-auto">
-            <svg viewBox="0 0 1040 160" className="w-full min-w-[900px]" preserveAspectRatio="xMidYMid meet">
-              {[
-                ["01 Data", "OHLCV / Features", "walk-forward ready"],
-                ["02 Teacher", "Hindsight Oracle", "signal_aim labels"],
-                ["03 World Model", "Transformer WM", "return / vol / drawdown"],
-                ["04 Policy", "BC + IAC", "route + recovery"],
-                ["05 Selector", "Validation Gate", "accept / reject / cooldown"],
-                ["06 Report", "Test Scorecard", "M2 / PBO / regime"],
-              ].map(([title, sub, desc], i) => {
-                const cx = 20 + i * 170;
-                return (
-                  <g key={title}>
-                    {i > 0 && (
-                      <line x1={20 + i * 170 - 170 + 150} y1={80} x2={20 + i * 170 + 10} y2={80} stroke="rgba(82,102,235,0.2)" strokeWidth="2" strokeDasharray="5,4" markerEnd="url(#pipeArr)" />
-                    )}
-                    <rect x={cx} y={80 - 42} width={150} height={84} rx="14" fill="rgba(18,21,29,0.85)" stroke="rgba(255,255,255,0.08)" strokeWidth="1.5" />
-                    <text x={cx + 12} y={80 - 22} fill="rgba(130,130,140,0.5)" fontSize="10" fontFamily="'Geist Mono',monospace">{title}</text>
-                    <text x={cx + 12} y={80 + 2} fill="#f4f7fb" fontSize="14" fontFamily="system-ui" fontWeight="600">{sub}</text>
-                    <text x={cx + 12} y={80 + 22} fill="#8a93a3" fontSize="11" fontFamily="'Geist Mono',monospace">{desc}</text>
-                  </g>
-                );
-              })}
-              <defs>
-                <marker id="pipeArr" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
-                  <path d="M0,0 L8,4 L0,8 Z" fill="rgba(82,102,235,0.3)" />
-                </marker>
-              </defs>
-            </svg>
-          </div>
         </div>
       </section>
 
