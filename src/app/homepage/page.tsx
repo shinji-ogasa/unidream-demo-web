@@ -293,14 +293,14 @@ export default function HomepagePage() {
       <section className="container-site py-16 md:py-24">
         <div className="mb-10">
           <SectionLabel>PIPELINE</SectionLabel>
-          <SectionLabel>VISION</SectionLabel>
-          <h2 className="text-[2.5rem] md:text-[3.5rem] font-semibold tracking-[-0.05em] leading-[1.0] text-[#f4f7fb]">価格予測を超えた市場理解へ</h2>
         </div>
-        <div className="rounded-card overflow-hidden border border-[rgba(255,255,255,0.08)] shadow-panel mb-10">
+        <div className="rounded-card overflow-hidden border border-[rgba(255,255,255,0.08)] shadow-panel mb-12">
           <Image src="/VISION_img.png" alt="UniDream pipeline diagram" width={2400} height={1350} className="w-full h-auto" />
         </div>
         <div className="max-w-[680px]">
-          <div className="space-y-4 text-base leading-7 text-[#8a93a3]">
+          <SectionLabel>VISION</SectionLabel>
+          <h2 className="text-[2.5rem] md:text-[3.5rem] font-semibold tracking-[-0.05em] leading-[1.0] text-[#f4f7fb]">価格予測を超えた市場理解へ</h2>
+          <div className="mt-6 space-y-4 text-base leading-7 text-[#8a93a3]">
             <p>金融市場は、価格だけで動いているわけではありません。投資家心理、流動性、リスク、ニュース、制度、そして時間とともに変化する市場状態。</p>
             <p>UniDreamは、世界モデルと強化学習によって、そうした<span className="font-semibold text-[#02b8cc]">見えない市場構造を学習</span>し、いま市場で何が起きているのか、どの行動がリスクに対して合理的なのかを判断するAIを目指します。</p>
           </div>
