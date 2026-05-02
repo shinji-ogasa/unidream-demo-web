@@ -167,7 +167,7 @@ export default function HomepagePage() {
       </motion.header>
 
       {/* hero */}
-      <section className="relative flex items-center pt-16">
+      <section className="relative flex items-center pt-24">
         <div className="hero-visual-bg" />
         <div className="relative z-10 max-w-[1200px] mx-auto px-6 md:px-8 py-14 md:py-20">
           <div className="max-w-[900px]">
@@ -183,7 +183,7 @@ export default function HomepagePage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.15 }}
-              className="text-[clamp(2.8rem,5vw,4.5rem)] font-semibold tracking-[-0.06em] leading-[0.95] text-[#f4f7fb]"
+              className="text-[clamp(2.2rem,4vw,3.5rem)] font-semibold tracking-[-0.06em] leading-[1.15] text-[#f4f7fb]"
             >
               市場の見えない構造を、<br />世界モデルで読む。
             </motion.h1>
