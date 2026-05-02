@@ -137,53 +137,6 @@ function MetricCard({
   );
 }
 
-function PipelineDiagram() {
-  const steps = [
-    { label: "Market Data", sub: "price · volume · order book" },
-    { label: "Latent Encoder", sub: "state compression" },
-    { label: "World Model", sub: "transformer · simulation" },
-    { label: "Risk / Regime", sub: "uncertainty · regime" },
-    { label: "RL Policy", sub: "action selection" },
-    { label: "Decision", sub: "position · signal" },
-  ];
-  const boxW = 150;
-  const gap = 44;
-  const totalW = steps.length * (boxW + gap) - gap;
-  return (
-    <div className="w-full overflow-x-auto py-6">
-      <svg viewBox={`0 0 ${totalW + 40} 160`} className="w-full min-w-[950px]" preserveAspectRatio="xMidYMid meet">
-        <defs>
-          <marker id="arr" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
-            <path d="M0,0 L10,5 L0,10 Z" fill="rgba(34,211,238,0.35)" />
-          </marker>
-        </defs>
-        {steps.map((s, i) => {
-          const cx = 20 + i * (boxW + gap);
-          return (
-            <g key={s.label}>
-              {i > 0 && (
-                <line
-                  x1={20 + i * (boxW + gap) - gap}
-                  y1={80}
-                  x2={20 + i * (boxW + gap)}
-                  y2={80}
-                  stroke="rgba(34,211,238,0.2)"
-                  strokeWidth="2.5"
-                  strokeDasharray="6,5"
-                  markerEnd="url(#arr)"
-                />
-              )}
-              <rect x={cx} y={80 - 38} width={boxW} height={76} rx="12" fill="rgba(30,41,59,0.85)" stroke="rgba(51,65,85,0.8)" strokeWidth="1.5" />
-              <text x={cx + boxW / 2} y={80 - 4} textAnchor="middle" fill="rgba(34,211,238,0.95)" fontSize="15" fontFamily="system-ui" fontWeight="600">{s.label}</text>
-              <text x={cx + boxW / 2} y={80 + 18} textAnchor="middle" fill="rgba(148,163,184,0.55)" fontSize="11" fontFamily="monospace">{s.sub}</text>
-            </g>
-          );
-        })}
-      </svg>
-    </div>
-  );
-}
-
 function Footer() {
   const columns: [string, ...string[]][] = [
     ["プロダクト", "UniDreamとは", "ダッシュボード", "API"],
@@ -191,7 +144,7 @@ function Footer() {
     ["会社", "会社概要", "採用情報", "お問い合わせ"],
   ];
   return (
-    <footer className="border-t border-slate-800/60 bg-slate-950 py-12">
+    <footer className="border-t border-slate-800/60 py-12">
       <div className="mx-auto max-w-7xl px-6">
         <div className="flex flex-wrap justify-between gap-10">
           <div className="max-w-xs">
@@ -223,13 +176,25 @@ function Footer() {
 
 export default function HomepagePage() {
   return (
-    <main className="min-h-screen bg-slate-950 text-white antialiased">
+    <main className="relative min-h-screen bg-[#020617] text-white antialiased">
+      {/* === layered background system === */}
+      <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+        {/* atmosphere: soft light fields */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_0%,rgba(34,211,238,0.12),transparent_32rem),radial-gradient(circle_at_82%_18%,rgba(59,130,246,0.09),transparent_36rem),radial-gradient(circle_at_48%_82%,rgba(99,102,241,0.06),transparent_34rem),linear-gradient(180deg,#020617_0%,#030712_48%,#020617_100%)]" />
+        {/* faint grid */}
+        <div className="absolute inset-0 opacity-[0.07] bg-[linear-gradient(rgba(255,255,255,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.06)_1px,transparent_1px)] bg-[size:96px_96px]" />
+        {/* vignette */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.40)_80%)]" />
+        {/* bottom fade */}
+        <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-b from-transparent to-[#020617]" />
+      </div>
+
       {/* header */}
       <motion.header
         initial={{ opacity: 0, y: -12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, ease: "easeOut" }}
-        className="sticky top-0 z-50 border-b border-slate-800/40 bg-slate-950/80 backdrop-blur-xl"
+        className="sticky top-0 z-50 border-b border-slate-800/40 bg-[#020617]/80 backdrop-blur-xl"
       >
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 md:px-6 py-4 md:py-5">
           <Logo />
@@ -247,7 +212,8 @@ export default function HomepagePage() {
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 z-0">
           <Image src="/hero-bg.png" alt="" fill className="object-cover" priority />
-          <div className="absolute inset-0 bg-gradient-to-r from-slate-950/92 via-slate-950/75 to-slate-950/85" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#020617]/88 via-[#020617]/65 to-[#020617]/80" />
+          <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-b from-transparent to-[#020617]" />
         </div>
         <div className="relative z-10 mx-auto max-w-7xl px-4 md:px-6 py-20 md:py-28">
           <div className="max-w-3xl">
@@ -392,7 +358,7 @@ export default function HomepagePage() {
         </div>
       </motion.section>
 
-      {/* vision — stacked */}
+      {/* vision */}
       <motion.section {...fadeUp} className="mx-auto max-w-7xl px-4 md:px-6 py-12 md:py-16">
         <div className="mb-8 max-w-3xl">
           <SectionLabel>VISION</SectionLabel>
@@ -402,12 +368,12 @@ export default function HomepagePage() {
             <p>UniDreamは、世界モデルと強化学習によって、そうした<span className="font-semibold text-cyan-300">見えない市場構造を学習</span>し、いま市場で何が起きているのか、どの行動がリスクに対して合理的なのかを判断するAIを目指します。</p>
           </div>
         </div>
-        <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
-          <PipelineDiagram />
+        <div className="rounded-2xl overflow-hidden border border-slate-800 shadow-2xl shadow-black/30">
+          <Image src="/VISION_img.png" alt="UniDream pipeline diagram" width={2400} height={1350} className="w-full h-auto" />
         </div>
       </motion.section>
 
-      {/* LIVE DEMO — text above, image below */}
+      {/* LIVE DEMO */}
       <motion.section {...fadeUp} className="mx-auto max-w-7xl px-4 md:px-6 py-12 md:py-16">
         <div className="mb-8 max-w-xl">
           <SectionLabel>LIVE DEMO</SectionLabel>
