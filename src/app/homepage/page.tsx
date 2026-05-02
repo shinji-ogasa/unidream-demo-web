@@ -165,7 +165,7 @@ export default function HomepagePage() {
       </motion.header>
 
       {/* hero */}
-      <section className="relative flex items-center">
+      <section className="relative flex items-center pt-16">
         <div className="hero-visual-bg" />
         <div className="relative z-10 max-w-[1200px] mx-auto px-6 md:px-8 py-14 md:py-20">
           <div className="max-w-[900px]">
@@ -218,7 +218,7 @@ export default function HomepagePage() {
       </section>
 
       {/* evidence / scorecard (DESIGN.md §9-5) */}
-      <section className="container-site py-12 md:py-16">
+      <section className="container-site py-12 md:py-16 pb-8 md:pb-10">
         <div className="mb-6 max-w-[680px]">
           <SectionLabel>EVIDENCE</SectionLabel>
           <h2 className="text-[clamp(2rem,3.5vw,3rem)] font-semibold tracking-[-0.05em] leading-[1.05] text-[#f4f7fb]">実データによる検証結果</h2>
