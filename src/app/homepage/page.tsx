@@ -2,7 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion, useInView } from "framer-motion";
+import { useRef } from "react";
 import {
   ArrowRight,
   BarChart3,
@@ -17,6 +18,26 @@ import {
   Zap,
 } from "lucide-react";
 import { FaGithub, FaLinkedin, FaXTwitter, FaYoutube } from "react-icons/fa6";
+
+function AnimateInView({
+  children, className = "", delay = 0, x = 0, y = 24, once = true,
+}: {
+  children: React.ReactNode; className?: string; delay?: number; x?: number; y?: number; once?: boolean;
+}) {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once, margin: "-40px" });
+  return (
+    <motion.div
+      ref={ref}
+      className={className}
+      initial={{ opacity: 0, x, y }}
+      animate={isInView ? { opacity: 1, x: 0, y: 0 } : { opacity: 0, x, y }}
+      transition={{ duration: 0.5, delay, ease: "easeOut" }}
+    >
+      {children}
+    </motion.div>
+  );
+}
 
 const NAV_ITEMS = ["プロダクト", "研究成果", "技術", "研究", "会社情報"];
 
@@ -258,13 +279,13 @@ export default function HomepagePage() {
 
       {/* metrics */}
       <section className="mx-auto max-w-7xl px-4 md:px-6 -mt-6 relative z-20 pb-8 md:pb-12">
-        <motion.div {...fadeUp} className="grid gap-3 md:grid-cols-4">
+        <div className="grid gap-3 md:grid-cols-4">
           {METRICS.map((m) => (
-            <motion.div key={m.label} initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4 }}>
+            <AnimateInView key={m.label} y={16}>
               <MetricCard {...m} />
-            </motion.div>
+            </AnimateInView>
           ))}
-        </motion.div>
+        </div>
       </section>
 
       {/* results */}
@@ -275,13 +296,7 @@ export default function HomepagePage() {
           <p className="mt-3 text-base text-slate-500">BTCUSDT 15m · 2018-2024。全指標B&H比較。</p>
         </div>
         <div className="grid gap-5 lg:grid-cols-[1.3fr_1fr]">
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="rounded-2xl border border-blue-500/20 bg-gradient-to-br from-slate-900 to-blue-950/30 p-6 md:p-10"
-          >
+          <AnimateInView className="rounded-2xl border border-blue-500/20 bg-gradient-to-br from-slate-900 to-blue-950/30 p-6 md:p-10" x={-20} y={0}>
             <div className="flex items-start gap-3 mb-6">
               <div className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-blue-500/10"><Zap className="h-5 w-5 text-blue-400" strokeWidth={2} /></div>
               <div><p className="text-base font-semibold text-white">3fold AC再学習</p><p className="text-sm text-slate-500">selector v2 strict · test平均</p></div>
@@ -292,14 +307,8 @@ export default function HomepagePage() {
               <div><p className="text-sm font-semibold tracking-widest text-slate-500">MaxDDΔ</p><p className="mt-1 text-4xl font-semibold text-emerald-400">-0.30 pt</p></div>
             </div>
             <p className="mt-5 text-sm text-slate-600 leading-5">B&H比でリターン増加、Sharpe微増、DD改善。※ strict条件でvalidation全fold acceptは未達。</p>
-          </motion.div>
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.15 }}
-            className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6 md:p-10 flex flex-col justify-between"
-          >
+          </AnimateInView>
+          <AnimateInView className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6 md:p-10 flex flex-col justify-between" x={20} y={0} delay={0.15}>
             <div>
               <div className="flex items-center gap-3 mb-6">
                 <div className="grid h-10 w-10 place-items-center rounded-lg bg-emerald-500/10"><ShieldCheck className="h-5 w-5 text-emerald-400" strokeWidth={2} /></div>
@@ -311,7 +320,7 @@ export default function HomepagePage() {
               </div>
             </div>
             <p className="mt-5 text-sm text-slate-600 leading-5">最も堅牢なベースライン。B&H比でリターンを維持しつつ最大ドローダウンを低減。</p>
-          </motion.div>
+          </AnimateInView>
         </div>
       </section>
 
@@ -322,9 +331,7 @@ export default function HomepagePage() {
           <h2 className="text-3xl md:text-4xl font-semibold tracking-[-0.055em] text-white">市場理解のためのAI</h2>
         </div>
         <div className="grid grid-cols-12 gap-4">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }}
-            className="col-span-12 lg:col-span-6 row-span-2 rounded-2xl border border-slate-800 bg-gradient-to-br from-slate-900 via-slate-900 to-cyan-950/20 p-8 md:p-10"
+          <AnimateInView y={20} className="col-span-12 lg:col-span-6 row-span-2 rounded-2xl border border-slate-800 bg-gradient-to-br from-slate-900 via-slate-900 to-cyan-950/20 p-8 md:p-10"
           >
             <div className="grid h-12 w-12 place-items-center rounded-xl bg-slate-800/80 ring-1 ring-slate-700"><Globe2 className="h-6 w-6 text-cyan-400" strokeWidth={1.8} /></div>
             <h3 className="mt-5 text-xl font-semibold tracking-[-0.03em] text-white">Transformer World Model</h3>
@@ -334,7 +341,7 @@ export default function HomepagePage() {
                 <span key={t} className="rounded-md border border-slate-700 bg-slate-800/60 px-3 py-1.5 text-sm text-slate-400">{t}</span>
               ))}
             </div>
-          </motion.div>
+          </AnimateInView>
           {[
             { icon: BrainCircuit, title: "強化学習方策", text: "世界モデルが認識した状態を基に、リスク調整リターンを最大化する行動を学習。", span: "col-span-12 sm:col-span-6 lg:col-span-3" },
             { icon: Radar, title: "市場状態推定", text: "レジーム・ボラティリティ・流動性・テールリスクをリアルタイムに推定。", span: "col-span-12 sm:col-span-6 lg:col-span-3" },
@@ -342,12 +349,10 @@ export default function HomepagePage() {
             { icon: LineChart, title: "ダッシュボード", text: "リアルタイム推論可視化。", span: "col-span-12 sm:col-span-4 lg:col-span-2" },
             { icon: DatabaseZap, title: "模倣学習", text: "教師方策から安定初期化。", span: "col-span-12 sm:col-span-4 lg:col-span-2" },
           ].map((card, i) => (
-            <motion.div
+            <AnimateInView
               key={card.title}
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.4, delay: 0.08 * i }}
+              y={16}
+              delay={0.08 * i}
               className={`${card.span} rounded-2xl border border-slate-800 bg-slate-900/40 ${i < 2 ? 'p-7' : 'p-6'}`}
             >
               <div className={`grid place-items-center rounded-xl bg-slate-800/80 ring-1 ring-slate-700 ${i < 2 ? 'h-10 w-10' : 'h-8 w-8 rounded-lg'}`}>
@@ -355,7 +360,7 @@ export default function HomepagePage() {
               </div>
               <h3 className={`mt-4 font-semibold text-white ${i < 2 ? 'text-lg' : 'text-base'}`}>{card.title}</h3>
               <p className={`mt-2 text-slate-400 ${i < 2 ? 'text-sm leading-6' : 'text-sm'}`}>{card.text}</p>
-            </motion.div>
+            </AnimateInView>
           ))}
         </div>
       </section>
