@@ -26,7 +26,7 @@ import { PositionGauge } from "./PositionGauge";
 import { StatCard } from "./StatCard";
 import { TradesTable } from "./TradesTable";
 
-const TRADES_LIMIT = 50;
+const TRADES_LIMIT = 200;
 const POSITION_HISTORY_BARS = 96; // 24h at 15m
 
 const SIGNAL_TONE: Record<string, "good" | "bad" | "warn" | "default"> = {
@@ -203,23 +203,23 @@ export function Dashboard({ initial }: DashboardProps) {
   const signalTone = SIGNAL_TONE[signalKey] ?? "default";
 
   return (
-    <div className="max-w-6xl mx-auto px-6 py-10 flex flex-col gap-5">
+    <div className="max-w-6xl mx-auto px-4 md:px-6 py-6 md:py-10 flex flex-col gap-4 md:gap-5">
       <header className="flex flex-col gap-3">
-        <div className="flex items-center justify-between flex-wrap gap-4">
-          <div className="flex items-baseline gap-4">
-            <h1 className="text-3xl font-semibold tracking-tight">UniDream Demo</h1>
-            <span className="text-sm text-zinc-500 font-mono">
+        <div className="flex items-start md:items-center justify-between flex-wrap gap-3 md:gap-4">
+          <div className="flex flex-col md:flex-row md:items-baseline gap-1 md:gap-4">
+            <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">UniDream Demo</h1>
+            <span className="text-xs md:text-sm text-zinc-500 font-mono break-all">
               {SYMBOL} · {TIMEFRAME} · {RUN_ID}
             </span>
           </div>
-          <div className="flex items-center gap-5">
-            <span className="text-sm font-mono text-zinc-500">
+          <div className="flex items-center flex-wrap gap-x-4 gap-y-1.5 md:gap-5">
+            <span className="text-xs md:text-sm font-mono text-zinc-500">
               model <span className="text-zinc-100">{DISPLAY_MODEL_NAME}</span>
             </span>
             <Countdown />
           </div>
         </div>
-        <p className="text-sm text-amber-400/80">
+        <p className="text-xs md:text-sm text-amber-400/80">
           This is a research demo, not financial advice. Virtual paper-trading only.
         </p>
       </header>
@@ -278,7 +278,7 @@ export function Dashboard({ initial }: DashboardProps) {
 
       <section className="flex flex-col gap-3">
         <div className="text-sm uppercase tracking-[0.18em] text-zinc-400">Recent Trades</div>
-        <TradesTable trades={trades.slice(0, 20)} />
+        <TradesTable trades={trades} />
       </section>
 
       <section className="panel p-5 flex flex-col gap-3">

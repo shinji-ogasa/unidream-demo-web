@@ -83,14 +83,14 @@ export function PerformanceChart({ snapshots, trades, range, onRangeChange }: Pr
     : lastIdx;
 
   return (
-    <div className="panel p-5 flex flex-col gap-4">
+    <div className="panel p-4 md:p-5 flex flex-col gap-3 md:gap-4">
       <div className="flex items-center justify-between flex-wrap gap-2">
         <div className="text-base font-semibold tracking-tight text-zinc-200">
           Performance vs Buy &amp; Hold
         </div>
         <div className="text-sm font-mono text-zinc-500">15m bars</div>
       </div>
-      <div className="h-[480px]">
+      <div className="h-80 md:h-[480px]">
         {data.length === 0 ? (
           <div className="h-full flex items-center justify-center text-zinc-500 text-base">
             No equity history yet. Run the backfill or trigger the Edge Function.
