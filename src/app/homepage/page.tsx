@@ -161,7 +161,7 @@ export default function HomepagePage() {
           </nav>
           <div className="flex items-center gap-4">
             <Link href="/" className="text-sm font-medium text-[#8a93a3] transition hover:text-[#f4f7fb]">デモ</Link>
-            <button type="button" className="btn-primary text-sm py-2 px-5">問い合わせ</button>
+            <Link href="/homepage/contact" className="btn-primary text-sm py-2 px-5 inline-flex items-center">問い合わせ</Link>
           </div>
         </div>
       </motion.header>
@@ -202,7 +202,8 @@ export default function HomepagePage() {
               className="mt-8 flex flex-wrap gap-4"
             >
               <CtaButton href="/">デモを見る</CtaButton>
-              <CtaButton variant="secondary">研究概要を読む</CtaButton>
+              <CtaButton variant="secondary" href="/homepage/contact">PoC導入を相談する</CtaButton>
+              <CtaButton variant="secondary" href="https://github.com/shinji-ogasa/UniDream">研究概要を読む</CtaButton>
             </motion.div>
           </div>
         </div>
@@ -340,8 +341,8 @@ export default function HomepagePage() {
             </div>
             <div className="flex flex-col gap-3">
               <CtaButton href="/">デモを試す</CtaButton>
-              <CtaButton variant="secondary">PoC導入を相談する</CtaButton>
-              <CtaButton variant="secondary">研究レポートを見る</CtaButton>
+              <CtaButton variant="secondary" href="/homepage/contact">PoC導入を相談する</CtaButton>
+              <CtaButton variant="secondary" href="https://github.com/shinji-ogasa/UniDream">研究レポートを見る</CtaButton>
             </div>
           </div>
         </div>
