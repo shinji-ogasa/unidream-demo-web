@@ -16,6 +16,7 @@ import {
   Zap,
 } from "lucide-react";
 import { FaGithub, FaLinkedin, FaXTwitter, FaYoutube } from "react-icons/fa6";
+import { SiHuggingface } from "react-icons/si";
 
 const NAV_ITEMS = ["プロダクト", "研究成果", "技術", "研究", "会社情報"];
 
@@ -29,6 +30,7 @@ const METRICS = [
 const SOCIAL_LINKS = [
   { label: "X", href: "#", icon: FaXTwitter },
   { label: "GitHub", href: "https://github.com/shinji-ogasa/UniDream", icon: FaGithub },
+  { label: "Hugging Face", href: "https://huggingface.co/spaces/ShinjiAA/unidream-space", icon: SiHuggingface },
   { label: "LinkedIn", href: "#", icon: FaLinkedin },
   { label: "YouTube", href: "#", icon: FaYoutube },
 ];
