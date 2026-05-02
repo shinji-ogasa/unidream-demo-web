@@ -8,11 +8,9 @@ import {
   ArrowRight,
   BarChart3,
   BrainCircuit,
-  DatabaseZap,
   Globe2,
   LineChart,
   LockKeyhole,
-  Network,
   Radar,
   ShieldCheck,
   Zap,
@@ -152,7 +150,7 @@ export default function HomepagePage() {
         initial={{ opacity: 0, y: -12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-        className="sticky top-0 z-50 border-b border-[rgba(255,255,255,0.08)] bg-[rgba(8,9,10,0.80)] backdrop-blur-xl"
+        className="fixed top-0 left-0 right-0 z-50 border-b border-[rgba(255,255,255,0.08)] bg-[rgba(8,9,10,0.80)] backdrop-blur-xl"
       >
         <div className="container-site flex items-center justify-between py-4 md:py-5">
           <Logo />
@@ -167,9 +165,9 @@ export default function HomepagePage() {
       </motion.header>
 
       {/* hero */}
-      <section className="relative min-h-[760px] flex items-center">
+      <section className="relative min-h-[760px] flex items-center pt-20">
         <div className="hero-visual-bg" />
-        <div className="relative z-10 max-w-[1200px] mx-4 md:mx-8 lg:mx-auto py-20 md:py-28">
+        <div className="relative z-10 px-[15%] py-20 md:py-28">
           <div className="max-w-[600px]">
             <motion.span
               initial={{ opacity: 0, y: 12 }}
@@ -278,7 +276,6 @@ export default function HomepagePage() {
             { icon: Radar, title: "市場状態推定", text: "レジーム・ボラティリティ・テールリスクをリアルタイムに推定。" },
             { icon: BarChart3, title: "バックテスト評価", text: "2018–2024実データ。全指標B&H比較。" },
             { icon: LineChart, title: "ダッシュボード", text: "リアルタイム推論可視化。" },
-            { icon: DatabaseZap, title: "模倣学習", text: "教師方策から安定初期化。" },
             { icon: LockKeyhole, title: "リスク制御", text: "DD抑制と安全な意思決定。" },
           ].map((card, i) => (
             <AnimateInView key={card.title} y={16} delay={0.06 * i} className="card p-6">
