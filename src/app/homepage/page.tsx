@@ -81,17 +81,15 @@ function CtaButton({ children, variant = "primary", href }: ButtonProps) {
 function Logo() {
   return (
     <Link href="/homepage" className="flex items-center shrink-0" aria-label="WorldForge AI">
-      <div className="relative h-12 md:h-16 w-auto" style={{ filter: "brightness(0) invert(0.92) contrast(0.8)" }}>
-        <Image
-          src="/worldforge-ai-logo.png"
-          alt="WorldForge AI"
-          height={64}
-          width={256}
-          priority
-          unoptimized
-          className="h-full w-auto"
-        />
-      </div>
+      <Image
+        src="/worldforge-ai-logo.png"
+        alt="WorldForge AI"
+        height={56}
+        width={224}
+        priority
+        unoptimized
+        className="h-10 md:h-14 w-auto"
+      />
     </Link>
   );
 }
