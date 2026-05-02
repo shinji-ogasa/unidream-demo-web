@@ -290,7 +290,7 @@ export default function HomepagePage() {
       <section className="mx-auto max-w-7xl px-4 md:px-6 py-12 md:py-16">
         <div className="mb-8 max-w-xl">
           <SectionLabel>RESEARCH</SectionLabel>
-          <h2 className="text-3xl md:text-4xl font-semibold tracking-[-0.055em] text-white">実データによる検証結果</h2>
+          <h2 className="text-3xl md:text-4xl font-semibold tracking-[-0.055em] text-white">実データによる<br className="sm:hidden" />検証結果</h2>
           <p className="mt-3 text-base text-slate-500">BTCUSDT 15m · 2018-2024。全指標B&H比較。</p>
         </div>
         <div className="grid gap-5 lg:grid-cols-[1.3fr_1fr]">
@@ -367,7 +367,7 @@ export default function HomepagePage() {
       <section className="mx-auto max-w-7xl px-4 md:px-6 py-12 md:py-16">
         <div className="mb-8 max-w-3xl">
           <SectionLabel>VISION</SectionLabel>
-          <h2 className="text-3xl md:text-4xl font-semibold tracking-[-0.055em] text-white">価格予測を超えた市場理解へ</h2>
+          <h2 className="text-3xl md:text-4xl font-semibold tracking-[-0.055em] text-white">価格予測を超えた<br className="sm:hidden" />市場理解へ</h2>
           <div className="mt-6 space-y-4 text-base leading-7 text-slate-400">
             <p>金融市場は、価格だけで動いているわけではありません。投資家心理、流動性、リスク、ニュース、制度、そして時間とともに変化する市場状態。</p>
             <p>UniDreamは、世界モデルと強化学習によって、そうした<span className="font-semibold text-cyan-300">見えない市場構造を学習</span>し、いま市場で何が起きているのか、どの行動がリスクに対して合理的なのかを判断するAIを目指します。</p>
