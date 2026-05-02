@@ -252,7 +252,7 @@ export default function HomepagePage() {
               transition={{ duration: 0.6, delay: 0.15 }}
               className="text-5xl md:text-7xl font-semibold tracking-[-0.075em] leading-[0.96] text-white"
             >
-              市場の見えない構造を、世界モデルで読む。
+              市場の見えない構造を、<br />世界モデルで読む。
             </motion.h1>
             <motion.p
               initial={{ opacity: 0, y: 16 }}
