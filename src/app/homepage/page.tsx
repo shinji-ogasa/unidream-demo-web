@@ -295,6 +295,7 @@ export default function HomepagePage() {
       {/* vision */}
       <section className="container-site py-16 md:py-24">
         <div className="mb-10">
+          <SectionLabel>PIPELINE</SectionLabel>
           <SectionLabel>VISION</SectionLabel>
           <h2 className="text-[2.5rem] md:text-[3.5rem] font-semibold tracking-[-0.05em] leading-[1.0] text-[#f4f7fb]">価格予測を超えた市場理解へ</h2>
         </div>
