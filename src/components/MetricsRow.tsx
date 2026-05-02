@@ -14,9 +14,9 @@ function tone(value: number, betterIsHigher: boolean): Tone {
 }
 
 const TONE_CLASS: Record<Tone, string> = {
-  good: "text-emerald-400",
-  bad: "text-rose-400",
-  default: "text-zinc-200",
+  good: "text-[#4ade80]",
+  bad: "text-[#ff6467]",
+  default: "text-[#d0d6e0]",
 };
 
 function Cell({
@@ -34,7 +34,7 @@ function Cell({
     <div className="panel p-4 flex flex-col gap-1.5">
       <div className="label">{label}</div>
       <div className={`text-2xl font-mono leading-tight ${TONE_CLASS[t]}`}>{value}</div>
-      {hint && <div className="text-sm font-mono text-zinc-500 leading-snug">{hint}</div>}
+      {hint && <div className="text-sm font-mono text-[#8a93a3] leading-snug">{hint}</div>}
     </div>
   );
 }

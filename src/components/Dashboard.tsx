@@ -208,18 +208,18 @@ export function Dashboard({ initial }: DashboardProps) {
         <div className="flex items-start md:items-center justify-between flex-wrap gap-3 md:gap-4">
           <div className="flex flex-col md:flex-row md:items-baseline gap-1 md:gap-4">
             <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">UniDream Demo</h1>
-            <span className="text-xs md:text-sm text-zinc-500 font-mono break-all">
+            <span className="text-xs md:text-sm text-[#8a93a3] font-mono break-all">
               {SYMBOL} · {TIMEFRAME} · {RUN_ID}
             </span>
           </div>
           <div className="flex items-center flex-wrap gap-x-4 gap-y-1.5 md:gap-5">
-            <span className="text-xs md:text-sm font-mono text-zinc-500">
-              model <span className="text-zinc-100">{DISPLAY_MODEL_NAME}</span>
+            <span className="text-xs md:text-sm font-mono text-[#8a93a3]">
+              model <span className="text-[#f4f7fb]">{DISPLAY_MODEL_NAME}</span>
             </span>
             <Countdown />
           </div>
         </div>
-        <p className="text-xs md:text-sm text-amber-400/80">
+        <p className="text-xs md:text-sm text-[#facc15]/80">
           This is a research demo, not financial advice. Virtual paper-trading only.
         </p>
       </header>
@@ -270,19 +270,19 @@ export function Dashboard({ initial }: DashboardProps) {
           range={range}
           onRangeChange={handleRangeChange}
         />
-        <div className="text-sm font-mono text-zinc-500">
+        <div className="text-sm font-mono text-[#8a93a3]">
           Metrics computed over the visible window ({metrics.bars} bars · {metrics.trades} trades).
           Drag the slider to see older data.
         </div>
       </section>
 
       <section className="flex flex-col gap-3">
-        <div className="text-sm uppercase tracking-[0.18em] text-zinc-400">Recent Trades</div>
+        <div className="text-sm uppercase tracking-[0.18em] text-[#8a93a3]">Recent Trades</div>
         <TradesTable trades={trades} />
       </section>
 
       <section className="panel p-5 flex flex-col gap-3">
-        <div className="text-sm text-zinc-300">
+        <div className="text-sm text-[#d0d6e0]">
           Both the research codebase and the inference server behind this demo are open source.
           The trained model bundle is published alongside the code, so anyone can reproduce or
           extend the same experiments end to end.
@@ -292,7 +292,7 @@ export function Dashboard({ initial }: DashboardProps) {
             href="https://github.com/shinji-ogasa/UniDream"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-zinc-200 hover:text-emerald-400 underline-offset-4 hover:underline transition-colors"
+            className="text-zinc-200 hover:text-[#4ade80] underline-offset-4 hover:underline transition-colors"
           >
             → UniDream (research repo) on GitHub
           </a>
@@ -300,7 +300,7 @@ export function Dashboard({ initial }: DashboardProps) {
             href="https://huggingface.co/spaces/ShinjiAA/unidream-space"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-zinc-200 hover:text-emerald-400 underline-offset-4 hover:underline transition-colors"
+            className="text-zinc-200 hover:text-[#4ade80] underline-offset-4 hover:underline transition-colors"
           >
             → unidream-space on Hugging Face
           </a>
@@ -313,7 +313,7 @@ export function Dashboard({ initial }: DashboardProps) {
         </div>
       </section>
 
-      <footer className="text-sm text-zinc-500 mt-1">
+      <footer className="text-sm text-[#8a93a3] mt-1">
         Data: Binance public API · Inference: UniDream HF Space · Storage &amp; realtime: Supabase ·
         Last inference {fmtTime(prediction?.created_at)} · Alpha (excess) ={" "}
         {fmtPercent(metrics.alphaEx, 2, true)}

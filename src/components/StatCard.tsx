@@ -7,9 +7,9 @@ type Props = {
 
 const TONE: Record<NonNullable<Props["tone"]>, string> = {
   default: "text-white",
-  good: "text-emerald-400",
-  bad: "text-rose-400",
-  warn: "text-amber-400",
+  good: "text-[#4ade80]",
+  bad: "text-[#ff6467]",
+  warn: "text-[#facc15]",
 };
 
 export function StatCard({ label, value, hint, tone = "default" }: Props) {
@@ -19,7 +19,7 @@ export function StatCard({ label, value, hint, tone = "default" }: Props) {
       <div className={`text-2xl md:text-3xl font-mono leading-tight ${TONE[tone]}`}>
         {value}
       </div>
-      {hint && <div className="text-xs md:text-sm text-zinc-500 font-mono">{hint}</div>}
+      {hint && <div className="text-xs md:text-sm text-[#8a93a3] font-mono">{hint}</div>}
     </div>
   );
 }

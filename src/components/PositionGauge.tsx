@@ -24,12 +24,12 @@ export function PositionGauge({
   const dash = fraction * circumference;
   const isFlat = Math.abs(position) < 1e-6;
   const isLong = position > 0;
-  const ringColor = isFlat ? "#52525b" : isLong ? "#6ee7b7" : "#f87171";
-  const labelTone = isFlat ? "text-zinc-400" : isLong ? "text-emerald-400" : "text-rose-400";
+  const ringColor = isFlat ? "#626b7a" : isLong ? "#4ade80" : "#ff6467";
+  const labelTone = isFlat ? "text-[#8a93a3]" : isLong ? "text-[#4ade80]" : "text-[#ff6467]";
   const labelText = isFlat ? "FLAT" : isLong ? "LONG" : "SHORT";
 
   const sparkPoints = useSparkPoints(positionHistory);
-  const sparkColor = position > 0 ? "#6ee7b7" : position < 0 ? "#f87171" : "#52525b";
+  const sparkColor = position > 0 ? "#4ade80" : position < 0 ? "#ff6467" : "#626b7a";
   const sparkBars = positionHistory.length;
   const sparkSpanLabel = sparkSpan(sparkBars);
 
@@ -39,7 +39,7 @@ export function PositionGauge({
       <div className="flex items-center gap-4">
         <div className="relative w-[124px] h-[124px] shrink-0">
           <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">
-            <circle cx="50" cy="50" r={r} stroke="#222831" strokeWidth="9" fill="none" />
+            <circle cx="50" cy="50" r={r} stroke="rgba(255,255,255,0.08)" strokeWidth="9" fill="none" />
             <circle
               cx="50"
               cy="50"
@@ -60,22 +60,22 @@ export function PositionGauge({
           </div>
         </div>
         <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-sm font-mono w-full">
-          <div className="text-zinc-500">target</div>
-          <div className="text-right text-zinc-200">{position.toFixed(3)}</div>
-          <div className="text-zinc-500">cash</div>
-          <div className="text-right text-zinc-200">{fmtUSD(cash)}</div>
-          <div className="text-zinc-500">qty</div>
-          <div className="text-right text-zinc-200">{fmtNumber(assetQty, 6)}</div>
-          <div className="text-zinc-500">equity</div>
-          <div className="text-right text-white">{fmtUSD(equity)}</div>
+          <div className="text-[#8a93a3]">target</div>
+          <div className="text-right text-[#d0d6e0]">{position.toFixed(3)}</div>
+          <div className="text-[#8a93a3]">cash</div>
+          <div className="text-right text-[#d0d6e0]">{fmtUSD(cash)}</div>
+          <div className="text-[#8a93a3]">qty</div>
+          <div className="text-right text-[#d0d6e0]">{fmtNumber(assetQty, 6)}</div>
+          <div className="text-[#8a93a3]">equity</div>
+          <div className="text-right text-[#f4f7fb]">{fmtUSD(equity)}</div>
         </div>
       </div>
-      <div className="mt-auto pt-2 border-t border-[#1a1d23] flex flex-col gap-1.5">
+      <div className="mt-auto pt-2 border-t border-[rgba(255,255,255,0.08)] flex flex-col gap-1.5">
         <div className="flex items-center justify-between text-xs">
-          <span className="uppercase tracking-[0.18em] text-zinc-500">
+          <span className="uppercase tracking-[0.18em] text-[#8a93a3]">
             position history
           </span>
-          <span className="font-mono text-zinc-500">{sparkSpanLabel}</span>
+          <span className="font-mono text-[#8a93a3]">{sparkSpanLabel}</span>
         </div>
         <svg viewBox="0 0 100 30" preserveAspectRatio="none" className="w-full h-9">
           <line
@@ -83,7 +83,7 @@ export function PositionGauge({
             y1="2"
             x2="100"
             y2="2"
-            stroke="#222831"
+            stroke="rgba(255,255,255,0.08)"
             strokeDasharray="2 2"
             strokeWidth="0.4"
           />
@@ -92,7 +92,7 @@ export function PositionGauge({
             y1="15"
             x2="100"
             y2="15"
-            stroke="#222831"
+            stroke="rgba(255,255,255,0.08)"
             strokeDasharray="2 2"
             strokeWidth="0.4"
           />
@@ -101,7 +101,7 @@ export function PositionGauge({
             y1="28"
             x2="100"
             y2="28"
-            stroke="#222831"
+            stroke="rgba(255,255,255,0.08)"
             strokeDasharray="2 2"
             strokeWidth="0.4"
           />

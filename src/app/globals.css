@@ -4,32 +4,147 @@
 
 html,
 body {
-  background-color: #0b0d10;
-  color: #e5e7eb;
+  background-color: #08090a;
+  color: #f4f7fb;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
-  font-family:
-    ui-sans-serif,
-    system-ui,
-    -apple-system,
-    "Segoe UI",
-    Roboto,
-    "Helvetica Neue",
-    Arial,
-    sans-serif;
+  font-family: "Inter", "Geist", "Noto Sans JP", system-ui, sans-serif;
 }
 
+/* Background system (DESIGN.md §7) */
+.site-bg {
+  background: radial-gradient(circle at 18% 8%, rgba(82, 102, 235, 0.22), transparent 34rem), radial-gradient(circle at 78% 18%, rgba(2, 184, 204, 0.12), transparent 30rem), linear-gradient(180deg, #08090a 0%, #0b0d12 45%, #08090a 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.site-bg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(circle at 50% 20%, black, transparent 72%);
+}
+
+.hero-visual-bg {
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(180deg, rgba(8, 9, 10, 0.20), rgba(8, 9, 10, 0.92)), url("/hero-bg.png");
+  background-size: cover;
+  background-position: center top;
+  opacity: 0.72;
+  mask-image: linear-gradient(to bottom, black 0%, black 70%, transparent 100%);
+}
+
+/* Card / panel (DESIGN.md §8) */
 .panel {
-  background-color: #13161b;
-  border: 1px solid #222831;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.025));
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
 }
 
+.card {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.025));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 28px;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.42);
+  backdrop-filter: blur(18px);
+}
+
+.card-panel {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+}
+
 .label {
-  font-size: 12px;
-  letter-spacing: 0.14em;
+  font-size: 11px;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #8b95a5;
-  font-weight: 500;
+  color: #8a93a3;
+  font-weight: 600;
+}
+
+/* Dashboard frame (DESIGN.md §8) */
+.dashboard-frame {
+  border-radius: 32px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03)), #0f1117;
+  box-shadow: 0 40px 120px rgba(0, 0, 0, 0.55), 0 0 120px rgba(82, 102, 235, 0.18);
+  overflow: hidden;
+}
+
+/* Buttons (DESIGN.md §8) */
+.btn-primary {
+  border-radius: 999px;
+  background: #5266eb;
+  color: white;
+  box-shadow: 0 0 80px rgba(82, 102, 235, 0.22);
+  padding: 0.85rem 1.25rem;
+  font-weight: 600;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.btn-primary:hover {
+  background: #6f81ff;
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  color: #f4f7fb;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 0.85rem 1.25rem;
+  font-weight: 600;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+/* Motion (DESIGN.md §13) */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+:root {
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-fast: 160ms;
+  --duration-base: 240ms;
+  --duration-slow: 520ms;
+}
+
+/* Focus (DESIGN.md §17) */
+:focus-visible {
+  outline: 2px solid #5266eb;
+  outline-offset: 3px;
+}
+
+/* Layout helpers (DESIGN.md §6) */
+.container-site {
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .container-site {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
 }
