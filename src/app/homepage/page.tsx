@@ -210,13 +210,6 @@ export default function HomepagePage() {
         <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-b from-transparent to-[#020617]" />
       </div>
 
-      {/* hero image layer — extends past hero section, fades into base bg */}
-      <div className="absolute top-0 left-0 right-0 h-[140vh] -z-5 overflow-hidden">
-        <Image src="/hero-bg.png" alt="" fill className="object-cover object-top" priority />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#020617]/90 via-[#020617]/65 to-[#020617]/80" />
-        <div className="absolute inset-x-0 bottom-0 h-3/5 bg-gradient-to-b from-transparent to-[#020617]" />
-      </div>
-
       {/* header */}
       <motion.header
         initial={{ opacity: 0, y: -12 }}
@@ -238,7 +231,12 @@ export default function HomepagePage() {
 
       {/* hero */}
       <section className="relative">
-        <div className="mx-auto max-w-7xl px-4 md:px-6 py-20 md:py-28">
+        <div className="absolute -top-24 left-0 right-0 h-[150vh] opacity-30 pointer-events-none">
+          <Image src="/hero-bg.png" alt="" fill className="object-cover object-top" priority />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#020617]/90 via-[#020617]/60 to-[#020617]/80" />
+          <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-b from-transparent to-[#020617]" />
+        </div>
+        <div className="relative mx-auto max-w-7xl px-4 md:px-6 py-20 md:py-28">
           <div className="max-w-3xl">
             <motion.span
               initial={{ opacity: 0, y: 12 }}
