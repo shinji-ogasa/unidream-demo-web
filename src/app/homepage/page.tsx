@@ -170,16 +170,16 @@ function CtaButton({ children, variant = "primary", href }: ButtonProps) {
 }
 
 function Logo({ size = "md" }: { size?: "sm" | "md" }) {
-  const h = size === "sm" ? 32 : 40;
+  const h = size === "sm" ? 40 : 56;
   return (
     <Link href="/homepage" className="flex items-center" aria-label="WorldForge AI">
       <Image
         src="/worldforge-ai-logo.png"
-        alt="WorldForge AI · UniDream"
+        alt="WorldForge AI"
         height={h}
         width={Math.round(h * 4)}
         priority
-        className="h-8 md:h-10 w-auto"
+        className="h-10 md:h-14 w-auto"
       />
     </Link>
   );
