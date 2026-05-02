@@ -24,41 +24,6 @@ const METRICS = [
   { label: "Backtest", value: "2018-2024", sub: "6yr · BTCUSDT · 15m bars", color: "text-indigo-400" },
 ];
 
-const PRODUCT_CARDS = [
-  {
-    title: "Transformer World Model",
-    text: "価格・流動性・リスク・ニュースから潜在市場状態を学習。将来の価格予測ではなく、市場の構造的理解を目的とします。",
-    icon: Globe2,
-  },
-  {
-    title: "強化学習方策",
-    text: "世界モデルが認識した状態を基に、長期的なリスク調整リターンを最大化する行動を学習。模倣学習からスタートし安定。",
-    icon: BrainCircuit,
-  },
-  {
-    title: "市場状態推定",
-    text: "現在のレジーム・ボラティリティ・流動性・テールリスクをリアルタイムに推定。隠れマルコフ＋Transformerのハイブリッド。",
-    icon: Radar,
-  },
-  {
-    title: "バックテスト評価",
-    text: "2018–2024の実データで検証。B&H比較、Alpha、DD抑制、ターンオーバーを指標に、戦略の頑健性を確認。",
-    icon: BarChart3,
-  },
-  {
-    title: "ダッシュボード",
-    text: "リアルタイム推論結果を可視化。エクイティ曲線、ポジション、シグナル、メトリクスを一画面でモニタリング。",
-    icon: LineChart,
-  },
-];
-
-const APPROACH_CARDS = [
-  { title: "世界モデル", text: "見えない市場構造と状態遷移を学習。", icon: Globe2 },
-  { title: "模倣学習", text: "教師方策を起点に安定した初期方策を構築。", icon: DatabaseZap },
-  { title: "強化学習", text: "報酬とリスクを見ながら方策を改善。", icon: Network },
-  { title: "リスク制御", text: "DD抑制と安全な意思決定を重視。", icon: LockKeyhole },
-];
-
 const SOCIAL_LINKS = [
   { label: "X", href: "#", icon: FaXTwitter },
   { label: "GitHub", href: "https://github.com/shinji-ogasa/UniDream", icon: FaGithub },
@@ -137,7 +102,7 @@ function SocialButton({
       aria-label={label}
       target={isExternal ? "_blank" : undefined}
       rel={isExternal ? "noopener noreferrer" : undefined}
-      className="grid h-10 w-10 place-items-center rounded-full border border-slate-700 bg-slate-900/60 text-base text-slate-400 shadow-sm transition hover:-translate-y-0.5 hover:border-cyan-500/50 hover:text-cyan-300"
+      className="grid h-10 w-10 place-items-center rounded-xl border border-slate-800 bg-slate-900/60 text-base text-slate-500 transition hover:-translate-y-0.5 hover:border-cyan-500/30 hover:text-cyan-300"
     >
       <Icon />
     </a>
@@ -156,106 +121,55 @@ function MetricCard({
   color: string;
 }) {
   return (
-    <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5 backdrop-blur">
-      <p className="text-[10px] font-semibold tracking-widest text-slate-500">{label}</p>
+    <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-5">
+      <p className="text-[10px] font-semibold tracking-widest text-slate-600">{label}</p>
       <p className={`mt-2 text-2xl font-semibold tracking-[-0.04em] ${color}`}>{value}</p>
-      <p className="mt-2 text-xs font-medium text-slate-500">{sub}</p>
-    </div>
-  );
-}
-
-function BentoCard({
-  icon: Icon,
-  title,
-  text,
-}: {
-  icon: React.ElementType;
-  title: string;
-  text: string;
-}) {
-  return (
-    <div className="group rounded-3xl border border-slate-800 bg-slate-900/40 p-6 transition hover:-translate-y-1 hover:border-slate-700 hover:bg-slate-900/70 hover:shadow-xl hover:shadow-black/20">
-      <div className="grid h-12 w-12 place-items-center rounded-2xl bg-slate-800/80 ring-1 ring-slate-700">
-        <Icon className="h-6 w-6 text-cyan-400" strokeWidth={1.8} />
-      </div>
-      <h3 className="mt-5 text-lg font-semibold tracking-[-0.03em] text-white">{title}</h3>
-      <p className="mt-2 text-sm leading-6 text-slate-400">{text}</p>
-    </div>
-  );
-}
-
-function SmallCard({
-  icon: Icon,
-  title,
-  text,
-}: {
-  icon: React.ElementType;
-  title: string;
-  text: string;
-}) {
-  return (
-    <div className="group rounded-3xl border border-slate-800 bg-slate-900/40 p-5">
-      <div className="grid h-10 w-10 place-items-center rounded-xl bg-slate-800/80 ring-1 ring-slate-700">
-        <Icon className="h-5 w-5 text-cyan-400" strokeWidth={1.8} />
-      </div>
-      <h3 className="mb-2 mt-4 font-semibold tracking-[-0.03em] text-white">{title}</h3>
-      <p className="text-xs leading-6 text-slate-400">{text}</p>
-    </div>
-  );
-}
-
-function BrowserFrame({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="rounded-3xl overflow-hidden border border-slate-800 shadow-2xl shadow-black/40 bg-slate-900/80">
-      <div className="flex items-center gap-2 px-5 py-4 border-b border-slate-800">
-        <div className="flex gap-2">
-          <div className="h-3 w-3 rounded-full bg-red-500/70" />
-          <div className="h-3 w-3 rounded-full bg-yellow-500/70" />
-          <div className="h-3 w-3 rounded-full bg-emerald-500/70" />
-        </div>
-        <span className="ml-4 text-xs text-slate-500 font-mono">UniDream Dashboard — Live Inference</span>
-      </div>
-      {children}
+      <p className="mt-2 text-xs font-medium text-slate-600">{sub}</p>
     </div>
   );
 }
 
 function Footer() {
   const columns: [string, ...string[]][] = [
-    ["プロダクト", "UniDreamとは", "機能一覧", "ダッシュボード", "料金プラン"],
-    ["技術", "世界モデル", "強化学習", "リスク制御", "アーキテクチャ"],
-    ["研究", "研究アプローチ", "論文・レポート", "ベンチマーク", "公開データ"],
-    ["会社情報", "会社概要", "採用情報", "ニュース", "お問い合わせ"],
+    ["プロダクト", "UniDreamとは", "ダッシュボード", "API"],
+    ["研究", "研究アプローチ", "論文・レポート", "ベンチマーク"],
+    ["会社", "会社概要", "採用情報", "お問い合わせ"],
   ];
 
   return (
-    <footer className="border-t border-slate-800 bg-slate-950 py-12">
-      <div className="mx-auto grid max-w-7xl gap-10 px-6 lg:grid-cols-[1.35fr_2fr]">
-        <div>
-          <Logo />
-          <p className="mt-5 max-w-sm text-sm leading-7 text-slate-400">
-            UniDreamは、世界モデルと強化学習を用いて市場状態を理解し、リスクを考慮した意思決定で、B&Hを超えるパフォーマンスを目指すAIプロダクトです。
-          </p>
-          <div className="mt-6 flex items-center gap-3">
-            {SOCIAL_LINKS.map((item) => (
-              <SocialButton key={item.label} {...item} />
+    <footer className="border-t border-slate-800/60 bg-slate-950 py-16">
+      <div className="mx-auto max-w-7xl px-6">
+        <div className="flex flex-wrap justify-between gap-12">
+          <div className="max-w-xs">
+            <Logo />
+            <p className="mt-4 text-sm leading-6 text-slate-500">
+              Transformer world modelと強化学習で市場状態を理解する。
+            </p>
+            <div className="mt-5 flex items-center gap-3">
+              {SOCIAL_LINKS.map((item) => (
+                <SocialButton key={item.label} {...item} />
+              ))}
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-12">
+            {columns.map((col) => (
+              <div key={col[0]}>
+                <h4 className="mb-4 text-xs font-semibold tracking-widest text-slate-500 uppercase">{col[0]}</h4>
+                <ul className="space-y-3">
+                  {col.slice(1).map((item) => (
+                    <li key={item} className="text-sm text-slate-400 hover:text-white transition cursor-default">{item}</li>
+                  ))}
+                </ul>
+              </div>
             ))}
           </div>
-          <p className="mt-8 text-xs font-medium text-slate-500">© 2026 WorldForge AI</p>
         </div>
-        <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
-          {columns.map((col) => (
-            <div key={col[0]}>
-              <h4 className="mb-4 text-sm font-semibold tracking-[-0.02em] text-white">
-                {col[0]}
-              </h4>
-              <ul className="space-y-3 text-sm font-medium text-slate-500">
-                {col.slice(1).map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
-              </ul>
-            </div>
-          ))}
+        <div className="mt-12 pt-6 border-t border-slate-800/40 flex flex-wrap justify-between gap-4 text-xs text-slate-600">
+          <p>© 2026 WorldForge AI</p>
+          <div className="flex gap-6">
+            <span>Privacy</span>
+            <span>Terms</span>
+          </div>
         </div>
       </div>
     </footer>
@@ -264,9 +178,10 @@ function Footer() {
 
 export default function HomepagePage() {
   return (
-    <main className="min-h-screen bg-slate-950 text-white antialiased overflow-hidden">
+    <main className="min-h-screen bg-slate-950 text-white antialiased">
+      {/* grid texture — subtle */}
       <div
-        className="fixed inset-0 pointer-events-none opacity-[0.04]"
+        className="fixed inset-0 pointer-events-none opacity-[0.02]"
         style={{
           backgroundImage:
             "linear-gradient(to right, rgba(255,255,255,0.3) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.3) 1px, transparent 1px)",
@@ -274,26 +189,22 @@ export default function HomepagePage() {
         }}
       />
 
-      <header className="sticky top-0 z-50 border-b border-slate-800/60 bg-slate-950/80 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 md:px-6 py-4 md:py-5">
+      {/* header */}
+      <header className="sticky top-0 z-50 border-b border-slate-800/40 bg-slate-950/80 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 md:px-6 py-4">
           <Logo />
-          <nav className="hidden items-center gap-10 text-sm font-semibold text-slate-400 lg:flex">
+          <nav className="hidden items-center gap-8 text-sm font-medium text-slate-400 lg:flex">
             {NAV_ITEMS.map((item) => (
-              <a key={item} href="#" className="transition hover:text-white">
-                {item}
-              </a>
+              <a key={item} href="#" className="transition hover:text-white">{item}</a>
             ))}
           </nav>
-          <div className="flex items-center gap-3 md:gap-5">
-            <Link
-              href="/"
-              className="hidden text-sm font-semibold text-slate-400 transition hover:text-white md:block"
-            >
+          <div className="flex items-center gap-4">
+            <Link href="/" className="text-sm font-medium text-slate-400 transition hover:text-white">
               デモ
             </Link>
             <button
               type="button"
-              className="rounded-full bg-white px-4 md:px-5 py-2.5 md:py-3 text-xs md:text-sm font-semibold text-slate-950 shadow-lg transition hover:-translate-y-0.5 hover:bg-slate-200"
+              className="rounded-lg bg-white px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-slate-200"
             >
               問い合わせ
             </button>
@@ -301,227 +212,308 @@ export default function HomepagePage() {
         </div>
       </header>
 
+      {/* hero */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <Image
-            src="/hero-bg.png"
-            alt=""
-            fill
-            className="object-cover"
-            priority
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-slate-950/85 via-slate-950/70 to-slate-950/85" />
+          <Image src="/hero-bg.png" alt="" fill className="object-cover" priority />
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-950/75 to-slate-950/85" />
         </div>
-        <div className="relative z-10 mx-auto max-w-7xl px-4 md:px-6 py-20 md:py-32">
+        <div className="relative z-10 mx-auto max-w-7xl px-4 md:px-6 py-24 md:py-36">
           <div className="max-w-3xl">
-            <span className="mb-6 inline-flex rounded-full border border-cyan-500/20 bg-cyan-500/10 px-5 py-2 text-sm font-semibold text-cyan-300">
+            <span className="mb-6 inline-flex rounded-lg border border-cyan-500/15 bg-cyan-500/[0.06] px-4 py-1.5 text-xs font-semibold text-cyan-300/80">
               UniDream · WorldForge AI
             </span>
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-semibold tracking-[-0.075em] leading-[1.02] text-white">
-              市場の見えない構造を、
-              <br />
-              世界モデルで読む。
+            <h1 className="text-4xl md:text-7xl font-semibold tracking-[-0.075em] leading-[0.98] text-white">
+              市場の見えない構造を、<br />世界モデルで読む。
             </h1>
-            <p className="mt-6 max-w-2xl text-base md:text-lg leading-8 text-slate-300">
-              UniDreamは、Transformer世界モデルと強化学習により、価格予測ではなく
-              市場状態・リスク・不確実性を学習する金融AI基盤です。
+            <p className="mt-5 max-w-xl text-base leading-7 text-slate-400">
+              Transformer世界モデルと強化学習により、価格予測ではなく市場状態・リスク・不確実性を学習する金融AI基盤。
             </p>
-            <div className="mt-10 flex flex-wrap gap-4">
+            <div className="mt-8 flex flex-wrap gap-3">
               <CtaButton href="/">デモを見る</CtaButton>
               <CtaButton variant="secondary">PoC資料を相談する</CtaButton>
+            </div>
+          </div>
+          {/* overlay: latent state labels */}
+          <div className="absolute right-8 bottom-8 hidden lg:flex gap-3">
+            <div className="rounded-xl border border-slate-700/60 bg-slate-900/70 px-4 py-3 backdrop-blur">
+              <p className="text-[10px] font-semibold tracking-widest text-slate-500">REGIME</p>
+              <p className="mt-1 text-sm font-semibold text-cyan-300">bear → neutral</p>
+            </div>
+            <div className="rounded-xl border border-slate-700/60 bg-slate-900/70 px-4 py-3 backdrop-blur">
+              <p className="text-[10px] font-semibold tracking-widest text-slate-500">RISK</p>
+              <p className="mt-1 text-sm font-semibold text-emerald-300">low</p>
+            </div>
+            <div className="rounded-xl border border-slate-700/60 bg-slate-900/70 px-4 py-3 backdrop-blur">
+              <p className="text-[10px] font-semibold tracking-widest text-slate-500">SIGNAL</p>
+              <p className="mt-1 text-sm font-semibold text-blue-300">LONG</p>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 md:px-6 -mt-8 relative z-20 pb-10">
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      {/* metrics */}
+      <section className="mx-auto max-w-7xl px-4 md:px-6 -mt-6 relative z-20 pb-12 md:pb-16">
+        <div className="grid gap-3 md:grid-cols-4">
           {METRICS.map((m) => (
             <MetricCard key={m.label} {...m} />
           ))}
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 md:px-6 py-16 md:py-24">
-        <div className="mx-auto mb-12 max-w-2xl text-center">
-          <SectionLabel>PRODUCT</SectionLabel>
-          <h2 className="mt-4 text-3xl md:text-4xl font-semibold tracking-[-0.055em] text-white">
-            市場理解のためのAIプロダクト
+      {/* results — 2-card hierarchy */}
+      <section className="mx-auto max-w-7xl px-4 md:px-6 py-16 md:py-20">
+        <div className="mb-10 max-w-xl">
+          <SectionLabel>RESEARCH</SectionLabel>
+          <h2 className="mt-3 text-3xl md:text-4xl font-semibold tracking-[-0.055em] text-white">
+            実データによる検証結果
           </h2>
-          <p className="mt-4 text-slate-400">
-            価格予測を超え、市場状態・リスク・行動を一貫してモデリング。
+          <p className="mt-3 text-slate-500 text-sm">
+            BTCUSDT 15m · 2018-2024。全指標B&H比較。
           </p>
         </div>
-        <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-          {PRODUCT_CARDS.map((card) => (
-            <BentoCard key={card.title} {...card} />
-          ))}
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-7xl px-4 md:px-6 py-16 md:py-24">
-        <div className="mx-auto mb-12 max-w-2xl text-center">
-          <SectionLabel>RESEARCH RESULTS</SectionLabel>
-          <h2 className="mt-4 text-3xl md:text-4xl font-semibold tracking-[-0.055em] text-white">
-            成果
-          </h2>
-          <p className="mt-4 text-slate-400">
-            実データによる検証結果。全ての戦略はB&H（Buy & Hold）との比較で評価。
-          </p>
-        </div>
-        <div className="grid gap-6 lg:grid-cols-[1fr_1fr]">
-          <div className="rounded-3xl border border-slate-800 bg-slate-900/40 p-8">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="grid h-10 w-10 place-items-center rounded-xl bg-emerald-500/10 ring-1 ring-emerald-500/20">
-                <ShieldCheck className="h-5 w-5 text-emerald-400" strokeWidth={1.8} />
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-white">Safe Baseline</p>
-                <p className="text-xs text-slate-500">Phase 8 · BTCUSDT 15m · 2018-2024</p>
-              </div>
-            </div>
-            <div className="mt-6 grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-xs font-semibold tracking-widest text-slate-500">AlphaEx</p>
-                <p className="mt-1 text-2xl font-semibold text-cyan-400">+0.89 pt/yr</p>
-              </div>
-              <div>
-                <p className="text-xs font-semibold tracking-widest text-slate-500">MaxDDΔ</p>
-                <p className="mt-1 text-2xl font-semibold text-emerald-400">-1.58 pt</p>
-              </div>
-            </div>
-            <p className="mt-4 text-xs leading-6 text-slate-500">
-              B&H比でリターンを維持しつつ最大ドローダウンを低減。最も堅牢なベースライン。
-            </p>
-          </div>
-          <div className="rounded-3xl border border-slate-800 bg-gradient-to-br from-slate-900/60 via-slate-900/40 to-blue-950/30 p-8">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="grid h-10 w-10 place-items-center rounded-xl bg-blue-500/10 ring-1 ring-blue-500/20">
-                <Zap className="h-5 w-5 text-blue-400" strokeWidth={1.8} />
+        <div className="grid gap-5 lg:grid-cols-[1.3fr_1fr]">
+          {/* featured result */}
+          <div className="rounded-2xl border border-blue-500/20 bg-gradient-to-br from-slate-900 to-blue-950/30 p-7 md:p-9">
+            <div className="flex items-center gap-3 mb-5">
+              <div className="grid h-9 w-9 place-items-center rounded-lg bg-blue-500/10">
+                <Zap className="h-4 w-4 text-blue-400" strokeWidth={2} />
               </div>
               <div>
                 <p className="text-sm font-semibold text-white">3fold AC再学習</p>
                 <p className="text-xs text-slate-500">selector v2 strict · test平均</p>
               </div>
             </div>
-            <div className="mt-6 grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-3 gap-5">
               <div>
                 <p className="text-xs font-semibold tracking-widest text-slate-500">AlphaEx</p>
-                <p className="mt-1 text-2xl font-semibold text-blue-400">+12.97 pt</p>
+                <p className="mt-1 text-3xl font-semibold text-blue-400">+12.97 pt</p>
               </div>
               <div>
                 <p className="text-xs font-semibold tracking-widest text-slate-500">SharpeΔ</p>
-                <p className="mt-1 text-2xl font-semibold text-indigo-400">+0.033</p>
+                <p className="mt-1 text-3xl font-semibold text-indigo-400">+0.033</p>
               </div>
               <div>
                 <p className="text-xs font-semibold tracking-widest text-slate-500">MaxDDΔ</p>
-                <p className="mt-1 text-2xl font-semibold text-emerald-400">-0.30 pt</p>
+                <p className="mt-1 text-3xl font-semibold text-emerald-400">-0.30 pt</p>
               </div>
             </div>
-            <p className="mt-4 text-xs leading-6 text-slate-500">
-              B&H比でリターン増加、Sharpe微増、DD改善。検証中の有望な結果。
+            <p className="mt-5 text-xs text-slate-600 leading-5">
+              B&H比でリターン増加、Sharpe微増、DD改善。※ strict条件でvalidation全fold acceptは未達。再現性確認中。
+            </p>
+          </div>
+          {/* supporting result */}
+          <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-7 md:p-9 flex flex-col justify-between">
+            <div>
+              <div className="flex items-center gap-3 mb-5">
+                <div className="grid h-9 w-9 place-items-center rounded-lg bg-emerald-500/10">
+                  <ShieldCheck className="h-4 w-4 text-emerald-400" strokeWidth={2} />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-white">Safe Baseline</p>
+                  <p className="text-xs text-slate-500">Phase 8</p>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-xs font-semibold tracking-widest text-slate-600">AlphaEx</p>
+                  <p className="mt-1 text-2xl font-semibold text-cyan-400">+0.89 pt/yr</p>
+                </div>
+                <div>
+                  <p className="text-xs font-semibold tracking-widest text-slate-600">MaxDDΔ</p>
+                  <p className="mt-1 text-2xl font-semibold text-emerald-400">-1.58 pt</p>
+                </div>
+              </div>
+            </div>
+            <p className="mt-5 text-xs text-slate-600 leading-5">
+              最も堅牢なベースライン。B&H比でリターンを維持しつつ最大ドローダウンを低減。
             </p>
           </div>
         </div>
-        <p className="mt-6 text-center text-xs text-slate-600">
-          ※ strict条件では validation 全fold accept 未達。Plan7既存ACとの同条件比較と danger率検証で再現性を確認中。
-        </p>
       </section>
 
+      {/* product — bento with hierarchy */}
+      <section className="mx-auto max-w-7xl px-4 md:px-6 py-16 md:py-20">
+        <div className="mb-10 max-w-xl">
+          <SectionLabel>PRODUCT</SectionLabel>
+          <h2 className="mt-3 text-3xl md:text-4xl font-semibold tracking-[-0.055em] text-white">
+            市場理解のためのAI
+          </h2>
+        </div>
+        <div className="grid grid-cols-12 gap-4">
+          {/* hero card — transformer world model */}
+          <div className="col-span-12 lg:col-span-6 row-span-2 rounded-2xl border border-slate-800 bg-gradient-to-br from-slate-900 via-slate-900 to-cyan-950/20 p-7 md:p-9">
+            <div className="grid h-12 w-12 place-items-center rounded-xl bg-slate-800/80 ring-1 ring-slate-700">
+              <Globe2 className="h-6 w-6 text-cyan-400" strokeWidth={1.8} />
+            </div>
+            <h3 className="mt-5 text-xl font-semibold tracking-[-0.03em] text-white">Transformer World Model</h3>
+            <p className="mt-3 max-w-md text-sm leading-6 text-slate-400">
+              価格・流動性・リスク・ニュースから潜在市場状態を学習。将来の価格予測ではなく、市場の構造的理解を目的とするコアモデル。
+            </p>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <span className="rounded-md border border-slate-700 bg-slate-800/60 px-3 py-1 text-xs text-slate-400">latent state</span>
+              <span className="rounded-md border border-slate-700 bg-slate-800/60 px-3 py-1 text-xs text-slate-400">regime detection</span>
+              <span className="rounded-md border border-slate-700 bg-slate-800/60 px-3 py-1 text-xs text-slate-400">risk estimation</span>
+            </div>
+          </div>
+          {/* medium card 1 */}
+          <div className="col-span-12 sm:col-span-6 lg:col-span-3 rounded-2xl border border-slate-800 bg-slate-900/40 p-6">
+            <div className="grid h-10 w-10 place-items-center rounded-xl bg-slate-800/80 ring-1 ring-slate-700">
+              <BrainCircuit className="h-5 w-5 text-cyan-400" strokeWidth={1.8} />
+            </div>
+            <h3 className="mt-4 text-base font-semibold text-white">強化学習方策</h3>
+            <p className="mt-2 text-xs leading-5 text-slate-400">世界モデルが認識した状態を基に、リスク調整リターンを最大化する行動を学習。</p>
+          </div>
+          {/* medium card 2 */}
+          <div className="col-span-12 sm:col-span-6 lg:col-span-3 rounded-2xl border border-slate-800 bg-slate-900/40 p-6">
+            <div className="grid h-10 w-10 place-items-center rounded-xl bg-slate-800/80 ring-1 ring-slate-700">
+              <Radar className="h-5 w-5 text-cyan-400" strokeWidth={1.8} />
+            </div>
+            <h3 className="mt-4 text-base font-semibold text-white">市場状態推定</h3>
+            <p className="mt-2 text-xs leading-5 text-slate-400">レジーム・ボラティリティ・流動性・テールリスクをリアルタイムに推定。</p>
+          </div>
+          {/* small card 1 */}
+          <div className="col-span-12 sm:col-span-6 lg:col-span-2 rounded-2xl border border-slate-800 bg-slate-900/40 p-5">
+            <div className="grid h-8 w-8 place-items-center rounded-lg bg-slate-800/80 ring-1 ring-slate-700">
+              <BarChart3 className="h-4 w-4 text-cyan-400" strokeWidth={1.8} />
+            </div>
+            <h3 className="mt-3 text-sm font-semibold text-white">バックテスト</h3>
+            <p className="mt-1 text-xs text-slate-500">2018–2024。全指標B&H比較。</p>
+          </div>
+          {/* small card 2 */}
+          <div className="col-span-12 sm:col-span-6 lg:col-span-2 rounded-2xl border border-slate-800 bg-slate-900/40 p-5">
+            <div className="grid h-8 w-8 place-items-center rounded-lg bg-slate-800/80 ring-1 ring-slate-700">
+              <LineChart className="h-4 w-4 text-cyan-400" strokeWidth={1.8} />
+            </div>
+            <h3 className="mt-3 text-sm font-semibold text-white">ダッシュボード</h3>
+            <p className="mt-1 text-xs text-slate-500">リアルタイム推論可視化。</p>
+          </div>
+          {/* small card 3 */}
+          <div className="col-span-12 sm:col-span-6 lg:col-span-2 rounded-2xl border border-slate-800 bg-slate-900/40 p-5">
+            <div className="grid h-8 w-8 place-items-center rounded-lg bg-slate-800/80 ring-1 ring-slate-700">
+              <DatabaseZap className="h-4 w-4 text-cyan-400" strokeWidth={1.8} />
+            </div>
+            <h3 className="mt-3 text-sm font-semibold text-white">模倣学習</h3>
+            <p className="mt-1 text-xs text-slate-500">教師方策から安定初期化。</p>
+          </div>
+        </div>
+      </section>
+
+      {/* vision — dark-adapted image */}
       <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-950 via-slate-900/50 to-slate-950" />
-        <div className="relative mx-auto max-w-7xl px-4 md:px-6 py-16 md:py-24">
-          <div className="grid items-center gap-10 md:gap-16 lg:grid-cols-[1fr_1fr]">
-            <div className="relative">
-              <div className="rounded-3xl overflow-hidden border border-slate-800 shadow-2xl shadow-black/30 bg-slate-900/60">
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950 via-slate-900/30 to-slate-950" />
+        <div className="relative mx-auto max-w-7xl px-4 md:px-6 py-16 md:py-20">
+          <div className="grid items-start gap-12 lg:grid-cols-[1fr_1.1fr]">
+            <div className="order-2 lg:order-1">
+              <SectionLabel>VISION</SectionLabel>
+              <h2 className="mt-3 text-3xl md:text-4xl font-semibold tracking-[-0.055em] text-white">
+                価格予測を超えた市場理解へ
+              </h2>
+              <div className="mt-6 space-y-4 text-sm leading-7 text-slate-400">
+                <p>
+                  金融市場は、価格だけで動いているわけではありません。投資家心理、流動性、リスク、ニュース、制度、そして時間とともに変化する市場状態。
+                </p>
+                <p>
+                  UniDreamは、世界モデルと強化学習によって、そうした
+                  <span className="font-semibold text-cyan-300">見えない市場構造を学習</span>
+                  し、いま市場で何が起きているのか、どの行動がリスクに対して合理的なのかを判断するAIを目指します。
+                </p>
+              </div>
+            </div>
+            <div className="order-1 lg:order-2 relative">
+              <div className="rounded-2xl overflow-hidden border border-slate-800/60">
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 to-transparent z-10 pointer-events-none" />
+                <div className="absolute inset-0 mix-blend-overlay bg-gradient-to-br from-cyan-500/5 to-blue-500/5 z-10 pointer-events-none" />
                 <Image
                   src="/vision-illustration.png"
-                  alt="Market structure visualization"
+                  alt=""
                   width={840}
                   height={720}
                   className="w-full h-auto"
                 />
               </div>
-              <div className="absolute -bottom-4 -right-4 rounded-2xl border border-slate-700 bg-slate-900/90 p-4 backdrop-blur shadow-lg">
-                <p className="text-[10px] font-semibold tracking-widest text-slate-500">LATENT STATE</p>
-                <div className="mt-2 flex gap-4">
-                  <div><span className="text-xs text-slate-400">regime</span><p className="text-sm font-semibold text-cyan-300">bear → neutral</p></div>
-                  <div><span className="text-xs text-slate-400">risk</span><p className="text-sm font-semibold text-emerald-300">low</p></div>
-                </div>
-              </div>
-            </div>
-            <div>
-              <SectionLabel>VISION</SectionLabel>
-              <h2 className="mt-4 text-3xl md:text-4xl font-semibold tracking-[-0.055em] text-white">
-                価格予測を超えた市場理解へ
-              </h2>
-              <div className="mt-6 space-y-5 text-base leading-8 text-slate-400">
-                <p>
-                  金融市場は、価格だけで動いているわけではありません。その裏側には、
-                  投資家心理、流動性、リスク、ニュース、制度、そして時間とともに変化する市場状態があります。
-                </p>
-                <p>
-                  UniDreamは、世界モデルと強化学習によって、そうした
-                  <span className="font-semibold text-cyan-300">見えない市場構造を学習</span>
-                  し、将来の価格を単純に当てるのではなく、
-                  「いま市場で何が起きているのか」「どの行動がリスクに対して合理的なのか」を判断するAIを目指します。
-                </p>
-                <p>
-                  私たちは、金融の意思決定を、経験と勘だけに頼るものから、
-                  <span className="font-semibold text-cyan-300">市場理解に基づいた、再現性のある知能</span>
-                  へ進化させます。
-                </p>
-              </div>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 md:px-6 py-16 md:py-24">
-        <div className="grid items-center gap-10 lg:grid-cols-[0.55fr_1.45fr]">
+      {/* dashboard — staged with annotations */}
+      <section className="mx-auto max-w-7xl px-4 md:px-6 py-16 md:py-20">
+        <div className="grid items-center gap-8 lg:grid-cols-[0.5fr_1.5fr]">
           <div>
             <SectionLabel>LIVE DEMO</SectionLabel>
-            <h2 className="mt-4 text-3xl md:text-4xl font-semibold tracking-[-0.055em] text-white">
-              実際の推論ダッシュボード
+            <h2 className="mt-3 text-3xl md:text-4xl font-semibold tracking-[-0.055em] text-white">
+              推論ダッシュボード
             </h2>
-            <p className="mt-4 text-slate-400">
-              リアルタイムで動作する研究デモ。エクイティ、ポジション、市場状態、
-              リスクメトリクスを一画面で確認できます。
+            <p className="mt-3 text-sm leading-6 text-slate-400">
+              リアルタイムで動作する研究デモ。エクイティ・ポジション・市場状態を一画面で。
             </p>
-            <div className="mt-8 flex flex-wrap gap-4">
+            <div className="mt-6 flex flex-col gap-2">
+              <div className="flex items-center gap-2 text-xs text-slate-500">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                Live · next inference in ~15m
+              </div>
+              <div className="flex items-center gap-2 text-xs text-slate-500">
+                <ArrowRight className="h-3 w-3 text-cyan-400" />
+                BTCUSDT · 15m
+              </div>
+            </div>
+            <div className="mt-8">
               <CtaButton href="/">デモを起動</CtaButton>
-              <CtaButton variant="secondary">詳しく見る</CtaButton>
             </div>
           </div>
           <div className="relative">
-            <div className="absolute -inset-4 rounded-[46px] bg-gradient-to-r from-cyan-500/10 via-blue-500/10 to-indigo-500/10 blur-2xl" />
-            <div className="relative">
-              <BrowserFrame>
-                <Image
-                  src="/dashboard-preview.png"
-                  alt="UniDream Demo dashboard"
-                  width={1400}
-                  height={900}
-                  className="w-full h-auto"
-                />
-              </BrowserFrame>
+            <div className="absolute -inset-3 rounded-3xl bg-gradient-to-r from-cyan-500/8 via-blue-500/8 to-indigo-500/8 blur-2xl" />
+            <div className="relative rounded-xl overflow-hidden border border-slate-800 shadow-2xl shadow-black/40 bg-slate-900">
+              {/* browser chrome */}
+              <div className="flex items-center gap-1.5 px-4 py-3 border-b border-slate-800">
+                <div className="flex gap-1.5">
+                  <div className="h-2.5 w-2.5 rounded-full bg-slate-600" />
+                  <div className="h-2.5 w-2.5 rounded-full bg-slate-600" />
+                  <div className="h-2.5 w-2.5 rounded-full bg-slate-600" />
+                </div>
+                <span className="ml-3 text-[11px] text-slate-600 font-mono">dashboard.unidream.ai</span>
+              </div>
+              <Image
+                src="/dashboard-preview.png"
+                alt="UniDream Demo dashboard"
+                width={1400}
+                height={900}
+                className="w-full h-auto"
+              />
+            </div>
+            {/* floating annotation */}
+            <div className="absolute -top-2 -right-2 hidden lg:block rounded-xl border border-slate-700 bg-slate-900/90 px-4 py-3 backdrop-blur shadow-lg">
+              <p className="text-[10px] font-semibold tracking-widest text-slate-500">EQUITY</p>
+              <p className="text-lg font-semibold text-emerald-400">$10,942.77</p>
+              <p className="text-xs text-slate-500">PnL +9.43%</p>
+            </div>
+            <div className="absolute -bottom-2 -left-2 hidden lg:block rounded-xl border border-slate-700 bg-slate-900/90 px-4 py-3 backdrop-blur shadow-lg">
+              <p className="text-[10px] font-semibold tracking-widest text-slate-500">SIGNAL</p>
+              <p className="text-base font-semibold text-cyan-300">LONG · target 1.000</p>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 md:px-6 pb-24">
-        <div className="rounded-3xl border border-slate-800 bg-gradient-to-r from-slate-900/80 via-slate-900/40 to-slate-900/80 p-8 md:p-12 text-center">
-          <SectionLabel>GET STARTED</SectionLabel>
-          <h2 className="mt-4 text-3xl md:text-4xl font-semibold tracking-[-0.055em] text-white">
-            金融市場の意思決定を、モデルベースに進化させる。
-          </h2>
-          <p className="mt-4 mx-auto max-w-xl text-slate-400">
-            UniDreamは研究段階のプロダクトです。PoC導入や共同研究のご相談はお問い合わせください。
-          </p>
-          <div className="mt-8 flex flex-wrap justify-center gap-4">
-            <CtaButton href="/">デモを見る</CtaButton>
-            <CtaButton variant="secondary">問い合わせ</CtaButton>
+      {/* final CTA — specific actions */}
+      <section className="mx-auto max-w-7xl px-4 md:px-6 pb-20">
+        <div className="rounded-2xl border border-slate-800 bg-slate-900/40 p-8 md:p-12">
+          <div className="grid gap-8 md:grid-cols-[1.5fr_1fr] items-center">
+            <div>
+              <p className="text-xs font-semibold tracking-[0.28em] text-cyan-400/70">CONTACT</p>
+              <h2 className="mt-3 text-2xl md:text-3xl font-semibold tracking-[-0.05em] text-white">
+                UniDreamに興味がある方へ
+              </h2>
+              <p className="mt-3 text-sm leading-6 text-slate-400 max-w-md">
+                研究段階のプロダクトです。PoC導入、共同研究、デモの試用など、目的に合わせてご連絡ください。
+              </p>
+            </div>
+            <div className="flex flex-col gap-3">
+              <CtaButton href="/">デモを試す</CtaButton>
+              <CtaButton variant="secondary">PoC導入を相談する</CtaButton>
+              <CtaButton variant="secondary">研究への参加</CtaButton>
+            </div>
           </div>
         </div>
       </section>
