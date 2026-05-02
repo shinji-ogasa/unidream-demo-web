@@ -168,7 +168,7 @@ export default function HomepagePage() {
       <section className="relative min-h-[1140px] flex items-center">
         <div className="hero-visual-bg" />
         <div className="relative z-10 px-[20%] py-20 md:py-28">
-          <div className="max-w-[600px]">
+          <div className="max-w-[900px]">
             <motion.span
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
@@ -221,7 +221,7 @@ export default function HomepagePage() {
       <section className="container-site py-16 md:py-24">
         <div className="mb-10 max-w-[680px]">
           <SectionLabel>EVIDENCE</SectionLabel>
-          <h2 className="text-[3.75rem] md:text-[5.25rem] font-semibold tracking-[-0.05em] leading-[1.0] text-[#f4f7fb]">実データによる検証結果</h2>
+          <h2 className="text-[clamp(2.8rem,5vw,4.5rem)] font-semibold tracking-[-0.06em] leading-[0.95] text-[#f4f7fb]">実データによる検証結果</h2>
           <p className="mt-4 text-lg text-[#8a93a3]">BTCUSDT 15m · 2018-2024。全指標B&H比較。</p>
         </div>
         <div className="grid gap-5 lg:grid-cols-[1.3fr_1fr]">
@@ -257,7 +257,7 @@ export default function HomepagePage() {
       <section className="container-site py-16 md:py-24">
         <div className="mb-10 max-w-[680px]">
           <SectionLabel>PRODUCT</SectionLabel>
-          <h2 className="text-[3.75rem] md:text-[5.25rem] font-semibold tracking-[-0.05em] leading-[1.0] text-[#f4f7fb]">市場理解のためのAI</h2>
+          <h2 className="text-[clamp(2.8rem,5vw,4.5rem)] font-semibold tracking-[-0.06em] leading-[0.95] text-[#f4f7fb]">市場理解のためのAI</h2>
           <p className="mt-4 text-lg text-[#8a93a3]">価格予測を超え、市場状態・リスク・行動を一貫してモデリング。</p>
         </div>
         <div className="grid gap-4 md:grid-cols-3">
@@ -299,8 +299,8 @@ export default function HomepagePage() {
         </div>
         <div className="max-w-[680px]">
           <SectionLabel>VISION</SectionLabel>
-          <h2 className="text-[3.75rem] md:text-[5.25rem] font-semibold tracking-[-0.05em] leading-[1.0] text-[#f4f7fb]">価格予測を超えた市場理解へ</h2>
-          <div className="mt-6 space-y-4 text-base leading-7 text-[#8a93a3]">
+          <h2 className="text-[clamp(2.8rem,5vw,4.5rem)] font-semibold tracking-[-0.06em] leading-[0.95] text-[#f4f7fb]">価格予測を超えた市場理解へ</h2>
+          <div className="mt-8 space-y-6 text-lg leading-8 text-[#8a93a3]">
             <p>金融市場は、価格だけで動いているわけではありません。投資家心理、流動性、リスク、ニュース、制度、そして時間とともに変化する市場状態。</p>
             <p>UniDreamは、世界モデルと強化学習によって、そうした<span className="font-semibold text-[#02b8cc]">見えない市場構造を学習</span>し、いま市場で何が起きているのか、どの行動がリスクに対して合理的なのかを判断するAIを目指します。</p>
           </div>
@@ -311,7 +311,7 @@ export default function HomepagePage() {
       <section className="container-site py-16 md:py-24">
         <div className="mb-10 max-w-[680px]">
           <SectionLabel>LIVE DEMO</SectionLabel>
-          <h2 className="text-[3.75rem] md:text-[5.25rem] font-semibold tracking-[-0.05em] leading-[1.0] text-[#f4f7fb]">推論ダッシュボード</h2>
+          <h2 className="text-[clamp(2.8rem,5vw,4.5rem)] font-semibold tracking-[-0.06em] leading-[0.95] text-[#f4f7fb]">推論ダッシュボード</h2>
           <p className="mt-4 text-lg text-[#8a93a3]">リアルタイムで動作する研究デモ。エクイティ・ポジション・市場状態を一画面で。</p>
           <div className="mt-5 flex items-center gap-4 text-sm text-[#8a93a3]">
             <span className="flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-[#4ade80]" />Live · next inference in ~15m</span>
