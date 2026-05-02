@@ -132,9 +132,9 @@ function MetricCard({
 }) {
   return (
     <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-6">
-      <p className="text-xs font-semibold tracking-widest text-slate-600">{label}</p>
+      <p className="text-sm font-semibold tracking-widest text-slate-600">{label}</p>
       <p className={`mt-2 text-3xl font-semibold tracking-[-0.04em] ${color}`}>{value}</p>
-      <p className="mt-2 text-sm font-medium text-slate-600">{sub}</p>
+      <p className="mt-2 text-sm font-medium text-slate-500">{sub}</p>
     </div>
   );
 }
@@ -148,15 +148,15 @@ function PipelineDiagram() {
     { label: "RL Policy", sub: "action selection" },
     { label: "Decision", sub: "position · signal" },
   ];
-  const boxW = 140;
-  const gap = 40;
+  const boxW = 150;
+  const gap = 44;
   const totalW = steps.length * (boxW + gap) - gap;
   return (
-    <div className="w-full overflow-x-auto py-4">
-      <svg viewBox={`0 0 ${totalW + 40} 140`} className="w-full min-w-[800px]" preserveAspectRatio="xMidYMid meet">
+    <div className="w-full overflow-x-auto py-6">
+      <svg viewBox={`0 0 ${totalW + 40} 160`} className="w-full min-w-[950px]" preserveAspectRatio="xMidYMid meet">
         <defs>
-          <marker id="arr" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
-            <path d="M0,0 L8,4 L0,8 Z" fill="rgba(34,211,238,0.4)" />
+          <marker id="arr" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+            <path d="M0,0 L10,5 L0,10 Z" fill="rgba(34,211,238,0.35)" />
           </marker>
         </defs>
         {steps.map((s, i) => {
@@ -166,18 +166,18 @@ function PipelineDiagram() {
               {i > 0 && (
                 <line
                   x1={20 + i * (boxW + gap) - gap}
-                  y1={70}
+                  y1={80}
                   x2={20 + i * (boxW + gap)}
-                  y2={70}
-                  stroke="rgba(34,211,238,0.25)"
-                  strokeWidth="2"
-                  strokeDasharray="5,4"
+                  y2={80}
+                  stroke="rgba(34,211,238,0.2)"
+                  strokeWidth="2.5"
+                  strokeDasharray="6,5"
                   markerEnd="url(#arr)"
                 />
               )}
-              <rect x={cx} y={70 - 32} width={boxW} height={64} rx="10" fill="rgba(30,41,59,0.85)" stroke="rgba(51,65,85,0.8)" strokeWidth="1.5" />
-              <text x={cx + boxW / 2} y={70 - 4} textAnchor="middle" fill="rgba(34,211,238,0.95)" fontSize="13" fontFamily="system-ui" fontWeight="600">{s.label}</text>
-              <text x={cx + boxW / 2} y={70 + 16} textAnchor="middle" fill="rgba(148,163,184,0.5)" fontSize="9" fontFamily="monospace">{s.sub}</text>
+              <rect x={cx} y={80 - 38} width={boxW} height={76} rx="12" fill="rgba(30,41,59,0.85)" stroke="rgba(51,65,85,0.8)" strokeWidth="1.5" />
+              <text x={cx + boxW / 2} y={80 - 4} textAnchor="middle" fill="rgba(34,211,238,0.95)" fontSize="15" fontFamily="system-ui" fontWeight="600">{s.label}</text>
+              <text x={cx + boxW / 2} y={80 + 18} textAnchor="middle" fill="rgba(148,163,184,0.55)" fontSize="11" fontFamily="monospace">{s.sub}</text>
             </g>
           );
         })}
@@ -226,14 +226,6 @@ function Footer() {
 export default function HomepagePage() {
   return (
     <main className="min-h-screen bg-slate-950 text-white antialiased">
-      <div
-        className="fixed inset-0 pointer-events-none opacity-[0.015]"
-        style={{
-          backgroundImage: "linear-gradient(to right, rgba(255,255,255,0.3) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.3) 1px, transparent 1px)",
-          backgroundSize: "80px 80px",
-        }}
-      />
-
       {/* header */}
       <motion.header
         initial={{ opacity: 0, y: -12 }}
@@ -273,7 +265,7 @@ export default function HomepagePage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.15 }}
-              className="text-5xl md:text-8xl font-semibold tracking-[-0.075em] leading-[0.96] text-white"
+              className="text-5xl md:text-7xl font-semibold tracking-[-0.075em] leading-[0.96] text-white"
             >
               市場の見えない構造を、<br />世界モデルで読む。
             </motion.h1>
@@ -313,7 +305,7 @@ export default function HomepagePage() {
       <motion.section {...fadeUp} className="mx-auto max-w-7xl px-4 md:px-6 py-12 md:py-16">
         <div className="mb-8 max-w-xl">
           <SectionLabel>RESEARCH</SectionLabel>
-          <h2 className="text-4xl md:text-5xl font-semibold tracking-[-0.055em] text-white">実データによる検証結果</h2>
+          <h2 className="text-3xl md:text-4xl font-semibold tracking-[-0.055em] text-white">実データによる検証結果</h2>
           <p className="mt-3 text-base text-slate-500">BTCUSDT 15m · 2018-2024。全指標B&H比較。</p>
         </div>
         <div className="grid gap-5 lg:grid-cols-[1.3fr_1fr]">
@@ -329,9 +321,9 @@ export default function HomepagePage() {
               <div><p className="text-base font-semibold text-white">3fold AC再学習</p><p className="text-sm text-slate-500">selector v2 strict · test平均</p></div>
             </div>
             <div className="grid grid-cols-3 gap-6">
-              <div><p className="text-xs font-semibold tracking-widest text-slate-500">AlphaEx</p><p className="mt-1 text-4xl font-semibold text-blue-400">+12.97 pt</p></div>
-              <div><p className="text-xs font-semibold tracking-widest text-slate-500">SharpeΔ</p><p className="mt-1 text-4xl font-semibold text-indigo-400">+0.033</p></div>
-              <div><p className="text-xs font-semibold tracking-widest text-slate-500">MaxDDΔ</p><p className="mt-1 text-4xl font-semibold text-emerald-400">-0.30 pt</p></div>
+              <div><p className="text-sm font-semibold tracking-widest text-slate-500">AlphaEx</p><p className="mt-1 text-4xl font-semibold text-blue-400">+12.97 pt</p></div>
+              <div><p className="text-sm font-semibold tracking-widest text-slate-500">SharpeΔ</p><p className="mt-1 text-4xl font-semibold text-indigo-400">+0.033</p></div>
+              <div><p className="text-sm font-semibold tracking-widest text-slate-500">MaxDDΔ</p><p className="mt-1 text-4xl font-semibold text-emerald-400">-0.30 pt</p></div>
             </div>
             <p className="mt-5 text-sm text-slate-600 leading-5">B&H比でリターン増加、Sharpe微増、DD改善。※ strict条件でvalidation全fold acceptは未達。</p>
           </motion.div>
@@ -348,8 +340,8 @@ export default function HomepagePage() {
                 <div><p className="text-base font-semibold text-white">Safe Baseline</p><p className="text-sm text-slate-500">Phase 8</p></div>
               </div>
               <div className="grid grid-cols-2 gap-5">
-                <div><p className="text-xs font-semibold tracking-widest text-slate-600">AlphaEx</p><p className="mt-1 text-3xl font-semibold text-cyan-400">+0.89 pt/yr</p></div>
-                <div><p className="text-xs font-semibold tracking-widest text-slate-600">MaxDDΔ</p><p className="mt-1 text-3xl font-semibold text-emerald-400">-1.58 pt</p></div>
+                <div><p className="text-sm font-semibold tracking-widest text-slate-600">AlphaEx</p><p className="mt-1 text-3xl font-semibold text-cyan-400">+0.89 pt/yr</p></div>
+                <div><p className="text-sm font-semibold tracking-widest text-slate-600">MaxDDΔ</p><p className="mt-1 text-3xl font-semibold text-emerald-400">-1.58 pt</p></div>
               </div>
             </div>
             <p className="mt-5 text-sm text-slate-600 leading-5">最も堅牢なベースライン。B&H比でリターンを維持しつつ最大ドローダウンを低減。</p>
@@ -361,7 +353,7 @@ export default function HomepagePage() {
       <motion.section {...fadeUp} className="mx-auto max-w-7xl px-4 md:px-6 py-12 md:py-16">
         <div className="mb-8 max-w-xl">
           <SectionLabel>PRODUCT</SectionLabel>
-          <h2 className="text-4xl md:text-5xl font-semibold tracking-[-0.055em] text-white">市場理解のためのAI</h2>
+          <h2 className="text-3xl md:text-4xl font-semibold tracking-[-0.055em] text-white">市場理解のためのAI</h2>
         </div>
         <div className="grid grid-cols-12 gap-4">
           <motion.div
@@ -406,7 +398,7 @@ export default function HomepagePage() {
       <motion.section {...fadeUp} className="mx-auto max-w-7xl px-4 md:px-6 py-12 md:py-16">
         <div className="mb-8 max-w-3xl">
           <SectionLabel>VISION</SectionLabel>
-          <h2 className="text-4xl md:text-5xl font-semibold tracking-[-0.055em] text-white">価格予測を超えた市場理解へ</h2>
+          <h2 className="text-3xl md:text-4xl font-semibold tracking-[-0.055em] text-white">価格予測を超えた市場理解へ</h2>
           <div className="mt-6 space-y-4 text-base leading-7 text-slate-400">
             <p>金融市場は、価格だけで動いているわけではありません。投資家心理、流動性、リスク、ニュース、制度、そして時間とともに変化する市場状態。</p>
             <p>UniDreamは、世界モデルと強化学習によって、そうした<span className="font-semibold text-cyan-300">見えない市場構造を学習</span>し、いま市場で何が起きているのか、どの行動がリスクに対して合理的なのかを判断するAIを目指します。</p>
@@ -417,37 +409,22 @@ export default function HomepagePage() {
         </div>
       </motion.section>
 
-      {/* dashboard */}
+      {/* LIVE DEMO — text above, image below */}
       <motion.section {...fadeUp} className="mx-auto max-w-7xl px-4 md:px-6 py-12 md:py-16">
-        <div className="grid items-center gap-8 lg:grid-cols-[0.45fr_1.55fr]">
-          <div>
-            <SectionLabel>LIVE DEMO</SectionLabel>
-            <h2 className="text-4xl md:text-5xl font-semibold tracking-[-0.055em] text-white">推論ダッシュボード</h2>
-            <p className="mt-3 text-base leading-7 text-slate-400">リアルタイムで動作する研究デモ。エクイティ・ポジション・市場状態を一画面で。</p>
-            <div className="mt-5 flex flex-col gap-2">
-              <div className="flex items-center gap-2 text-sm text-slate-500"><span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />Live · next inference in ~15m</div>
-              <div className="flex items-center gap-2 text-sm text-slate-500"><ArrowRight className="h-3 w-3 text-cyan-400" />BTCUSDT · 15m</div>
-            </div>
-            <div className="mt-8"><CtaButton href="/">デモを起動</CtaButton></div>
+        <div className="mb-8 max-w-xl">
+          <SectionLabel>LIVE DEMO</SectionLabel>
+          <h2 className="text-3xl md:text-4xl font-semibold tracking-[-0.055em] text-white">推論ダッシュボード</h2>
+          <p className="mt-3 text-base leading-7 text-slate-400">リアルタイムで動作する研究デモ。エクイティ・ポジション・市場状態を一画面で。</p>
+          <div className="mt-4 flex items-center gap-4 text-sm text-slate-500">
+            <span className="flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />Live · next inference in ~15m</span>
+            <span className="flex items-center gap-2"><ArrowRight className="h-3 w-3 text-cyan-400" />BTCUSDT · 15m</span>
           </div>
-          <div className="relative">
-            <div className="absolute -inset-3 rounded-3xl bg-gradient-to-r from-cyan-500/8 via-blue-500/8 to-indigo-500/8 blur-2xl" />
-            <div className="relative rounded-xl overflow-hidden border border-slate-800 shadow-2xl shadow-black/40 bg-slate-900">
-              <div className="flex items-center gap-1.5 px-5 py-3.5 border-b border-slate-800">
-                <div className="flex gap-1.5"><div className="h-2.5 w-2.5 rounded-full bg-slate-600" /><div className="h-2.5 w-2.5 rounded-full bg-slate-600" /><div className="h-2.5 w-2.5 rounded-full bg-slate-600" /></div>
-                <span className="ml-3 text-xs text-slate-600 font-mono">dashboard.unidream.ai</span>
-              </div>
-              <Image src="/dashboard-preview.png" alt="UniDream Demo dashboard" width={1400} height={900} className="w-full h-auto" />
-            </div>
-            <div className="absolute -top-2 -right-2 hidden lg:block rounded-xl border border-slate-700 bg-slate-900/90 px-4 py-3 backdrop-blur shadow-lg">
-              <p className="text-[10px] font-semibold tracking-widest text-slate-500">EQUITY</p>
-              <p className="text-lg font-semibold text-emerald-400">$10,942.77</p>
-              <p className="text-xs text-slate-500">PnL +9.43%</p>
-            </div>
-            <div className="absolute -bottom-2 -left-2 hidden lg:block rounded-xl border border-slate-700 bg-slate-900/90 px-4 py-3 backdrop-blur shadow-lg">
-              <p className="text-[10px] font-semibold tracking-widest text-slate-500">SIGNAL</p>
-              <p className="text-base font-semibold text-cyan-300">LONG · target 1.000</p>
-            </div>
+          <div className="mt-6"><CtaButton href="/">デモを起動</CtaButton></div>
+        </div>
+        <div className="relative">
+          <div className="absolute -inset-3 rounded-3xl bg-gradient-to-r from-cyan-500/8 via-blue-500/8 to-indigo-500/8 blur-2xl" />
+          <div className="relative rounded-xl overflow-hidden border border-slate-800 shadow-2xl shadow-black/40">
+            <Image src="/dashboard-preview.png" alt="UniDream Demo dashboard" width={1400} height={900} className="w-full h-auto" />
           </div>
         </div>
       </motion.section>
@@ -458,7 +435,7 @@ export default function HomepagePage() {
           <div className="grid gap-8 md:grid-cols-[1.5fr_1fr] items-center">
             <div>
               <p className="text-xs font-semibold tracking-[0.28em] text-cyan-400/70">CONTACT</p>
-              <h2 className="mt-3 text-3xl md:text-4xl font-semibold tracking-[-0.05em] text-white">UniDreamに興味がある方へ</h2>
+              <h2 className="mt-3 text-2xl md:text-3xl font-semibold tracking-[-0.05em] text-white">UniDreamに興味がある方へ</h2>
               <p className="mt-3 text-base leading-6 text-slate-400 max-w-md">研究段階のプロダクトです。PoC導入、共同研究、デモの試用など、目的に合わせてご連絡ください。</p>
             </div>
             <div className="flex flex-col gap-3">
