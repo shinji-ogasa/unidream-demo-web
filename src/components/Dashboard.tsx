@@ -304,6 +304,12 @@ export function Dashboard({ initial }: DashboardProps) {
           >
             → unidream-space on Hugging Face
           </a>
+          <a
+            href="/homepage"
+            className="text-zinc-200 hover:text-blue-400 underline-offset-4 hover:underline transition-colors"
+          >
+            → WorldForge AI (会社概要)
+          </a>
         </div>
       </section>
 
