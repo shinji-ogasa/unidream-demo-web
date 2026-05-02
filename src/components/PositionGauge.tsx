@@ -70,7 +70,7 @@ export function PositionGauge({
           <div className="text-right text-white">{fmtUSD(equity)}</div>
         </div>
       </div>
-      <div className="pt-2 border-t border-[#1a1d23] flex flex-col gap-1.5">
+      <div className="mt-auto pt-2 border-t border-[#1a1d23] flex flex-col gap-1.5">
         <div className="flex items-center justify-between text-xs">
           <span className="uppercase tracking-[0.18em] text-zinc-500">
             position history

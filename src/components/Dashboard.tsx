@@ -245,7 +245,7 @@ export function Dashboard({ initial }: DashboardProps) {
         />
       </section>
 
-      <section className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
+      <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <PositionGauge
           position={currentPosition}
           equity={equity}
@@ -253,7 +253,7 @@ export function Dashboard({ initial }: DashboardProps) {
           assetQty={assetQty}
           positionHistory={positionHistory}
         />
-        <div className="md:col-span-2 flex flex-col gap-4">
+        <div className="md:col-span-2 flex flex-col gap-4 justify-between">
           <MetricsRow metrics={metrics} />
           <LongShortBar
             longPct={metrics.longPct}
