@@ -230,22 +230,26 @@ export default function HomepagePage() {
           </p>
         </div>
         <div className="flex flex-col md:flex-row items-stretch gap-4 md:gap-8">
-          <AnimateInView className="flex-1 rounded-xl border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.03)] p-6 flex flex-col justify-center text-left" x={-16} y={0}>
-            <p className="text-xs font-semibold tracking-[0.12em] text-[#ff6467] mb-2">PAIN</p>
-            <div className="text-base leading-7 text-[#d0d6e0] space-y-3">
-              <p>Buy & Holdは長期では強い。<br />しかし、暴落局面では深いドローダウンを抱え、回復までの時間も長い。</p>
-              <p>銘柄をいつ入れ替えるか。<br />どの比率で持つか。<br />いつ守り、いつリスクを取るか。</p>
-              <p>その判断は、いまだ人間に委ねられている。</p>
+          <AnimateInView className="flex-1 rounded-xl border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.03)] p-6 flex flex-col" x={-16} y={0}>
+            <p className="text-sm font-semibold tracking-[0.12em] text-[#ff6467] mb-3">PAIN</p>
+            <div className="flex-1 flex flex-col justify-center text-left">
+              <div className="text-base leading-7 text-[#d0d6e0] space-y-3">
+                <p>Buy & Holdは長期では強い。<br />しかし、暴落局面では深いドローダウンを抱え、回復までの時間も長い。</p>
+                <p>銘柄をいつ入れ替えるか。<br />どの比率で持つか。<br />いつ守り、いつリスクを取るか。</p>
+                <p>その判断は、いまだ人間に委ねられている。</p>
+              </div>
             </div>
           </AnimateInView>
           <div className="flex items-center justify-center self-stretch">
             <ArrowRight className="h-10 w-10 text-[#5266eb] rotate-90 md:rotate-0" />
           </div>
-          <AnimateInView className="flex-1 rounded-xl border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.03)] p-6 flex flex-col justify-center text-left" x={16} y={0} delay={0.15}>
-            <p className="text-xs font-semibold tracking-[0.12em] text-[#4ade80] mb-2">SOLUTION</p>
-            <div className="text-base leading-7 text-[#d0d6e0] space-y-3">
-              <p>UniDreamは、長期投資を「持つだけ」から「市場状態に応じて最適化する」へ進化させる意思決定AI。</p>
-              <p>Transformer世界モデルで市場の潜在状態を学習し、強化学習によって銘柄選定・ポジション調整・取引行動を一貫して最適化する。</p>
+          <AnimateInView className="flex-1 rounded-xl border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.03)] p-6 flex flex-col" x={16} y={0} delay={0.15}>
+            <p className="text-sm font-semibold tracking-[0.12em] text-[#4ade80] mb-3">SOLUTION</p>
+            <div className="flex-1 flex flex-col justify-center text-left">
+              <div className="text-base leading-7 text-[#d0d6e0] space-y-3">
+                <p>UniDreamは、長期投資を「持つだけ」から「市場状態に応じて最適化する」へ進化させる意思決定AI。</p>
+                <p>Transformer世界モデルで市場の潜在状態を学習し、強化学習によって銘柄選定・ポジション調整・取引行動を一貫して最適化する。</p>
+              </div>
             </div>
           </AnimateInView>
         </div>
