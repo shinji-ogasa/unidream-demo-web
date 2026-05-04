@@ -193,7 +193,7 @@ export default function HomepagePage() {
               transition={{ duration: 0.5, delay: 0.25 }}
               className="mt-8 max-w-[680px] text-lg leading-8 text-[#8a93a3]"
             >
-              UniDreamはOHLCVと特徴量から市場状態を学習し、想像ロールアウトと検証セレクタでB&Hを超える意思決定を探索する研究開発プロダクトです。
+              UniDreamは、長期投資を「持つだけ」から「市場状態に応じて最適化する」へ進化させるAI運用基盤です。Transformer世界モデルと強化学習により、銘柄選定・リスク管理・ポジション調整・売買判断を一貫して学習し、Buy & Holdの弱点である大きなドローダウンと機会損失を改善します。
             </motion.p>
             <motion.div
               initial={{ opacity: 0, y: 14 }}
@@ -224,8 +224,8 @@ export default function HomepagePage() {
       <section className="container-site py-12 md:py-16 pb-8 md:pb-10">
         <div className="mb-6 max-w-[680px]">
           <SectionLabel>EVIDENCE</SectionLabel>
-          <h2 className="text-[clamp(2rem,3.5vw,3rem)] font-semibold tracking-[-0.05em] leading-[1.05] text-[#f4f7fb]">実データによる検証結果</h2>
-          <p className="mt-4 text-lg leading-8 text-[#8a93a3]">BTCUSDT 15m · 2018-2024。全指標B&H比較。</p>
+          <h2 className="text-[clamp(2rem,3.5vw,3rem)] font-semibold tracking-[-0.05em] leading-[1.05] text-[#f4f7fb]">B&H改善の検証結果</h2>
+          <p className="mt-4 text-lg leading-8 text-[#8a93a3]">UniDreamのPoCでは、特定の銘柄・期間・取引制約のもとで、Buy & Holdや既存のルールベース戦略に対してリスク調整後の成績を改善できるかを検証します。検証軸はAlphaEx、MaxDD、Sharpe、ターンオーバー、Walk-Forwardでの汎化性能です。</p>
         </div>
         <div className="grid gap-5 lg:grid-cols-[1.3fr_1fr]">
           <AnimateInView className="card p-8 md:p-10 border-[rgba(94,106,210,0.36)]" x={-20} y={0}>
@@ -260,8 +260,8 @@ export default function HomepagePage() {
       <section className="container-site py-12 md:py-16">
         <div className="mb-6 max-w-[680px]">
           <SectionLabel>PRODUCT</SectionLabel>
-          <h2 className="text-[clamp(2rem,3.5vw,3rem)] font-semibold tracking-[-0.05em] leading-[1.05] text-[#f4f7fb]">市場理解のためのAI</h2>
-          <p className="mt-4 text-lg leading-8 text-[#8a93a3]">価格予測を超え、市場状態・リスク・行動を一貫してモデリング。</p>
+          <h2 className="text-[clamp(2rem,3.5vw,3rem)] font-semibold tracking-[-0.05em] leading-[1.05] text-[#f4f7fb]">予測ではなく、意思決定を学習する</h2>
+          <p className="mt-4 text-lg leading-8 text-[#8a93a3]">「価格を当てるモデル」ではなく、「市場状態を学習し、その状態に応じた取引行動を最適化するモデル」です。</p>
         </div>
         <div className="grid gap-4 md:grid-cols-3">
           <AnimateInView y={20} className="md:col-span-2 md:row-span-2 card p-8 md:p-10">
@@ -302,10 +302,11 @@ export default function HomepagePage() {
         </div>
         <div className="max-w-[680px]">
           <SectionLabel>VISION</SectionLabel>
-          <h2 className="text-[clamp(2rem,3.5vw,3rem)] font-semibold tracking-[-0.05em] leading-[1.05] text-[#f4f7fb]">価格予測を超えた市場理解へ</h2>
+          <h2 className="text-[clamp(2rem,3.5vw,3rem)] font-semibold tracking-[-0.05em] leading-[1.05] text-[#f4f7fb]">長期投資を、AIで再設計する</h2>
           <div className="mt-8 space-y-6 text-lg leading-8 text-[#8a93a3]">
-            <p>金融市場は、価格だけで動いているわけではありません。投資家心理、流動性、リスク、ニュース、制度、そして時間とともに変化する市場状態。</p>
-            <p>UniDreamは、世界モデルと強化学習によって、そうした<span className="font-semibold text-[#02b8cc]">見えない市場構造を学習</span>し、いま市場で何が起きているのか、どの行動がリスクに対して合理的なのかを判断するAIを目指します。</p>
+            <p>従来の多くの予測モデルは、短期的な値動きの予測に焦点を当ててきました。しかし、実際の運用で重要なのは、いつリスクを取り、いつ守り、どの銘柄をどの比率で保有し、どのタイミングで調整するかです。</p>
+            <p>UniDreamは<span className="font-semibold text-[#02b8cc]">「価格を当てるモデル」ではなく、「市場状態を学習し、その状態に応じた取引行動を最適化するモデル」</span>です。Transformer世界モデルによって市場の潜在状態を学習し、強化学習によって取引行動を最適化します。</p>
+            <p>目指すのは、Buy & Holdの長期的な強さを活かしながら、ドローダウンと機会損失を抑える次世代のAI運用エンジンです。</p>
           </div>
         </div>
       </section>
@@ -315,7 +316,7 @@ export default function HomepagePage() {
         <div className="mb-6 max-w-[680px]">
           <SectionLabel>LIVE DEMO</SectionLabel>
           <h2 className="text-[clamp(2rem,3.5vw,3rem)] font-semibold tracking-[-0.05em] leading-[1.05] text-[#f4f7fb]">推論ダッシュボード</h2>
-          <p className="mt-4 text-lg leading-8 text-[#8a93a3]">リアルタイムで動作する研究デモ。エクイティ・ポジション・市場状態を一画面で。</p>
+          <p className="mt-4 text-lg leading-8 text-[#8a93a3]">長期投資の意思決定を最適化するAIの実際の推論結果をリアルタイムで確認できます。</p>
           <div className="mt-5 flex items-center gap-4 text-sm text-[#8a93a3]">
             <span className="flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-[#4ade80]" />Live · next inference in ~15m</span>
             <span className="flex items-center gap-2"><ArrowRight className="h-3 w-3 text-[#02b8cc]" />BTCUSDT · 15m</span>
