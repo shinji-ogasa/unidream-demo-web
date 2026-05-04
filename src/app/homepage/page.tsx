@@ -266,7 +266,7 @@ export default function HomepagePage() {
           </AnimateInView>
           <div className="relative">
             <div className="absolute -inset-6 rounded-[48px] bg-gradient-to-r from-[rgba(74,222,128,0.10)] via-[rgba(74,222,128,0.05)] to-transparent blur-3xl" />
-            <AnimateInView className="card p-8 md:p-10 flex flex-col justify-between relative" x={20} y={0} delay={0.15}>
+            <AnimateInView className="card p-8 md:p-10 flex flex-col justify-between" x={20} y={0} delay={0.15}>
             <div>
               <div className="flex items-center gap-3 mb-6">
                 <div className="grid h-10 w-10 place-items-center rounded-lg bg-[rgba(74,222,128,0.12)]"><ShieldCheck className="h-5 w-5 text-[#4ade80]" strokeWidth={2} /></div>
@@ -355,6 +355,7 @@ export default function HomepagePage() {
         </div>
         <div className="dashboard-frame">
           <Image src="/dashboard-preview.png" alt="UniDream Demo dashboard" width={1400} height={900} className="w-full h-auto" />
+        </div>
       </section>
 
       {/* CTA (DESIGN.md §9-8) */}
