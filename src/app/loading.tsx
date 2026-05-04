@@ -9,7 +9,7 @@ export default function LoadingPage() {
             src="/worldforge-ai-logo.png"
             alt="WorldForge AI"
             fill
-            className="object-contain brightness-0 invert opacity-40"
+            className="object-contain opacity-50"
             priority
           />
         </div>
