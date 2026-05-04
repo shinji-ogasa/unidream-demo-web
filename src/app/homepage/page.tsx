@@ -220,6 +220,30 @@ export default function HomepagePage() {
         </div>
       </section>
 
+      {/* for whom — 誰の何を変えるのか */}
+      <section className="container-site py-8 md:py-10">
+        <div className="max-w-[680px] mb-8">
+          <SectionLabel>FOR WHOM</SectionLabel>
+          <h2 className="text-[clamp(2rem,3.5vw,3rem)] font-semibold tracking-[-0.05em] leading-[1.05] text-[#f4f7fb] mb-4">長期投資を、AIで再設計する。</h2>
+          <p className="text-lg leading-8 text-[#8a93a3]">
+            UniDreamは、信託・アセットマネージャー・ファンドなど、長期で資産を預かる運用者のために設計されています。
+          </p>
+        </div>
+        <div className="flex flex-col md:flex-row items-start gap-4 md:gap-6">
+          <div className="flex-1 rounded-xl border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.03)] p-6">
+            <p className="text-xs font-semibold tracking-[0.12em] text-[#ff6467] mb-2">PAIN</p>
+            <p className="text-base leading-6 text-[#d0d6e0]">Buy & Holdは長期では強い一方で、暴落局面のドローダウン、回復までの時間、銘柄入れ替え、ポジション調整を人間の判断に依存している。</p>
+          </div>
+          <div className="flex items-center justify-center self-stretch">
+            <ArrowRight className="h-6 w-6 text-[#5266eb] rotate-90 md:rotate-0" />
+          </div>
+          <div className="flex-1 rounded-xl border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.03)] p-6">
+            <p className="text-xs font-semibold tracking-[0.12em] text-[#4ade80] mb-2">SOLUTION</p>
+            <p className="text-base leading-6 text-[#d0d6e0]">UniDreamは長期投資のリターンを維持・改善しながら、MaxDDを抑える意思決定AI。銘柄選定から取引最適化までAIが一貫実行する。</p>
+          </div>
+        </div>
+      </section>
+
       {/* evidence / scorecard (DESIGN.md §9-5) */}
       <section className="container-site py-12 md:py-16 pb-8 md:pb-10">
         <div className="mb-6 max-w-[680px]">
@@ -307,31 +331,6 @@ export default function HomepagePage() {
             <p>従来の多くの予測モデルは、短期的な値動きの予測に焦点を当ててきました。しかし、実際の運用で重要なのは、いつリスクを取り、いつ守り、どの銘柄をどの比率で保有し、どのタイミングで調整するかです。</p>
             <p>UniDreamは<span className="font-semibold text-[#02b8cc]">「価格を当てるモデル」ではなく、「市場状態を学習し、その状態に応じた取引行動を最適化するモデル」</span>です。Transformer世界モデルによって市場の潜在状態を学習し、強化学習によって取引行動を最適化します。</p>
             <p>目指すのは、Buy & Holdの長期的な強さを活かしながら、ドローダウンと機会損失を抑える次世代のAI運用エンジンです。</p>
-          </div>
-        </div>
-      </section>
-
-      {/* who / why — 誰の何を変えるのか */}
-      <section className="container-site py-12 md:py-16">
-        <div className="card border-[rgba(255,255,255,0.08)] p-10 md:p-14">
-          <div className="grid gap-8 md:grid-cols-[1.2fr_1fr] items-center">
-            <div>
-              <SectionLabel>FOR WHOM</SectionLabel>
-              <h2 className="text-[clamp(2rem,3.5vw,3rem)] font-semibold tracking-[-0.05em] leading-[1.05] text-[#f4f7fb] mb-4">長期投資を、AIで再設計する。</h2>
-              <p className="text-lg leading-8 text-[#8a93a3]">
-                UniDreamは、信託・アセットマネージャー・ファンドなど、長期で資産を預かる運用者のために設計されています。
-              </p>
-            </div>
-            <div className="flex flex-col gap-5">
-              <div className="rounded-xl border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.03)] p-5">
-                <p className="text-xs font-semibold tracking-[0.12em] text-[#ff6467] mb-2">PAIN</p>
-                <p className="text-base leading-6 text-[#d0d6e0]">Buy & Holdは長期では強い一方で、暴落局面のドローダウン、回復までの時間、銘柄入れ替え、ポジション調整を人間の判断に依存している。</p>
-              </div>
-              <div className="rounded-xl border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.03)] p-5">
-                <p className="text-xs font-semibold tracking-[0.12em] text-[#4ade80] mb-2">SOLUTION</p>
-                <p className="text-base leading-6 text-[#d0d6e0]">UniDreamは長期投資のリターンを維持・改善しながら、MaxDDを抑える意思決定AI。銘柄選定から取引最適化までAIが一貫実行する。</p>
-              </div>
-            </div>
           </div>
         </div>
       </section>
