@@ -265,7 +265,7 @@ export default function HomepagePage() {
             <p className="mt-5 text-sm text-[#626b7a] leading-5">B&H比でリターン増加、Sharpe微増、DD改善。※ strict条件でvalidation全fold acceptは未達。</p>
           </AnimateInView>
           <div className="relative">
-            <div className="absolute -inset-6 rounded-[48px] bg-gradient-to-r from-[rgba(74,222,128,0.10)] via-[rgba(74,222,128,0.05)] to-transparent blur-3xl" />
+            <div className="absolute -top-12 -right-12 -bottom-6 -left-6 rounded-[48px] bg-gradient-to-br from-[rgba(2,184,204,0.15)] via-[rgba(2,184,204,0.06)] to-transparent blur-3xl" />
             <AnimateInView className="card p-8 md:p-10 flex flex-col justify-between" x={20} y={0} delay={0.15}>
             <div>
               <div className="flex items-center gap-3 mb-6">

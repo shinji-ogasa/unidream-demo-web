@@ -16,7 +16,7 @@ body {
 
 /* Background system (DESIGN.md §7) */
 .site-bg {
-  background: radial-gradient(circle at 18% 8%, rgba(82, 102, 235, 0.22), transparent 34rem), radial-gradient(circle at 78% 18%, rgba(2, 184, 204, 0.12), transparent 30rem), linear-gradient(180deg, #08090a 0%, #0b0d12 45%, #08090a 100%);
+  background: linear-gradient(180deg, #08090a 0%, #0b0d12 45%, #08090a 100%);
   position: relative;
   overflow: hidden;
 }
