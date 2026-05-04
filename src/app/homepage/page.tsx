@@ -321,8 +321,11 @@ export default function HomepagePage() {
         <div className="mb-6">
           <SectionLabel>PIPELINE</SectionLabel>
         </div>
-        <div className="rounded-card overflow-hidden border border-[rgba(255,255,255,0.08)] shadow-panel mb-12">
-          <Image src="/VISION_img.png" alt="UniDream pipeline diagram" width={2400} height={1350} className="w-full h-auto" />
+        <div className="relative mb-12">
+          <div className="absolute -inset-6 rounded-[56px] bg-gradient-to-r from-[rgba(82,102,235,0.15)] via-[rgba(2,184,204,0.10)] to-[rgba(82,102,235,0.12)] blur-3xl" />
+          <div className="relative rounded-card overflow-hidden border border-[rgba(255,255,255,0.08)] shadow-panel">
+            <Image src="/VISION_img.png" alt="UniDream pipeline diagram" width={2400} height={1350} className="w-full h-auto" />
+          </div>
         </div>
         <div className="max-w-[680px]">
           <SectionLabel>VISION</SectionLabel>
@@ -348,7 +351,7 @@ export default function HomepagePage() {
           <div className="mt-6"><CtaButton href="/">デモを起動</CtaButton></div>
         </div>
         <div className="relative">
-          <div className="absolute -inset-4 rounded-3xl bg-gradient-to-r from-[rgba(82,102,235,0.10)] via-[rgba(2,184,204,0.08)] to-[rgba(139,92,246,0.08)] blur-2xl" />
+          <div className="absolute -inset-8 rounded-[56px] bg-gradient-to-r from-[rgba(82,102,235,0.12)] via-[rgba(2,184,204,0.08)] to-[rgba(139,92,246,0.10)] blur-3xl" />
           <div className="relative dashboard-frame">
             <Image src="/dashboard-preview.png" alt="UniDream Demo dashboard" width={1400} height={900} className="w-full h-auto" />
           </div>
