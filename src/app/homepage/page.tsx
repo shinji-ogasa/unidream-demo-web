@@ -229,18 +229,18 @@ export default function HomepagePage() {
             UniDreamは、信託・アセットマネージャー・ファンドなど、長期で資産を預かる運用者のために設計されています。
           </p>
         </div>
-        <div className="flex flex-col md:flex-row items-start gap-4 md:gap-6">
-          <div className="flex-1 rounded-xl border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.03)] p-6">
+        <div className="flex flex-col md:flex-row items-start gap-4 md:gap-8">
+          <AnimateInView className="flex-1 rounded-xl border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.03)] p-6" x={-16} y={0}>
             <p className="text-xs font-semibold tracking-[0.12em] text-[#ff6467] mb-2">PAIN</p>
             <p className="text-base leading-6 text-[#d0d6e0]">Buy & Holdは長期では強い一方で、暴落局面のドローダウン、回復までの時間、銘柄入れ替え、ポジション調整を人間の判断に依存している。</p>
-          </div>
+          </AnimateInView>
           <div className="flex items-center justify-center self-stretch">
-            <ArrowRight className="h-6 w-6 text-[#5266eb] rotate-90 md:rotate-0" />
+            <ArrowRight className="h-10 w-10 text-[#5266eb] rotate-90 md:rotate-0" />
           </div>
-          <div className="flex-1 rounded-xl border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.03)] p-6">
+          <AnimateInView className="flex-1 rounded-xl border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.03)] p-6" x={16} y={0} delay={0.15}>
             <p className="text-xs font-semibold tracking-[0.12em] text-[#4ade80] mb-2">SOLUTION</p>
             <p className="text-base leading-6 text-[#d0d6e0]">UniDreamは長期投資のリターンを維持・改善しながら、MaxDDを抑える意思決定AI。銘柄選定から取引最適化までAIが一貫実行する。</p>
-          </div>
+          </AnimateInView>
         </div>
       </section>
 
