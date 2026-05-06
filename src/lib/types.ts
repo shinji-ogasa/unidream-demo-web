@@ -59,4 +59,4 @@ export const RUN_ID = "unidream_btcusdt_15m_main";
 export const SYMBOL = "BTCUSDT";
 export const TIMEFRAME = "15m";
 export const INITIAL_EQUITY = 10_000;
-export const DISPLAY_MODEL_NAME = "ACtuning_v0";
+export const DISPLAY_MODEL_NAME = "UniDream-α1.0";
