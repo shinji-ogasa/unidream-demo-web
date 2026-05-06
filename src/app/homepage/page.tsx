@@ -229,29 +229,18 @@ export default function HomepagePage() {
             UniDreamは、信託・アセットマネージャー・ファンドなど、長期で資産を預かる運用者のために設計されています。
           </p>
         </div>
-        <div className="flex flex-col md:flex-row items-stretch gap-4 md:gap-8">
-          <AnimateInView className="flex-1 rounded-xl border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.03)] p-6 flex flex-col" x={-16} y={0}>
-            <p className="text-sm font-semibold tracking-[0.12em] text-[#ff6467] mb-3">PAIN</p>
-            <div className="flex-1 flex flex-col justify-center text-left">
-              <div className="text-base leading-7 text-[#d0d6e0] space-y-3">
-                <p>Buy & Holdは長期では強い。<br />しかし、暴落局面では深いドローダウンを抱え、回復までの時間も長い。</p>
-                <p>銘柄をいつ入れ替えるか。<br />どの比率で持つか。<br />いつ守り、いつリスクを取るか。</p>
-                <p>その判断は、いまだ人間に委ねられている。</p>
-              </div>
-            </div>
-          </AnimateInView>
-          <div className="flex items-center justify-center self-stretch">
-            <ArrowRight className="h-10 w-10 text-[#5266eb] rotate-90 md:rotate-0" />
+        <div className="flex flex-col md:flex-row items-start gap-4 md:gap-6">
+          <div className="flex-1 rounded-xl border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.03)] p-6">
+            <p className="text-xs font-semibold tracking-[0.12em] text-[#ff6467] mb-2">PAIN</p>
+            <p className="text-base leading-6 text-[#d0d6e0]">Buy & Holdは長期では強い一方で、暴落局面のドローダウン、回復までの時間、銘柄入れ替え、ポジション調整を人間の判断に依存している。</p>
           </div>
-          <AnimateInView className="flex-1 rounded-xl border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.03)] p-6 flex flex-col" x={16} y={0} delay={0.15}>
-            <p className="text-sm font-semibold tracking-[0.12em] text-[#4ade80] mb-3">SOLUTION</p>
-            <div className="flex-1 flex flex-col justify-center text-left">
-              <div className="text-base leading-7 text-[#d0d6e0] space-y-3">
-                <p>UniDreamは、長期投資を「持つだけ」から「市場状態に応じて最適化する」へ進化させる意思決定AI。</p>
-                <p>Transformer世界モデルで市場の潜在状態を学習し、強化学習によって銘柄選定・ポジション調整・取引行動を一貫して最適化する。</p>
-              </div>
-            </div>
-          </AnimateInView>
+          <div className="flex items-center justify-center self-stretch">
+            <ArrowRight className="h-6 w-6 text-[#5266eb] rotate-90 md:rotate-0" />
+          </div>
+          <div className="flex-1 rounded-xl border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.03)] p-6">
+            <p className="text-xs font-semibold tracking-[0.12em] text-[#4ade80] mb-2">SOLUTION</p>
+            <p className="text-base leading-6 text-[#d0d6e0]">UniDreamは長期投資のリターンを維持・改善しながら、MaxDDを抑える意思決定AI。銘柄選定から取引最適化までAIが一貫実行する。</p>
+          </div>
         </div>
       </section>
 
@@ -275,9 +264,7 @@ export default function HomepagePage() {
             </div>
             <p className="mt-5 text-sm text-[#626b7a] leading-5">B&H比でリターン増加、Sharpe微増、DD改善。※ strict条件でvalidation全fold acceptは未達。</p>
           </AnimateInView>
-          <div className="relative">
-            <div className="absolute -top-12 -right-12 -bottom-6 -left-6 rounded-[48px] bg-gradient-to-br from-[rgba(2,184,204,0.15)] via-[rgba(2,184,204,0.06)] to-transparent blur-3xl" />
-            <AnimateInView className="card p-8 md:p-10 flex flex-col justify-between" x={20} y={0} delay={0.15}>
+          <AnimateInView className="card p-8 md:p-10 flex flex-col justify-between" x={20} y={0} delay={0.15}>
             <div>
               <div className="flex items-center gap-3 mb-6">
                 <div className="grid h-10 w-10 place-items-center rounded-lg bg-[rgba(74,222,128,0.12)]"><ShieldCheck className="h-5 w-5 text-[#4ade80]" strokeWidth={2} /></div>
@@ -290,7 +277,6 @@ export default function HomepagePage() {
             </div>
             <p className="mt-5 text-sm text-[#626b7a] leading-5">最も堅牢なベースライン。B&H比でリターンを維持しつつ最大ドローダウンを低減。</p>
           </AnimateInView>
-          </div>
         </div>
       </section>
 
@@ -364,8 +350,11 @@ export default function HomepagePage() {
           </div>
           <div className="mt-6"><CtaButton href="/">デモを起動</CtaButton></div>
         </div>
-        <div className="dashboard-frame">
-          <Image src="/dashboard-preview.png" alt="UniDream Demo dashboard" width={1400} height={900} className="w-full h-auto" />
+        <div className="relative">
+          <div className="absolute -inset-8 rounded-[56px] bg-gradient-to-r from-[rgba(82,102,235,0.12)] via-[rgba(2,184,204,0.08)] to-[rgba(139,92,246,0.10)] blur-3xl" />
+          <div className="relative dashboard-frame">
+            <Image src="/dashboard-preview.png" alt="UniDream Demo dashboard" width={1400} height={900} className="w-full h-auto" />
+          </div>
         </div>
       </section>
 
