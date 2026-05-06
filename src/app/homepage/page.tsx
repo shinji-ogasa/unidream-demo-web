@@ -268,14 +268,14 @@ export default function HomepagePage() {
             <div>
               <div className="flex items-center gap-3 mb-6">
                 <div className="grid h-10 w-10 place-items-center rounded-lg bg-[rgba(74,222,128,0.12)]"><ShieldCheck className="h-5 w-5 text-[#4ade80]" strokeWidth={2} /></div>
-                <div><p className="text-base font-semibold text-[#f4f7fb]">Safe Baseline</p><p className="text-sm text-[#8a93a3]">Phase 8</p></div>
+                <div><p className="text-base font-semibold text-[#f4f7fb]">Safe Baseline</p><p className="text-sm text-[#8a93a3]">Phase 8 - cost stress test</p></div>
               </div>
               <div className="grid grid-cols-2 gap-5">
                 <div><p className="label">AlphaEx</p><p className="mt-1 text-3xl font-semibold text-[#02b8cc]">+0.89 pt/yr</p></div>
                 <div><p className="label">MaxDDΔ</p><p className="mt-1 text-3xl font-semibold text-[#4ade80]">-1.58 pt</p></div>
               </div>
             </div>
-            <p className="mt-5 text-sm text-[#626b7a] leading-5">最も堅牢なベースライン。B&H比でリターンを維持しつつ最大ドローダウンを低減。</p>
+            <p className="mt-5 text-sm text-[#626b7a] leading-5">cost x1: AlphaEx&gt;0 14/14, +1 &amp; DD&lt;=+1 14/14 / cost x2: AlphaEx&gt;0 14/14, +1 &amp; DD&lt;=+1 14/14 / cost x3: AlphaEx&gt;0 13/14, +1 &amp; DD&lt;=+1 11/14. Settings: fee_rate 0.03%, slippage 1.0bps, spread 3.0bps (0.055% one-way). Actor position optimized with these costs.</p>
           </AnimateInView>
         </div>
       </section>
