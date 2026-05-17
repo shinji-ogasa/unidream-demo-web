@@ -308,7 +308,7 @@ export function Dashboard({ initial }: DashboardProps) {
             href="/homepage"
             className="text-zinc-200 hover:text-blue-400 underline-offset-4 hover:underline transition-colors"
           >
-            → Zeniq
+            → Zeniq (Company Overview)
           </a>
         </div>
       </section>
