@@ -4,10 +4,10 @@ export default function LoadingPage() {
   return (
     <div className="min-h-screen bg-[#08090a] flex items-center justify-center">
       <div className="flex flex-col items-center gap-6">
-        <div className="relative h-16 w-64 animate-pulse">
+        <div className="relative h-16 w-48 animate-pulse">
           <Image
-            src="/worldforge-ai-logo.png"
-            alt="WorldForge AI"
+            src="/Zeniq-logo.png"
+            alt="Zeniq"
             fill
             className="object-contain opacity-50"
             priority

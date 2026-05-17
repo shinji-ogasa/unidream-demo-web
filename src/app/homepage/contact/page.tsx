@@ -8,7 +8,7 @@ export default function ContactPage() {
       <header className="fixed top-0 left-0 right-0 z-50 border-b border-[rgba(255,255,255,0.08)] bg-[rgba(8,9,10,0.80)] backdrop-blur-xl">
         <div className="max-w-[1200px] mx-auto px-6 md:px-8 flex items-center justify-between py-4 md:py-5">
           <Link href="/homepage" className="text-base font-semibold text-[#f4f7fb] hover:text-[#8a93a3] transition">
-            ← WorldForge AI
+            ← Zeniq
           </Link>
           <Link href="/" className="text-sm font-medium text-[#8a93a3] transition hover:text-[#f4f7fb]">
             デモを見る

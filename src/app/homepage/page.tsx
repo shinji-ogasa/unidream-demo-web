@@ -80,8 +80,8 @@ function CtaButton({ children, variant = "primary", href }: { children: React.Re
 
 function Logo() {
   return (
-    <Link href="/homepage" className="flex items-center shrink-0" aria-label="WorldForge AI">
-      <Image src="/worldforge-ai-logo.png" alt="WorldForge AI" height={56} width={224} priority unoptimized className="h-10 md:h-14 w-auto" />
+    <Link href="/homepage" className="flex items-center shrink-0" aria-label="Zeniq">
+      <Image src="/Zeniq-logo.png" alt="Zeniq" height={56} width={224} priority unoptimized className="h-10 md:h-14 w-auto" />
     </Link>
   );
 }
@@ -136,7 +136,7 @@ function Footer() {
           </div>
         </div>
         <div className="mt-10 pt-5 border-t border-[rgba(255,255,255,0.08)] flex flex-wrap justify-between gap-4 text-xs text-[#626b7a]">
-          <p>© 2026 WorldForge AI</p>
+          <p>© 2026 Zeniq AI</p>
           <div className="flex gap-6"><span>Privacy</span><span>Terms</span></div>
         </div>
       </div>
@@ -177,7 +177,7 @@ export default function HomepagePage() {
               transition={{ duration: 0.5, delay: 0.1 }}
               className="mb-8 inline-flex rounded-full border border-[rgba(82,102,235,0.3)] bg-[rgba(82,102,235,0.12)] px-5 py-1.5 text-sm font-semibold text-[#5266eb]"
             >
-              UniDream · WorldForge AI
+              UniDream · Zeniq
             </motion.span>
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
