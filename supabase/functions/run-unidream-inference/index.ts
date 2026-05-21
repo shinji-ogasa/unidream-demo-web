@@ -1,12 +1,12 @@
 // Supabase Edge Function: run-unidream-inference
 //
 // Pipeline (every 15 minutes via Supabase Cron):
-//   1. Fetch BTCUSDT 15m candles from Binance public klines (~1800 bars).
+//   1. Fetch BTCUSDT 15m candles from Binance public klines.
 //   2. POST candles to the UniDream HF Space /predict (x-api-key auth).
 //   3. Read the previous strategy_state row.
 //   4. Idempotency: if the latest candle is not newer than last_timestamp, skip.
 //   5. Simulate a virtual fill from current_position -> target_position at the
-//      latest close, updating cash/asset_qty/equity (spot long-only by default).
+//      latest close, updating cash/asset_qty/equity (long-only exposure).
 //   6. Insert prediction log, append equity_snapshot, optionally append trade,
 //      upsert strategy_state.
 //
@@ -24,12 +24,16 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
 const SYMBOL = "BTCUSDT";
 const TIMEFRAME = "15m";
 const RUN_ID = "unidream_btcusdt_15m_main";
-const TARGET_BARS = 1800;
-const MIN_BARS = 1504;
+const BARS_PER_DAY = 96;
+const PLAN008_LOOKBACK_DAYS = 60;
+const FEATURE_WARMUP_BARS = 1488;
+const TARGET_BARS = PLAN008_LOOKBACK_DAYS * BARS_PER_DAY + FEATURE_WARMUP_BARS;
+const MIN_BARS = TARGET_BARS;
 const BINANCE_LIMIT = 1000;
 const INITIAL_CASH = 10_000;
 const FEE_RATE = 0; // PoC: no fees / slippage. Tune later if needed.
-// Spot long/flat baseline. Negative target positions collapse to flat.
+const MAX_TARGET_POSITION = 1.12;
+// Long-only exposure baseline. Plan008 v2 overweight up to 1.06 is allowed.
 const ALLOW_SHORT = false;
 
 type Candle = {
@@ -97,7 +101,8 @@ async function fetchCandles(target: number): Promise<Candle[]> {
   const byOpenTime = new Map<number, BinanceKline>();
   for (const k of acc) byOpenTime.set(k[0], k);
   const sorted = [...byOpenTime.values()].sort((a, b) => a[0] - b[0]);
-  return sorted.map((k) => ({
+  const clipped = sorted.slice(-target);
+  return clipped.map((k) => ({
     timestamp: new Date(k[0]).toISOString(),
     open: Number(k[1]),
     high: Number(k[2]),
@@ -156,7 +161,7 @@ function clampTargetPosition(raw: unknown): number {
   if (typeof raw !== "number" || !Number.isFinite(raw)) return 0;
   let target = raw;
   if (!ALLOW_SHORT && target < 0) target = 0;
-  if (target > 1) target = 1;
+  if (target > MAX_TARGET_POSITION) target = MAX_TARGET_POSITION;
   if (target < -1) target = -1;
   return target;
 }

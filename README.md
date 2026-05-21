@@ -104,9 +104,9 @@ supabase functions invoke run-unidream-inference
 ```json
 {
   "ok": true,
-  "candles": 1800,
-  "prediction": { "signal": "...", "raw_position": 1.0, "target_position": 1.0, ... },
-  "state":      { "equity": 10000.0, "cash": 0.0, "asset_qty": 0.116, "position": 1.0 },
+  "candles": 7248,
+  "prediction": { "signal": "...", "raw_position": 1.06, "target_position": 1.06, ... },
+  "state":      { "equity": 10000.0, "cash": -600.0, "asset_qty": 0.123, "position": 1.06 },
   "traded": true
 }
 ```
@@ -185,9 +185,9 @@ npm run backfill -- --reset --max-steps 200
 スクリプトの動き:
 
 1. `--reset` 指定時は run_id に紐づく `predictions` / `trades` / `equity_snapshots` を削除し、`strategy_state` を初期値で再シード
-2. Binance public klines から ~60 日ぶん（~5760 本）の 15m candles を取得（1000 本制限を端から端まで巻き戻して取得 → openTime で重複除去 → 昇順ソート）
+2. Binance public klines から replay 期間 + Plan008 context ぶんの 15m candles を取得（デフォルトなら ~135.5日 = 60日 replay + 75.5日 context）
 3. **Probe フェーズ**: replay 範囲から 20 個の index を均等サンプリングして HF `/predict` を叩き、`target_position` の unique 値をログに出す。全部 `1.0` だった場合は「trades 履歴は増えない」と warn を出す
-4. **Replay フェーズ**: warmup（1504 本）以降の各 step で、直近最大 1800 本の candle を /predict に POST。クランプ後の target_position をもとに前回 state から仮想 fill を計算して、`predictions` / `equity_snapshots` / `trades` をバッファして 200 行ごとに flush
+4. **Replay フェーズ**: Plan008 context（7248 本）以降の各 step で、直近 7248 本の candle を /predict に POST。クランプ後の target_position をもとに前回 state から仮想 fill を計算して、`predictions` / `equity_snapshots` / `trades` をバッファして 200 行ごとに flush
 5. すべて終わったら `strategy_state` を最終 state で upsert（以降のライブ Cron はその続きから動く）
 
 注意:
@@ -223,7 +223,7 @@ npm run backfill -- --reset --max-steps 200
 ## 動作メモ
 
 - **二重処理防止**：Edge Function は `strategy_state.last_timestamp` を読んで、最新 15 分足が新しくなければスキップ。`equity_snapshots` の `(run_id, timestamp)` UNIQUE が二段構えの保険
-- **ポジション解釈**：`target_position` はスポットの建玉割合。`1.0` = 100% long、`0.0` = flat。マイナスは関数内の `ALLOW_SHORT = false` で flat に潰している。Space 側がショート対応したらフラグを立てる
+- **ポジション解釈**：`target_position` は B&H=1.0 を基準にしたエクスポージャー倍率。Plan008 v2 は `1.06 / 1.00 / 0.94` を使うため、デモ側は最大 `1.12` まで許可している。マイナスは関数内の `ALLOW_SHORT = false` で flat に潰している。Space 側がショート対応したらフラグを立てる
 - **手数料・スリッページ**：PoC なので `FEE_RATE = 0`。リアル感が欲しくなったら `0.0005` あたりに上げて再デプロイ
 - **初期状態**：マイグレーション `0002` で `strategy_state` を初期 cash 10,000 USDT・flat でシード。デモをリセットしたいときは:
   ```sql

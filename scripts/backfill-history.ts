@@ -9,9 +9,10 @@
 //   npm run backfill -- --max-steps 200
 //
 // Notes:
-//   - Sequential HF /predict calls, ~1-5s each. 60 days of 15m bars is ~5760
-//     candles → ~4256 replay steps. Expect a long-running job; flush every 200
-//     steps so partial progress is preserved on Ctrl+C.
+//   - Sequential HF /predict calls, ~1-5s each. The script fetches the requested
+//     replay span plus Plan008 context, then replays only the requested span.
+//     Expect a long-running job; flush every 200 steps so partial progress is
+//     preserved on Ctrl+C.
 //   - Run before the live Cron is enabled, or pause the Cron during the run.
 
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
@@ -27,9 +28,14 @@ const TIMEFRAME = "15m";
 const RUN_ID = "unidream_btcusdt_15m_main";
 const INITIAL_CASH = 10_000;
 const FEE_RATE = 0;
+const MAX_TARGET_POSITION = 1.12;
 const ALLOW_SHORT = false;
-const WARMUP_BARS = 1504;
-const WINDOW_BARS = 1800;
+const BARS_PER_DAY = 96;
+const PLAN008_LOOKBACK_DAYS = 60;
+const FEATURE_WARMUP_BARS = 1488;
+const WINDOW_BARS = PLAN008_LOOKBACK_DAYS * BARS_PER_DAY + FEATURE_WARMUP_BARS;
+const WARMUP_BARS = WINDOW_BARS;
+const MODEL_CONTEXT_DAYS = WINDOW_BARS / BARS_PER_DAY;
 const BINANCE_LIMIT = 1000;
 const SAMPLE_PROBES = 20;
 const FLUSH_EVERY = 200;
@@ -158,7 +164,9 @@ async function fetchCandles(days: number): Promise<Candle[]> {
   const sorted = [...byOpenTime.values()].sort(
     (a, b) => Number(a[0]) - Number(b[0]),
   );
-  return sorted.map((k) => ({
+  const targetBars = Math.ceil(days * BARS_PER_DAY) + 1;
+  const clipped = sorted.slice(-targetBars);
+  return clipped.map((k) => ({
     timestamp: new Date(Number(k[0])).toISOString(),
     open: Number(k[1]),
     high: Number(k[2]),
@@ -247,7 +255,7 @@ function clampTargetPosition(raw: unknown): number {
   if (typeof raw !== "number" || !Number.isFinite(raw)) return 0;
   let t = raw;
   if (!ALLOW_SHORT && t < 0) t = 0;
-  if (t > 1) t = 1;
+  if (t > MAX_TARGET_POSITION) t = MAX_TARGET_POSITION;
   if (t < -1) t = -1;
   return t;
 }
@@ -374,8 +382,12 @@ async function main(): Promise<void> {
     await resetRun(supabase);
   }
 
-  console.log(`[fetch] requesting ~${opts.days} days of ${SYMBOL} ${TIMEFRAME} candles from Binance`);
-  const candles = await fetchCandles(opts.days);
+  const fetchDays = opts.days + MODEL_CONTEXT_DAYS;
+  console.log(
+    `[fetch] requesting ~${fetchDays.toFixed(1)} days of ${SYMBOL} ${TIMEFRAME} candles ` +
+      `(${opts.days} replay days + ${MODEL_CONTEXT_DAYS.toFixed(1)} context days) from Binance`,
+  );
+  const candles = await fetchCandles(fetchDays);
   if (candles.length === 0) {
     console.error("no candles returned from Binance");
     process.exit(1);
@@ -444,6 +456,7 @@ async function main(): Promise<void> {
   const totalSteps = Math.min(lastStep - firstStep + 1, opts.maxSteps);
   console.log(`[replay] starting at idx=${firstStep} (${candles[firstStep].timestamp})`);
   console.log(`[replay] ending   at idx=${lastStep} (${candles[lastStep].timestamp})`);
+  console.log(`[replay] Plan008 window bars = ${WINDOW_BARS}`);
   if (probeTargets.length > 0) {
     const avgMs = (probeElapsedSec * 1000) / probeTargets.length;
     const estMin = (totalSteps * avgMs) / 1000 / 60;
