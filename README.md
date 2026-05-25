@@ -1,6 +1,6 @@
 # unidream-demo-web
 
-UniDream のライブデモ。Next.js のフロントエンドと Supabase Edge Function を組み合わせて、15 分ごとに [unidream-space](../unidream-space) の HF Spaces 推論 API を叩き、仮想ペーパートレードの結果を表示する。
+UniDream のライブデモ。Next.js のフロントエンドと Supabase Edge Function を組み合わせて、15 分ごとに [unidream-space](../unidream-space) の HF Spaces 推論 API を叩き、仮想ペーパートレードの結果を表示する。現行モデルは Plan008 recent overlay v2 で、B&H=1.0 を基準に `1.06 / 1.00 / 0.94` の exposure を取る。
 
 ```
 Binance klines (15m)
@@ -8,8 +8,8 @@ Binance klines (15m)
 Supabase Cron (15m)
     ↓
 Edge Function: run-unidream-inference
-    ↓
-HF Space /predict (UniDream)
+    ↓ 7248 candles = 60d window + feature warmup
+HF Space /predict (Plan008 v2)
     ↓
 Supabase: predictions / strategy_state / equity_snapshots / trades
     ↓
@@ -28,7 +28,7 @@ src/
     globals.css
   components/
     Dashboard.tsx         Realtime 購読 + レイアウト
-    EquityChart.tsx       recharts のラインチャート
+    PerformanceChart.tsx  recharts のラインチャート
     StatCard.tsx
     TradesTable.tsx
   lib/
@@ -150,9 +150,9 @@ Authorization ヘッダの渡し方はプロジェクトでの service role key 
 
 ## 過去データの backfill
 
-ライブ Cron だけだと履歴が空のままなので、初回だけローカルから過去 60 日ぶんの 15m candles を replay して `predictions` / `trades` / `equity_snapshots` / `strategy_state` を埋める用のスクリプトを用意した。
+ライブ Cron だけだと履歴が空のままなので、初回だけローカルから過去 60 日ぶんの 15m candles を replay して `predictions` / `trades` / `equity_snapshots` / `strategy_state` を埋める用のスクリプトを用意した。Plan008 v2 の推論には 60日 window とは別に 1488 本の feature warmup が必要なので、実際の `/predict` には各 step で 7248 本を渡す。
 
-[scripts/backfill-history.ts](scripts/backfill-history.ts) は Edge Function と同じシミュレーションロジックをそのまま再利用する（`run_id = unidream_btcusdt_15m_main`, `INITIAL_CASH = 10_000`, `FEE_RATE = 0`, `ALLOW_SHORT = false`）。
+[scripts/backfill-history.ts](scripts/backfill-history.ts) は Edge Function と同じシミュレーションロジックをそのまま再利用する（`run_id = unidream_btcusdt_15m_main`, `INITIAL_CASH = 10_000`, `FEE_RATE = 0`, `ALLOW_SHORT = false`, `MAX_TARGET_POSITION = 1.12`）。
 
 セットアップ:
 
@@ -175,7 +175,7 @@ npm install
 # 既存履歴をクリアして 60 日ぶんを最初から replay
 npm run backfill -- --reset
 
-# 範囲を狭めたいときは --days
+# 表示期間を狭めたいときは --days
 npm run backfill -- --reset --days 30
 
 # 動作確認だけしたいときは --max-steps
@@ -192,7 +192,7 @@ npm run backfill -- --reset --max-steps 200
 
 注意:
 
-- HF Spaces は 1 リクエスト数秒かかるので、60 日ぶんで体感 1〜2 時間。所要時間は probe フェーズの平均レイテンシから推定値を表示する
+- HF Spaces は 1 リクエスト数秒かかるので、60 日 replay は長時間実行になる。所要時間は probe フェーズの平均レイテンシから推定値を表示する
 - 同じ candle を二重処理しないよう `latest.openTimeMs <= strategy_state.last_timestamp` の step はスキップ
 - `predictions.created_at` を bar 時刻で上書きするので、チャート上で snapshots と整合する。ライブ Cron 側は `now()` のままなので backfill 行 → ライブ行の順序は保たれる
 - 途中で Ctrl+C しても直前の flush 分までは DB に入っている。再開したいときは `--reset` を付けずにもう一度叩けば、`last_timestamp` 以降だけ続きから処理される
@@ -224,7 +224,7 @@ npm run backfill -- --reset --max-steps 200
 
 - **二重処理防止**：Edge Function は `strategy_state.last_timestamp` を読んで、最新 15 分足が新しくなければスキップ。`equity_snapshots` の `(run_id, timestamp)` UNIQUE が二段構えの保険
 - **ポジション解釈**：`target_position` は B&H=1.0 を基準にしたエクスポージャー倍率。Plan008 v2 は `1.06 / 1.00 / 0.94` を使うため、デモ側は最大 `1.12` まで許可している。マイナスは関数内の `ALLOW_SHORT = false` で flat に潰している。Space 側がショート対応したらフラグを立てる
-- **手数料・スリッページ**：PoC なので `FEE_RATE = 0`。リアル感が欲しくなったら `0.0005` あたりに上げて再デプロイ
+- **手数料・スリッページ**：リアルタイムデモでは表示の分かりやすさを優先して `FEE_RATE = 0`。研究repo側の評価 JSON では cost stress (`cost_x1` / `cost_x2` / `cost_x3`) を別途見る
 - **初期状態**：マイグレーション `0002` で `strategy_state` を初期 cash 10,000 USDT・flat でシード。デモをリセットしたいときは:
   ```sql
   delete from trades            where run_id = 'unidream_btcusdt_15m_main';
