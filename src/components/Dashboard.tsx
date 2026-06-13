@@ -1,6 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
 
 import { ANNUALIZATION, sortedAscending } from "@/lib/aggregate";
 import { fmtPercent, fmtTime, fmtUSD, pnlPercent } from "@/lib/format";
@@ -27,7 +29,7 @@ import { StatCard } from "./StatCard";
 import { TradesTable } from "./TradesTable";
 
 const TRADES_LIMIT = 200;
-const POSITION_HISTORY_BARS = 96; // 24h at 15m
+const POSITION_HISTORY_BARS = 96;
 
 const SIGNAL_TONE: Record<string, "good" | "bad" | "warn" | "default"> = {
   overweight: "good",
@@ -61,8 +63,6 @@ export function Dashboard({ initial }: DashboardProps) {
     fullRange(sortedAscending(initial.snapshots).length),
   );
 
-  // On data growth, follow the right edge if the user was already there;
-  // otherwise leave the browsed position untouched.
   useEffect(() => {
     setRange((prev) => {
       const len = sortedSnapshots.length;
@@ -144,9 +144,6 @@ export function Dashboard({ initial }: DashboardProps) {
     };
   }, []);
 
-  // Brush fires onChange continuously while dragging. Coalesce to one render
-  // per animation frame so recharts isn't redrawing the 4500-point path on
-  // every mousemove event — that's what made the slider feel choppy.
   const rafRef = useRef<number | null>(null);
   const pendingRangeRef = useRef<Range | null>(null);
 
@@ -203,121 +200,151 @@ export function Dashboard({ initial }: DashboardProps) {
   const signalTone = SIGNAL_TONE[signalKey] ?? "default";
 
   return (
-    <div className="max-w-6xl mx-auto px-4 md:px-6 py-6 md:py-10 flex flex-col gap-4 md:gap-5">
-      <header className="flex flex-col gap-3">
-        <div className="flex items-start md:items-center justify-between flex-wrap gap-3 md:gap-4">
-          <div className="flex flex-col md:flex-row md:items-baseline gap-1 md:gap-4">
-            <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">UniDream Demo</h1>
-            <span className="text-xs md:text-sm text-[#8a93a3] font-mono break-all">
-              {SYMBOL} · {TIMEFRAME} · {RUN_ID}
-            </span>
+    <div className="min-h-screen bg-bg-deep text-text antialiased">
+      {/* ambient background */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(82,102,235,0.08),transparent_50%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_80%,rgba(2,184,204,0.06),transparent_50%)]" />
+      </div>
+
+      <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-10 flex flex-col gap-5 md:gap-6">
+        {/* header */}
+        <header className="rounded-[32px] border border-white/[0.08] bg-gradient-to-b from-white/[0.07] to-white/[0.02] backdrop-blur-md p-4 md:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-panel">
+          <div className="flex items-center gap-4">
+            <Link href="/homepage" className="flex items-center shrink-0">
+              <Image
+                src="/Zeniq-logo.png"
+                alt="Zeniq"
+                height={56}
+                width={224}
+                priority
+                unoptimized
+                className="h-8 md:h-10 w-auto brightness-0 invert"
+              />
+            </Link>
+            <div className="h-6 w-px bg-white/[0.12] hidden md:block" />
+            <div className="hidden md:flex flex-col">
+              <span className="text-sm font-semibold tracking-tight">UniDream Live</span>
+              <span className="text-xs font-mono text-text-muted">
+                {SYMBOL} · {TIMEFRAME}
+              </span>
+            </div>
           </div>
-          <div className="flex items-center flex-wrap gap-x-4 gap-y-1.5 md:gap-5">
-            <span className="text-xs md:text-sm font-mono text-[#8a93a3]">
-              model <span className="text-[#f4f7fb]">{DISPLAY_MODEL_NAME}</span>
+          <div className="flex items-center flex-wrap gap-x-5 gap-y-2">
+            <span className="text-xs md:text-sm font-mono text-text-muted">
+              model <span className="text-text">{DISPLAY_MODEL_NAME}</span>
+            </span>
+            <span className="flex items-center gap-2 text-xs text-text-muted">
+              <span className="h-1.5 w-1.5 rounded-full bg-success animate-pulse" />
+              Live
             </span>
             <Countdown />
           </div>
-        </div>
-        <p className="text-xs md:text-sm text-[#facc15]/80">
+        </header>
+
+        <p className="text-xs md:text-sm text-warning/80 px-1">
           This is a research demo, not financial advice. Virtual paper-trading only.
         </p>
-      </header>
 
-      <section className="grid grid-cols-1 md:grid-cols-4 gap-4 items-stretch">
-        <StatCard
-          label="Equity"
-          value={fmtUSD(equity)}
-          hint={`PnL ${pnl >= 0 ? "+" : ""}${pnl.toFixed(2)}%`}
-          tone={pnlTone}
-        />
-        <StatCard
-          label="Cash"
-          value={fmtUSD(cash)}
-          hint={`asset_qty ${assetQty.toFixed(6)}`}
-        />
-        <StatCard label="Last Price" value={fmtUSD(lastPrice)} hint={fmtTime(lastTimestamp)} />
-        <StatCard
-          label="Latest Signal"
-          value={prediction?.signal ?? "—"}
-          hint={`raw position ${prediction?.position?.toFixed(3) ?? "—"}`}
-          tone={signalTone}
-        />
-      </section>
-
-      <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <PositionGauge
-          position={currentPosition}
-          equity={equity}
-          cash={cash}
-          assetQty={assetQty}
-          positionHistory={positionHistory}
-        />
-        <div className="md:col-span-2 flex flex-col gap-4 justify-between">
-          <MetricsRow metrics={metrics} />
-          <LongShortBar
-            longPct={metrics.longPct}
-            shortPct={metrics.shortPct}
-            flatPct={metrics.flatPct}
+        {/* stats */}
+        <section className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+          <StatCard
+            label="Equity"
+            value={fmtUSD(equity)}
+            hint={`PnL ${pnl >= 0 ? "+" : ""}${pnl.toFixed(2)}%`}
+            tone={pnlTone}
           />
-        </div>
-      </section>
+          <StatCard
+            label="Cash"
+            value={fmtUSD(cash)}
+            hint={`asset_qty ${assetQty.toFixed(6)}`}
+          />
+          <StatCard label="Last Price" value={fmtUSD(lastPrice)} hint={fmtTime(lastTimestamp)} />
+          <StatCard
+            label="Latest Signal"
+            value={prediction?.signal ?? "—"}
+            hint={`raw position ${prediction?.position?.toFixed(3) ?? "—"}`}
+            tone={signalTone}
+          />
+        </section>
 
-      <section className="flex flex-col gap-2">
+        {/* position + metrics */}
+        <section className="grid grid-cols-1 lg:grid-cols-[1fr_2fr] gap-4 md:gap-5">
+          <PositionGauge
+            position={currentPosition}
+            equity={equity}
+            cash={cash}
+            assetQty={assetQty}
+            positionHistory={positionHistory}
+          />
+          <div className="flex flex-col gap-4 justify-between">
+            <MetricsRow metrics={metrics} />
+            <LongShortBar
+              longPct={metrics.longPct}
+              shortPct={metrics.shortPct}
+              flatPct={metrics.flatPct}
+            />
+          </div>
+        </section>
+
+        {/* chart */}
         <PerformanceChart
           snapshots={sortedSnapshots}
           trades={trades}
           range={range}
           onRangeChange={handleRangeChange}
         />
-        <div className="text-sm font-mono text-[#8a93a3]">
-          Metrics computed over the visible window ({metrics.bars} bars · {metrics.trades} trades).
-          Drag the slider to see older data.
-        </div>
-      </section>
 
-      <section className="flex flex-col gap-3">
-        <div className="text-sm uppercase tracking-[0.18em] text-[#8a93a3]">Recent Trades</div>
-        <TradesTable trades={trades} />
-      </section>
+        {/* trades */}
+        <section className="flex flex-col gap-3">
+          <div className="flex items-center gap-2 px-1">
+            <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+            <div className="text-xs font-semibold tracking-[0.2em] uppercase text-text-muted">
+              Recent Trades
+            </div>
+          </div>
+          <TradesTable trades={trades} />
+        </section>
 
-      <section className="panel p-5 flex flex-col gap-3">
-        <div className="text-sm text-[#d0d6e0]">
-          Both the research codebase and the inference server behind this demo are open source.
-          The trained model bundle is published alongside the code, so anyone can reproduce or
-          extend the same experiments end to end.
-        </div>
-        <div className="flex flex-wrap gap-x-6 gap-y-2 font-mono text-sm">
-          <a
-            href="https://github.com/shinji-ogasa/UniDream"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-zinc-200 hover:text-[#4ade80] underline-offset-4 hover:underline transition-colors"
-          >
-            → UniDream (research repo) on GitHub
-          </a>
-          <a
-            href="https://huggingface.co/spaces/ShinjiAA/unidream-space"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-zinc-200 hover:text-[#4ade80] underline-offset-4 hover:underline transition-colors"
-          >
-            → unidream-space on Hugging Face
-          </a>
-          <a
-            href="/homepage"
-            className="text-zinc-200 hover:text-blue-400 underline-offset-4 hover:underline transition-colors"
-          >
-            → Zeniq (Company Overview)
-          </a>
-        </div>
-      </section>
+        {/* info + footer */}
+        <section className="rounded-[32px] border border-white/[0.08] bg-gradient-to-b from-white/[0.05] to-white/[0.02] backdrop-blur-sm p-5 md:p-6 flex flex-col gap-4 shadow-panel">
+          <p className="text-sm text-text-soft leading-relaxed">
+            Both the research codebase and the inference server behind this demo are open source.
+            The trained model bundle is published alongside the code, so anyone can reproduce or
+            extend the same experiments end to end.
+          </p>
+          <div className="flex flex-wrap gap-x-6 gap-y-2 font-mono text-sm">
+            <a
+              href="https://github.com/shinji-ogasa/UniDream"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-text-soft hover:text-success underline-offset-4 hover:underline transition-colors"
+            >
+              → UniDream (research repo) on GitHub
+            </a>
+            <a
+              href="https://huggingface.co/spaces/ShinjiAA/unidream-space"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-text-soft hover:text-success underline-offset-4 hover:underline transition-colors"
+            >
+              → unidream-space on Hugging Face
+            </a>
+            <Link
+              href="/homepage"
+              className="text-text-soft hover:text-primary underline-offset-4 hover:underline transition-colors"
+            >
+              → Zeniq (Company Overview)
+            </Link>
+          </div>
+        </section>
 
-      <footer className="text-sm text-[#8a93a3] mt-1">
-        Data: Binance public API · Inference: UniDream HF Space · Storage &amp; realtime: Supabase ·
-        Last inference {fmtTime(prediction?.created_at)} · Alpha (excess) ={" "}
-        {fmtPercent(metrics.alphaEx, 2, true)}
-      </footer>
+        <footer className="text-sm text-text-muted px-1">
+          Data: Binance public API · Inference: UniDream HF Space · Storage &amp; realtime: Supabase ·
+          Last inference {fmtTime(prediction?.created_at)} · Alpha (excess) ={" "}
+          {fmtPercent(metrics.alphaEx, 2, true)}
+        </footer>
+      </div>
     </div>
   );
 }

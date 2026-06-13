@@ -83,12 +83,15 @@ export function PerformanceChart({ snapshots, trades, range, onRangeChange }: Pr
     : lastIdx;
 
   return (
-    <div className="panel p-4 md:p-5 flex flex-col gap-3 md:gap-4">
+    <div className="rounded-[32px] border border-white/[0.08] bg-gradient-to-b from-white/[0.07] to-white/[0.02] backdrop-blur-md p-5 flex flex-col gap-4 shadow-panel">
       <div className="flex items-center justify-between flex-wrap gap-2">
-        <div className="text-base font-semibold tracking-tight text-zinc-200">
-          Performance vs Buy &amp; Hold
+        <div className="flex items-center gap-2">
+          <span className="h-1.5 w-1.5 rounded-full bg-cyan" />
+          <div className="text-base font-semibold tracking-tight text-text">
+            Performance vs Buy &amp; Hold
+          </div>
         </div>
-        <div className="text-sm font-mono text-zinc-500">15m bars</div>
+        <div className="text-sm font-mono text-text-muted">15m bars</div>
       </div>
       <div className="h-80 md:h-[480px]">
         {data.length === 0 ? (
@@ -133,7 +136,7 @@ export function PerformanceChart({ snapshots, trades, range, onRangeChange }: Pr
               <Line
                 type="monotone"
                 dataKey="bnh"
-                stroke="#5b6573"
+                stroke="rgba(255,255,255,0.25)"
                 strokeWidth={1.5}
                 dot={false}
                 isAnimationActive={false}
@@ -142,22 +145,22 @@ export function PerformanceChart({ snapshots, trades, range, onRangeChange }: Pr
               <Line
                 type="monotone"
                 dataKey="equity"
-                stroke="#6ee7b7"
-                strokeWidth={2}
+                stroke="#02b8cc"
+                strokeWidth={2.5}
                 dot={false}
                 isAnimationActive={false}
                 name="equity"
               />
               <Scatter
                 dataKey="buyMarker"
-                fill="#60a5fa"
+                fill="#5266eb"
                 shape={UpTriangle}
                 isAnimationActive={false}
                 legendType="none"
               />
               <Scatter
                 dataKey="sellMarker"
-                fill="#f87171"
+                fill="#ff6467"
                 shape={DownTriangle}
                 isAnimationActive={false}
                 legendType="none"
@@ -165,8 +168,8 @@ export function PerformanceChart({ snapshots, trades, range, onRangeChange }: Pr
               <Brush
                 dataKey="label"
                 height={28}
-                stroke="#3a4150"
-                fill="#0f1115"
+                stroke="rgba(255,255,255,0.15)"
+                fill="rgba(255,255,255,0.03)"
                 travellerWidth={10}
                 startIndex={safeStart}
                 endIndex={safeEnd}
@@ -183,11 +186,11 @@ export function PerformanceChart({ snapshots, trades, range, onRangeChange }: Pr
           </ResponsiveContainer>
         )}
       </div>
-      <div className="flex flex-wrap items-center gap-x-5 gap-y-1 text-sm font-mono text-zinc-400">
-        <LegendSwatch color="#6ee7b7" label="strategy" />
-        <LegendSwatch color="#5b6573" label="B&H" />
-        <LegendTriangle color="#60a5fa" label="buy" up />
-        <LegendTriangle color="#f87171" label="sell" />
+      <div className="flex flex-wrap items-center gap-x-5 gap-y-1 text-sm font-mono text-text-muted">
+        <LegendSwatch color="#02b8cc" label="strategy" />
+        <LegendSwatch color="rgba(255,255,255,0.25)" label="B&H" />
+        <LegendTriangle color="#5266eb" label="buy" up />
+        <LegendTriangle color="#ff6467" label="sell" />
       </div>
     </div>
   );

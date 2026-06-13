@@ -12,10 +12,20 @@ const TONE: Record<NonNullable<Props["tone"]>, string> = {
   warn: "text-[#facc15]",
 };
 
+const TONE_DOT: Record<NonNullable<Props["tone"]>, string> = {
+  default: "bg-white/30",
+  good: "bg-[#4ade80]",
+  bad: "bg-[#ff6467]",
+  warn: "bg-[#facc15]",
+};
+
 export function StatCard({ label, value, hint, tone = "default" }: Props) {
   return (
-    <div className="panel p-4 md:p-5 flex flex-col gap-1.5 md:gap-2">
-      <div className="label">{label}</div>
+    <div className="rounded-[32px] border border-white/[0.08] bg-gradient-to-b from-white/[0.07] to-white/[0.02] backdrop-blur-md p-5 flex flex-col gap-2 shadow-panel hover:-translate-y-0.5 transition-transform duration-200">
+      <div className="flex items-center gap-2">
+        <span className={`h-1.5 w-1.5 rounded-full ${TONE_DOT[tone]}`} />
+        <div className="label">{label}</div>
+      </div>
       <div className={`text-2xl md:text-3xl font-mono leading-tight ${TONE[tone]}`}>
         {value}
       </div>

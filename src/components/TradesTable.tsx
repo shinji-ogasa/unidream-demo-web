@@ -22,16 +22,16 @@ export function TradesTable({ trades }: Props) {
   const visible = trades.slice(startIdx, startIdx + PAGE_SIZE);
 
   if (trades.length === 0) {
-    return <div className="panel p-6 text-[#8a93a3] text-base">No trades yet.</div>;
+    return <div className="rounded-[32px] border border-white/[0.08] bg-gradient-to-b from-white/[0.07] to-white/[0.02] p-6 text-text-muted text-base shadow-panel">No trades yet.</div>;
   }
 
   const showingTo = Math.min(startIdx + PAGE_SIZE, trades.length);
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="panel overflow-x-auto">
+      <div className="rounded-[32px] border border-white/[0.08] bg-gradient-to-b from-white/[0.07] to-white/[0.02] backdrop-blur-md overflow-x-auto shadow-panel">
         <table className="w-full text-sm font-mono min-w-[520px]">
-          <thead className="bg-[#12151d] text-[#8a93a3] text-xs uppercase tracking-[0.14em]">
+          <thead className="bg-white/[0.04] text-text-muted text-xs uppercase tracking-[0.14em]">
             <tr>
               <th className="text-left px-4 py-3">time</th>
               <th className="text-right px-4 py-3">from</th>

@@ -10,9 +10,12 @@ export function LongShortBar({ longPct, shortPct, flatPct }: Props) {
   const flatW = Math.max(0, 100 - longW - shortW);
 
   return (
-    <div className="panel p-4 flex flex-col gap-3">
-      <div className="label">Long / Short / Flat</div>
-      <div className="flex h-4 rounded-full overflow-hidden bg-[#12151d] mt-1">
+    <div className="rounded-[28px] border border-white/[0.08] bg-gradient-to-b from-white/[0.06] to-white/[0.02] backdrop-blur-sm p-4 flex flex-col gap-3 shadow-panel">
+      <div className="flex items-center gap-2">
+        <span className="h-1.5 w-1.5 rounded-full bg-warning" />
+        <div className="label">Long / Short / Flat</div>
+      </div>
+      <div className="flex h-4 rounded-full overflow-hidden bg-white/[0.05] mt-1">
         {longW > 0 && (
           <div
             style={{ width: `${longW}%` }}

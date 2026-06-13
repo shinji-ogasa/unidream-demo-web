@@ -34,8 +34,11 @@ export function PositionGauge({
   const sparkSpanLabel = sparkSpan(sparkBars);
 
   return (
-    <div className="panel p-4 flex flex-col gap-2">
-      <div className="label">Position</div>
+    <div className="rounded-[32px] border border-white/[0.08] bg-gradient-to-b from-white/[0.07] to-white/[0.02] backdrop-blur-md p-5 flex flex-col gap-3 shadow-panel">
+      <div className="flex items-center gap-2">
+        <span className={`h-1.5 w-1.5 rounded-full ${ringColor}`} />
+        <div className="label">Position</div>
+      </div>
       <div className="flex items-center gap-4">
         <div className="relative w-[124px] h-[124px] shrink-0">
           <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">

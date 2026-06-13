@@ -19,6 +19,12 @@ const TONE_CLASS: Record<Tone, string> = {
   default: "text-[#d0d6e0]",
 };
 
+const TONE_DOT: Record<Tone, string> = {
+  good: "bg-[#4ade80]",
+  bad: "bg-[#ff6467]",
+  default: "bg-white/30",
+};
+
 function Cell({
   label,
   value,
@@ -31,8 +37,11 @@ function Cell({
   tone?: Tone;
 }) {
   return (
-    <div className="panel p-4 flex flex-col gap-1.5">
-      <div className="label">{label}</div>
+    <div className="rounded-[28px] border border-white/[0.08] bg-gradient-to-b from-white/[0.06] to-white/[0.02] backdrop-blur-sm p-4 flex flex-col gap-1.5 hover:-translate-y-0.5 transition-transform duration-200 shadow-panel">
+      <div className="flex items-center gap-2">
+        <span className={`h-1.5 w-1.5 rounded-full ${TONE_DOT[t]}`} />
+        <div className="label">{label}</div>
+      </div>
       <div className={`text-2xl font-mono leading-tight ${TONE_CLASS[t]}`}>{value}</div>
       {hint && <div className="text-sm font-mono text-[#8a93a3] leading-snug">{hint}</div>}
     </div>
