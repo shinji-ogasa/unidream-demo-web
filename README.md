@@ -1,6 +1,6 @@
 # unidream-demo-web
 
-UniDream のライブデモ。Next.js のフロントエンドと Supabase Edge Function を組み合わせて、15 分ごとに [unidream-space](../unidream-space) の HF Spaces 推論 API を叩き、仮想ペーパートレードの結果を表示する。現行モデルは Plan008 recent overlay v2 で、B&H=1.0 を基準に `1.06 / 1.00 / 0.94` の exposure を取る。
+UniDream のライブデモ。Next.js のフロントエンドと Supabase Edge Function を組み合わせて、15 分ごとに [unidream-space](../unidream-space) の HF Spaces 推論 API を叩き、仮想ペーパートレードの結果を表示する。現行モデルは Plan011 v31 neural overlay actor。Transformer WM -> BC -> AC の実モデル推論で、B&H=1.0 近傍の小さな continuous exposure を返す。
 
 ```
 Binance klines (15m)
@@ -9,7 +9,7 @@ Supabase Cron (15m)
     ↓
 Edge Function: run-unidream-inference
     ↓ 7248 candles = 60d window + feature warmup
-HF Space /predict (Plan008 v2)
+HF Space /predict (Plan011 v31 fold23)
     ↓
 Supabase: predictions / strategy_state / equity_snapshots / trades
     ↓
@@ -105,8 +105,8 @@ supabase functions invoke run-unidream-inference
 {
   "ok": true,
   "candles": 7248,
-  "prediction": { "signal": "...", "raw_position": 1.06, "target_position": 1.06, ... },
-  "state":      { "equity": 10000.0, "cash": -600.0, "asset_qty": 0.123, "position": 1.06 },
+  "prediction": { "signal": "...", "raw_position": 1.006, "target_position": 1.006, ... },
+  "state":      { "equity": 10000.0, "cash": -60.0, "asset_qty": 0.012, "position": 1.006 },
   "traded": true
 }
 ```
@@ -150,7 +150,7 @@ Authorization ヘッダの渡し方はプロジェクトでの service role key 
 
 ## 過去データの backfill
 
-ライブ Cron だけだと履歴が空のままなので、初回だけローカルから過去 60 日ぶんの 15m candles を replay して `predictions` / `trades` / `equity_snapshots` / `strategy_state` を埋める用のスクリプトを用意した。Plan008 v2 の推論には 60日 window とは別に 1488 本の feature warmup が必要なので、実際の `/predict` には各 step で 7248 本を渡す。
+ライブ Cron だけだと履歴が空のままなので、初回だけローカルから過去 60 日ぶんの 15m candles を replay して `predictions` / `trades` / `equity_snapshots` / `strategy_state` を埋める用のスクリプトを用意した。Plan011 v31 の推論には 60日 window とは別に 1488 本の feature warmup が必要なので、実際の `/predict` には各 step で 7248 本を渡す。
 
 [scripts/backfill-history.ts](scripts/backfill-history.ts) は Edge Function と同じシミュレーションロジックをそのまま再利用する（`run_id = unidream_btcusdt_15m_main`, `INITIAL_CASH = 10_000`, `FEE_RATE = 0`, `ALLOW_SHORT = false`, `MAX_TARGET_POSITION = 1.12`）。
 
@@ -185,9 +185,9 @@ npm run backfill -- --reset --max-steps 200
 スクリプトの動き:
 
 1. `--reset` 指定時は run_id に紐づく `predictions` / `trades` / `equity_snapshots` を削除し、`strategy_state` を初期値で再シード
-2. Binance public klines から replay 期間 + Plan008 context ぶんの 15m candles を取得（デフォルトなら ~135.5日 = 60日 replay + 75.5日 context）
+2. Binance public klines から replay 期間 + Plan011 context ぶんの 15m candles を取得（デフォルトなら ~135.5日 = 60日 replay + 75.5日 context）
 3. **Probe フェーズ**: replay 範囲から 20 個の index を均等サンプリングして HF `/predict` を叩き、`target_position` の unique 値をログに出す。全部 `1.0` だった場合は「trades 履歴は増えない」と warn を出す
-4. **Replay フェーズ**: Plan008 context（7248 本）以降の各 step で、直近 7248 本の candle を /predict に POST。クランプ後の target_position をもとに前回 state から仮想 fill を計算して、`predictions` / `equity_snapshots` / `trades` をバッファして 200 行ごとに flush
+4. **Replay フェーズ**: Plan011 context（7248 本）以降の各 step で、直近 7248 本の candle を /predict に POST。クランプ後の target_position をもとに前回 state から仮想 fill を計算して、`predictions` / `equity_snapshots` / `trades` をバッファして 200 行ごとに flush
 5. すべて終わったら `strategy_state` を最終 state で upsert（以降のライブ Cron はその続きから動く）
 
 注意:
@@ -223,7 +223,7 @@ npm run backfill -- --reset --max-steps 200
 ## 動作メモ
 
 - **二重処理防止**：Edge Function は `strategy_state.last_timestamp` を読んで、最新 15 分足が新しくなければスキップ。`equity_snapshots` の `(run_id, timestamp)` UNIQUE が二段構えの保険
-- **ポジション解釈**：`target_position` は B&H=1.0 を基準にしたエクスポージャー倍率。Plan008 v2 は `1.06 / 1.00 / 0.94` を使うため、デモ側は最大 `1.12` まで許可している。マイナスは関数内の `ALLOW_SHORT = false` で flat に潰している。Space 側がショート対応したらフラグを立てる
+- **ポジション解釈**：`target_position` は B&H=1.0 を基準にしたエクスポージャー倍率。Plan011 v31 は continuous overlay を返すため、デモ側は最大 `1.12` まで許可している。マイナスは関数内の `ALLOW_SHORT = false` で flat に潰している。Space 側がショート対応したらフラグを立てる
 - **手数料・スリッページ**：リアルタイムデモでは表示の分かりやすさを優先して `FEE_RATE = 0`。研究repo側の評価 JSON では cost stress (`cost_x1` / `cost_x2` / `cost_x3`) を別途見る
 - **初期状態**：マイグレーション `0002` で `strategy_state` を初期 cash 10,000 USDT・flat でシード。デモをリセットしたいときは:
   ```sql

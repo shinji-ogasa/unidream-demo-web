@@ -10,7 +10,7 @@
 //
 // Notes:
 //   - Sequential HF /predict calls, ~1-5s each. The script fetches the requested
-//     replay span plus Plan008 context, then replays only the requested span.
+//     replay span plus Plan011 context, then replays only the requested span.
 //     Expect a long-running job; flush every 200 steps so partial progress is
 //     preserved on Ctrl+C.
 //   - Run before the live Cron is enabled, or pause the Cron during the run.
@@ -31,9 +31,9 @@ const FEE_RATE = 0;
 const MAX_TARGET_POSITION = 1.12;
 const ALLOW_SHORT = false;
 const BARS_PER_DAY = 96;
-const PLAN008_LOOKBACK_DAYS = 60;
+const MODEL_LOOKBACK_DAYS = 60;
 const FEATURE_WARMUP_BARS = 1488;
-const WINDOW_BARS = PLAN008_LOOKBACK_DAYS * BARS_PER_DAY + FEATURE_WARMUP_BARS;
+const WINDOW_BARS = MODEL_LOOKBACK_DAYS * BARS_PER_DAY + FEATURE_WARMUP_BARS;
 const WARMUP_BARS = WINDOW_BARS;
 const MODEL_CONTEXT_DAYS = WINDOW_BARS / BARS_PER_DAY;
 const BINANCE_LIMIT = 1000;
@@ -456,7 +456,7 @@ async function main(): Promise<void> {
   const totalSteps = Math.min(lastStep - firstStep + 1, opts.maxSteps);
   console.log(`[replay] starting at idx=${firstStep} (${candles[firstStep].timestamp})`);
   console.log(`[replay] ending   at idx=${lastStep} (${candles[lastStep].timestamp})`);
-  console.log(`[replay] Plan008 window bars = ${WINDOW_BARS}`);
+  console.log(`[replay] Plan011 window bars = ${WINDOW_BARS}`);
   if (probeTargets.length > 0) {
     const avgMs = (probeElapsedSec * 1000) / probeTargets.length;
     const estMin = (totalSteps * avgMs) / 1000 / 60;

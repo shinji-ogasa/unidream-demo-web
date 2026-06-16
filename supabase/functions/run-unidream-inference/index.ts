@@ -25,15 +25,15 @@ const SYMBOL = "BTCUSDT";
 const TIMEFRAME = "15m";
 const RUN_ID = "unidream_btcusdt_15m_main";
 const BARS_PER_DAY = 96;
-const PLAN008_LOOKBACK_DAYS = 60;
+const MODEL_LOOKBACK_DAYS = 60;
 const FEATURE_WARMUP_BARS = 1488;
-const TARGET_BARS = PLAN008_LOOKBACK_DAYS * BARS_PER_DAY + FEATURE_WARMUP_BARS;
+const TARGET_BARS = MODEL_LOOKBACK_DAYS * BARS_PER_DAY + FEATURE_WARMUP_BARS;
 const MIN_BARS = TARGET_BARS;
 const BINANCE_LIMIT = 1000;
 const INITIAL_CASH = 10_000;
 const FEE_RATE = 0; // PoC: no fees / slippage. Tune later if needed.
 const MAX_TARGET_POSITION = 1.12;
-// Long-only exposure baseline. Plan008 v2 overweight up to 1.06 is allowed.
+// Long-only exposure baseline. Plan011 v31 is a B&H-relative neural overlay.
 const ALLOW_SHORT = false;
 
 type Candle = {
