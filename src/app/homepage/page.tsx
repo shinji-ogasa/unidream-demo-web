@@ -277,7 +277,7 @@ export default function HomepagePage() {
                 <div><p className="label">MaxDDΔ</p><p className="mt-1 text-3xl font-semibold text-[#4ade80]">+0.20 pt</p></div>
               </div>
             </div>
-            <p className="mt-5 text-sm text-[#626b7a] leading-5">未学習の2024-2026でもMaxDD改善は全foldプラス。低回転（TO avg 0.60）で汎化。3/9foldでAlphaExプラス。</p>
+            <p className="mt-5 text-sm text-[#626b7a] leading-5">未学習の2024-2026でもMaxDDは全fold改善、AlphaExは最大+11.35ptを記録。低回転（TO avg 0.60）で汎化性能を確認。</p>
           </AnimateInView>
         </div>
       </section>
