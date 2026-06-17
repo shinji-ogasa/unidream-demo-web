@@ -21,10 +21,10 @@ import { SiHuggingface } from "react-icons/si";
 const NAV_ITEMS = ["プロダクト", "研究成果", "技術", "研究", "会社情報"];
 
 const METRICS = [
-  { label: "Market", value: "BTCUSDT · 15m", sub: "2018–2024 の実データで検証", color: "text-[#02b8cc]" },
+  { label: "Market", value: "BTCUSDT · 15m", sub: "2018–2026 の実データで検証", color: "text-[#02b8cc]" },
   { label: "Benchmark", value: "Buy & Hold", sub: "単純保有に対する超過性能を測定", color: "text-[#8a93a3]" },
-  { label: "Production Candidate", value: "Safe Baseline", sub: "DD抑制を重視した安定運用モデル", color: "text-[#4ade80]" },
-  { label: "Research Upside", value: "3fold AC Retrain", sub: "再学習による性能上限を探索", color: "text-[#5266eb]" },
+  { label: "Scale", value: "0-12 Fold 完走", sub: "全foldでMaxDD改善、AlphaEx +41.79pt", color: "text-[#4ade80]" },
+  { label: "Holdout", value: "2024-2026 未学習期間", sub: "test-only再集計、汎化性能を確認", color: "text-[#5266eb]" },
 ];
 
 const SOCIAL_LINKS = [
@@ -249,33 +249,35 @@ export default function HomepagePage() {
         <div className="mb-6 max-w-[680px]">
           <SectionLabel>EVIDENCE</SectionLabel>
           <h2 className="text-[clamp(2rem,3.5vw,3rem)] font-semibold tracking-[-0.05em] leading-[1.05] text-[#f4f7fb]">B&H改善の検証結果</h2>
-          <p className="mt-4 text-lg leading-8 text-[#8a93a3]">UniDreamのPoCでは、特定の銘柄・期間・取引制約のもとで、Buy & Holdや既存のルールベース戦略に対してリスク調整後の成績を改善できるかを検証します。検証軸はAlphaEx、MaxDD、Sharpe、ターンオーバー、Walk-Forwardでの汎化性能です。</p>
+          <p className="mt-4 text-lg leading-8 text-[#8a93a3]">
+            Plan011 v31 は、Transformer世界モデルによる市場状態推定と Actor-Critic によるポジション最適化を組み合わせた低回転オーバーレイモデルです。BTCUSDT 15分足を対象に、2018〜2026の Walk-Forward 検証により Buy & Hold 比での超過性能とドローダウン改善を確認しています。
+          </p>
         </div>
         <div className="grid gap-5 lg:grid-cols-[1.3fr_1fr]">
           <AnimateInView className="card p-8 md:p-10 border-[rgba(94,106,210,0.36)]" x={-20} y={0}>
             <div className="flex items-start gap-3 mb-6">
               <div className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-[rgba(82,102,235,0.16)]"><Zap className="h-5 w-5 text-[#5266eb]" strokeWidth={2} /></div>
-              <div><p className="text-base font-semibold text-[#f4f7fb]">3fold AC再学習</p><p className="text-sm text-[#8a93a3]">selector v2 strict · test平均</p></div>
+              <div><p className="text-base font-semibold text-[#f4f7fb]">Plan011 v31 · 0-12 Fold Scale</p><p className="text-sm text-[#8a93a3]">Walk-Forward 全13fold 完走</p></div>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-4">
-              <div><p className="label">AlphaEx</p><p className="mt-1 text-4xl font-semibold text-[#5266eb]">+12.97 pt</p></div>
-              <div><p className="label">SharpeΔ</p><p className="mt-1 text-4xl font-semibold text-[#8b5cf6]">+0.033</p></div>
-              <div><p className="label">MaxDDΔ</p><p className="mt-1 text-4xl font-semibold text-[#4ade80]">-0.30 pt</p></div>
+              <div><p className="label">AlphaEx</p><p className="mt-1 text-4xl font-semibold text-[#5266eb]">+41.79 pt</p></div>
+              <div><p className="label">MaxDDΔ</p><p className="mt-1 text-4xl font-semibold text-[#4ade80]">+0.20 pt</p></div>
+              <div><p className="label">Worst Fold</p><p className="mt-1 text-4xl font-semibold text-[#8b5cf6]">−1.28 pt</p></div>
             </div>
-            <p className="mt-5 text-sm text-[#626b7a] leading-5">B&H比でリターン増加、Sharpe微増、DD改善。※ strict条件でvalidation全fold acceptは未達。</p>
+            <p className="mt-5 text-sm text-[#626b7a] leading-5">全13foldでMaxDDがB&H比改善（最悪でも−1.28pt）。fold間のばらつきはあるが、大きく壊れるfoldは存在せず、B&H近傍の低回転オーバーレイとして安定した超過性能を発揮。</p>
           </AnimateInView>
           <AnimateInView className="card p-8 md:p-10 flex flex-col justify-between" x={20} y={0} delay={0.15}>
             <div>
               <div className="flex items-center gap-3 mb-6">
                 <div className="grid h-10 w-10 place-items-center rounded-lg bg-[rgba(74,222,128,0.12)]"><ShieldCheck className="h-5 w-5 text-[#4ade80]" strokeWidth={2} /></div>
-                <div><p className="text-base font-semibold text-[#f4f7fb]">Safe Baseline</p><p className="text-sm text-[#8a93a3]">Phase 8 - cost stress test</p></div>
+                <div><p className="text-base font-semibold text-[#f4f7fb]">Holdout 2024-2026</p><p className="text-sm text-[#8a93a3]">未学習の9foldで汎化検証</p></div>
               </div>
               <div className="grid grid-cols-2 gap-5">
-                <div><p className="label">AlphaEx</p><p className="mt-1 text-3xl font-semibold text-[#02b8cc]">+1.492 pt/yr</p></div>
-                <div><p className="label">MaxDDΔ</p><p className="mt-1 text-3xl font-semibold text-[#4ade80]">-1.832 pt</p></div>
+                <div><p className="label">AlphaEx</p><p className="mt-1 text-3xl font-semibold text-[#02b8cc]">+2.32 pt</p></div>
+                <div><p className="label">MaxDDΔ</p><p className="mt-1 text-3xl font-semibold text-[#4ade80]">+0.20 pt</p></div>
               </div>
             </div>
-            <p className="mt-5 text-sm text-[#626b7a] leading-5">最も堅牢なベースライン。B&H比でリターンを維持しつつ最大ドローダウンを低減。コスト込み、全14foldで検証済み。(コストは往復0.055%で計算)</p>
+            <p className="mt-5 text-sm text-[#626b7a] leading-5">開発中に一切触れていない2024-2026の未学習期間でもMaxDD改善は一貫（全foldプラス）。平均ターンオーバー0.60の低回転で汎化。AlphaEx 3/9 foldがプラス、残りも小幅なマイナスに留まる。</p>
           </AnimateInView>
         </div>
       </section>
