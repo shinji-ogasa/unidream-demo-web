@@ -13,7 +13,7 @@ export function fmtUSD(n: number | null | undefined, digits = 2): string {
 
 export function fmtPosition(n: number | null | undefined): string {
   if (n === null || n === undefined || !Number.isFinite(n)) return "—";
-  return n.toFixed(3);
+  return n.toFixed(4);
 }
 
 export function fmtTime(ts: string | null | undefined): string {
