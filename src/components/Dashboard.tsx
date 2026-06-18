@@ -28,7 +28,7 @@ import { PositionGauge } from "./PositionGauge";
 import { StatCard } from "./StatCard";
 import { TradesTable } from "./TradesTable";
 
-const TRADES_LIMIT = 200;
+const TRADES_LIMIT = 10000;
 const POSITION_HISTORY_BARS = 96;
 
 const SIGNAL_TONE: Record<string, "good" | "bad" | "warn" | "default"> = {

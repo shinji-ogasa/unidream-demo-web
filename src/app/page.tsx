@@ -19,7 +19,7 @@ export const revalidate = 0;
 // of 15m data). Hard ceiling so we don't accidentally fetch unbounded history.
 const SNAPSHOT_PAGE = 1000;
 const SNAPSHOT_HARD_LIMIT = 50_000;
-const TRADES_LIMIT = 200;
+const TRADES_LIMIT = 10000;
 
 function getServerClient(): SupabaseClient {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
