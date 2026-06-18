@@ -42,8 +42,8 @@ export function TradesTable({ trades }: Props) {
           </thead>
           <tbody className="text-base">
             {visible.map((t) => {
-              const from = Math.trunc(t.from_position * 1000) / 1000;
-              const to = Math.trunc(t.to_position * 1000) / 1000;
+              const from = Math.trunc(t.from_position * 10000) / 10000;
+              const to = Math.trunc(t.to_position * 10000) / 10000;
               const direction = to - from;
               const tone =
                 direction > 0
