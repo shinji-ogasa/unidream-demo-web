@@ -317,20 +317,41 @@ function applyFill(prev: State, targetPosition: number, price: number): FillResu
 
 // --- Reset ----------------------------------------------------------------
 
+async function deleteBatched(
+  supabase: SupabaseClient,
+  table: string,
+  filter: Record<string, string>,
+  batchSize = 100,
+): Promise<void> {
+  while (true) {
+    const query = supabase.from(table).select("id");
+    for (const [k, v] of Object.entries(filter)) {
+      query.eq(k, v);
+    }
+    const { data, error } = await query.limit(batchSize);
+    if (error) throw error;
+    if (!data || data.length === 0) break;
+    const ids: number[] = data.map((r: { id: number }) => r.id);
+    const { error: delErr } = await supabase.from(table).delete().in("id", ids);
+    if (delErr) throw delErr;
+    console.log(`  deleted ${ids.length} from ${table}`);
+  }
+}
+
 async function resetRun(supabase: SupabaseClient): Promise<void> {
-  const delPred = await supabase
-    .from("predictions")
-    .delete()
-    .eq("symbol", SYMBOL)
-    .eq("timeframe", TIMEFRAME);
-  if (delPred.error) throw new Error(`reset predictions failed: ${delPred.error.message}`);
+  console.log("[reset] clearing predictions...");
+  await deleteBatched(supabase, "predictions", {
+    symbol: SYMBOL,
+    timeframe: TIMEFRAME,
+  });
 
-  const delTrades = await supabase.from("trades").delete().eq("run_id", RUN_ID);
-  if (delTrades.error) throw new Error(`reset trades failed: ${delTrades.error.message}`);
+  console.log("[reset] clearing trades...");
+  await deleteBatched(supabase, "trades", { run_id: RUN_ID });
 
-  const delSnaps = await supabase.from("equity_snapshots").delete().eq("run_id", RUN_ID);
-  if (delSnaps.error) throw new Error(`reset equity_snapshots failed: ${delSnaps.error.message}`);
+  console.log("[reset] clearing equity_snapshots...");
+  await deleteBatched(supabase, "equity_snapshots", { run_id: RUN_ID });
 
+  console.log("[reset] resetting strategy_state...");
   const upState = await supabase.from("strategy_state").upsert({
     id: RUN_ID,
     symbol: SYMBOL,
