@@ -72,7 +72,7 @@ async function loadInitial() {
   const prediction = (predRes.data?.[0] as Prediction | undefined) ?? null;
   const state = (stateRes.data as StrategyState | null) ?? null;
   const trades = ((tradesRes.data ?? []) as Trade[]).filter(
-    (t) => Math.trunc(t.from_position * 10000) !== Math.trunc(t.to_position * 10000),
+    (t) => Math.round(t.from_position * 10000) !== Math.round(t.to_position * 10000),
   );
   return { prediction, state, snapshots, trades };
 }

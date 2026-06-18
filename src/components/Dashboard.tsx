@@ -131,7 +131,7 @@ export function Dashboard({ initial }: DashboardProps) {
         },
         (payload) => {
           const next = payload.new as Trade;
-          if (Math.trunc(next.from_position * 10000) === Math.trunc(next.to_position * 10000)) return;
+          if (Math.round(next.from_position * 10000) === Math.round(next.to_position * 10000)) return;
           setTrades((prev) => {
             if (prev.some((t) => t.id === next.id)) return prev;
             return [next, ...prev].slice(0, TRADES_LIMIT);

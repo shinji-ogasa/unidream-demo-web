@@ -185,9 +185,10 @@ function applyFill(
   const targetAssetQty = (targetPosition * equityAtPrice) / price;
   const deltaQty = targetAssetQty - prev.asset_qty;
 
-  // No-op when target position equals current within tiny epsilon.
-  const positionUnchanged = Math.abs(targetPosition - prev.current_position) < 1e-9
-    && Math.abs(deltaQty) < 1e-9;
+  // No-op when target position rounds to the same micro-value.
+  // We ignore deltaQty because price movement always causes tiny drift.
+  const positionUnchanged =
+    Math.round(targetPosition * 1e6) === Math.round(prev.current_position * 1e6);
 
   if (positionUnchanged) {
     return {
@@ -201,6 +202,9 @@ function applyFill(
     };
   }
 
+  // Round position to micro-precision to prevent floating-point drift.
+  const current_position = Math.round(targetPosition * 1e6) / 1e6;
+
   const tradeNotional = Math.abs(deltaQty) * price;
   const fee = tradeNotional * FEE_RATE;
   const newCash = prev.cash - deltaQty * price - fee;
@@ -209,14 +213,14 @@ function applyFill(
 
   return {
     next: {
-      current_position: targetPosition,
+      current_position,
       cash: newCash,
       asset_qty: newAssetQty,
       equity: newEquity,
     },
     trade: {
       from_position: prev.current_position,
-      to_position: targetPosition,
+      to_position: current_position,
       price,
       trade_notional: tradeNotional,
       fee,

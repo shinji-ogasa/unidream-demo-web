@@ -275,9 +275,10 @@ function applyFill(prev: State, targetPosition: number, price: number): FillResu
   const equityAtPrice = prev.cash + prev.asset_qty * price;
   const targetAssetQty = (targetPosition * equityAtPrice) / price;
   const deltaQty = targetAssetQty - prev.asset_qty;
+  // No-op when target position rounds to the same micro-value.
+  // We ignore deltaQty because price movement always causes tiny drift.
   const positionUnchanged =
-    Math.abs(targetPosition - prev.current_position) < 1e-9 &&
-    Math.abs(deltaQty) < 1e-9;
+    Math.round(targetPosition * 1e6) === Math.round(prev.current_position * 1e6);
 
   if (positionUnchanged) {
     return {
@@ -291,6 +292,11 @@ function applyFill(prev: State, targetPosition: number, price: number): FillResu
     };
   }
 
+  // Round position to micro-precision to prevent floating-point drift
+  // from creating phantom trades. Model outputs 4 decimal places;
+  // use 6 so rounding error stays far below the model's resolution.
+  const current_position = Math.round(targetPosition * 1e6) / 1e6;
+
   const tradeNotional = Math.abs(deltaQty) * price;
   const fee = tradeNotional * FEE_RATE;
   const cash = prev.cash - deltaQty * price - fee;
@@ -298,7 +304,7 @@ function applyFill(prev: State, targetPosition: number, price: number): FillResu
   const equity = cash + asset_qty * price;
 
   return {
-    next: { current_position: targetPosition, cash, asset_qty, equity },
+    next: { current_position, cash, asset_qty, equity },
     trade: {
       from_position: prev.current_position,
       to_position: targetPosition,
