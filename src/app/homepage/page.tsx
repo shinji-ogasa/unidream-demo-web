@@ -208,26 +208,6 @@ export default function HomepagePage() {
               <CtaButton variant="secondary" href="https://github.com/shinji-ogasa/UniDream">研究概要を読む</CtaButton>
             </motion.div>
           </div>
-
-          {/* product preview inside hero (DESIGN.md §9-1, §20) */}
-          <motion.div
-            initial={{ opacity: 0, y: 28 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.45, ease: [0.16, 1, 0.3, 1] }}
-            className="mt-14 md:mt-20 relative"
-          >
-            <div className="absolute -inset-8 rounded-[56px] bg-gradient-to-r from-[rgba(82,102,235,0.14)] via-[rgba(2,184,204,0.08)] to-[rgba(139,92,246,0.10)] blur-3xl pointer-events-none" />
-            <div className="relative dashboard-frame">
-              <Image
-                src="/dashboard-preview.png"
-                alt="UniDream ライブ推論ダッシュボード"
-                width={1400}
-                height={900}
-                priority
-                className="w-full h-auto"
-              />
-            </div>
-          </motion.div>
         </div>
       </section>
 
@@ -282,9 +262,9 @@ export default function HomepagePage() {
               <div><p className="text-base font-semibold text-[#f4f7fb]">Plan011 v31 · 0-12 Fold Scale</p><p className="text-sm text-[#8a93a3]">Walk-Forward 全13fold 完走</p></div>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-4">
-              <div><p className="label">AlphaEx</p><p className="mt-1 text-4xl font-semibold font-mono text-[#5266eb]">+41.79 pt</p></div>
-              <div><p className="label">MaxDDΔ</p><p className="mt-1 text-4xl font-semibold font-mono text-[#4ade80]">+0.20 pt</p></div>
-              <div><p className="label">Worst Fold</p><p className="mt-1 text-4xl font-semibold font-mono text-[#8b5cf6]">−1.28 pt</p></div>
+              <div><p className="label">AlphaEx</p><p className="mt-1 text-3xl font-semibold font-mono text-[#5266eb]">+41.79 pt</p></div>
+              <div><p className="label">MaxDDΔ</p><p className="mt-1 text-3xl font-semibold font-mono text-[#4ade80]">+0.20 pt</p></div>
+              <div><p className="label">Worst Fold</p><p className="mt-1 text-3xl font-semibold font-mono text-[#8b5cf6]">−1.28 pt</p></div>
             </div>
             <p className="mt-5 text-sm text-[#626b7a] leading-5">AlphaEx +41.79pt。最悪foldでも−1.28pt、大きく壊れるfoldなし。低回転で安定したB&Hオーバーレイ。</p>
           </AnimateInView>
@@ -295,8 +275,8 @@ export default function HomepagePage() {
                 <div><p className="text-base font-semibold text-[#f4f7fb]">Holdout 2024-2026</p><p className="text-sm text-[#8a93a3]">未学習の9foldで汎化検証</p></div>
               </div>
               <div className="grid grid-cols-2 gap-5">
-                <div><p className="label">AlphaEx</p><p className="mt-1 text-3xl font-semibold font-mono text-[#02b8cc]">+2.32 pt</p></div>
-                <div><p className="label">MaxDDΔ</p><p className="mt-1 text-3xl font-semibold font-mono text-[#4ade80]">+0.20 pt</p></div>
+                <div><p className="label">AlphaEx</p><p className="mt-1 text-2xl font-semibold font-mono text-[#02b8cc]">+2.32 pt</p></div>
+                <div><p className="label">MaxDDΔ</p><p className="mt-1 text-2xl font-semibold font-mono text-[#4ade80]">+0.20 pt</p></div>
               </div>
             </div>
             <p className="mt-5 text-sm text-[#626b7a] leading-5">未学習の2024-2026でもAlphaEx最大+11.35ptを記録。低回転（TO avg 0.60）で汎化性能を確認。</p>
@@ -369,19 +349,26 @@ export default function HomepagePage() {
 
       {/* live demo (DESIGN.md §9-4) */}
       <section className="container-site py-12 md:py-16">
-        <div className="card p-8 md:p-12 grid gap-8 md:grid-cols-[1.4fr_1fr] items-center">
-          <div>
-            <SectionLabel>LIVE DEMO</SectionLabel>
-            <h2 className="text-[clamp(2rem,3.5vw,3rem)] font-semibold tracking-[-0.05em] leading-[1.05] text-[#f4f7fb]">推論ダッシュボード</h2>
-            <p className="mt-4 text-lg leading-8 text-[#8a93a3] max-w-md">長期投資の意思決定を最適化するAIの実際の推論結果をリアルタイムで確認。</p>
-            <div className="mt-5 flex flex-wrap items-center gap-4 text-sm text-[#8a93a3]">
-              <span className="flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-[#4ade80] animate-pulse" />Live · next inference in ~15m</span>
-              <span className="flex items-center gap-2"><ArrowRight className="h-3 w-3 text-[#02b8cc]" />BTCUSDT · 15m</span>
-            </div>
+        <div className="mb-8 max-w-[680px]">
+          <SectionLabel>LIVE DEMO</SectionLabel>
+          <h2 className="text-[clamp(2rem,3.5vw,3rem)] font-semibold tracking-[-0.05em] leading-[1.05] text-[#f4f7fb]">推論ダッシュボード</h2>
+          <p className="mt-4 text-lg leading-8 text-[#8a93a3]">長期投資の意思決定を最適化するAIの実際の推論結果をリアルタイムで確認。</p>
+          <div className="mt-5 flex flex-wrap items-center gap-4 text-sm text-[#8a93a3]">
+            <span className="flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-[#4ade80] animate-pulse" />Live · next inference in ~15m</span>
+            <span className="flex items-center gap-2"><ArrowRight className="h-3 w-3 text-[#02b8cc]" />BTCUSDT · 15m</span>
           </div>
-          <div className="flex flex-col gap-3 md:items-end">
-            <CtaButton href="/">デモを起動</CtaButton>
-            <CtaButton variant="secondary" href="https://github.com/shinji-ogasa/UniDream">研究レポートを見る</CtaButton>
+          <div className="mt-6"><CtaButton href="/">デモを起動</CtaButton></div>
+        </div>
+        <div className="relative">
+          <div className="absolute -inset-8 rounded-[56px] bg-gradient-to-r from-[rgba(82,102,235,0.12)] via-[rgba(2,184,204,0.08)] to-[rgba(139,92,246,0.10)] blur-3xl pointer-events-none" />
+          <div className="relative dashboard-frame">
+            <Image
+              src="/dashboard-preview.png"
+              alt="UniDream ライブ推論ダッシュボード"
+              width={1400}
+              height={900}
+              className="w-full h-auto"
+            />
           </div>
         </div>
       </section>
