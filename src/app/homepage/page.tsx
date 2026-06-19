@@ -18,6 +18,8 @@ import {
 import { FaGithub, FaLinkedin, FaXTwitter, FaYoutube } from "react-icons/fa6";
 import { SiHuggingface } from "react-icons/si";
 
+import { PipelineFlow } from "@/components/PipelineFlow";
+
 const NAV_ITEMS = ["プロダクト", "研究成果", "技術", "研究", "会社情報"];
 
 const METRICS = [
@@ -167,15 +169,15 @@ export default function HomepagePage() {
       </motion.header>
 
       {/* hero */}
-      <section className="relative flex items-center pt-16">
+      <section className="relative flex flex-col pt-24 md:pt-32 min-h-[680px]">
         <div className="hero-visual-bg" />
-        <div className="relative z-10 max-w-[1200px] mx-auto px-6 md:px-8 py-14 md:py-20">
-          <div className="max-w-[900px]">
+        <div className="relative z-10 max-w-[1200px] mx-auto px-6 md:px-8 py-10 md:py-16 w-full">
+          <div className="max-w-[760px]">
             <motion.span
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
-              className="mb-8 inline-flex rounded-full border border-[rgba(82,102,235,0.3)] bg-[rgba(82,102,235,0.12)] px-5 py-1.5 text-sm font-semibold text-[#5266eb]"
+              className="mb-7 inline-flex rounded-full border border-[rgba(82,102,235,0.3)] bg-[rgba(82,102,235,0.12)] px-5 py-1.5 text-sm font-semibold text-[#5266eb]"
             >
               UniDream · Zeniq
             </motion.span>
@@ -183,7 +185,7 @@ export default function HomepagePage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.15 }}
-              className="text-[clamp(2.2rem,4vw,3.5rem)] font-semibold tracking-[-0.06em] leading-[1.35] text-[#f4f7fb]"
+              className="text-[clamp(2.8rem,6vw,5rem)] font-semibold tracking-[-0.05em] leading-[1.04] text-[#f4f7fb]"
             >
               市場の見えない構造を、<br />世界モデルで読む。
             </motion.h1>
@@ -191,21 +193,41 @@ export default function HomepagePage() {
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.25 }}
-              className="mt-8 max-w-[680px] text-lg leading-8 text-[#8a93a3]"
+              className="mt-7 max-w-[680px] text-lg leading-8 text-[#8a93a3]"
             >
-              UniDreamは、長期投資を「持つだけ」から「市場状態に応じて最適化する」へ進化させるAI運用基盤です。Transformer世界モデルと強化学習により、銘柄選定・リスク管理・ポジション調整・売買判断を一貫して学習し、Buy & Holdの弱点である大きなドローダウンと機会損失を改善します。
+              UniDreamは、長期投資を「持つだけ」から「市場状態に応じて最適化する」へ進化させるAI運用基盤です。Transformer世界モデルと強化学習により、銘柄選定・リスク管理・ポジション調整・売買判断を一貫して学習し、Buy &amp; Holdの弱点である大きなドローダウンと機会損失を改善します。
             </motion.p>
             <motion.div
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.35 }}
-              className="mt-10 flex flex-wrap gap-4"
+              className="mt-9 flex flex-wrap gap-4"
             >
               <CtaButton href="/">デモを見る</CtaButton>
               <CtaButton variant="secondary" href="/homepage/contact">PoC導入を相談する</CtaButton>
               <CtaButton variant="secondary" href="https://github.com/shinji-ogasa/UniDream">研究概要を読む</CtaButton>
             </motion.div>
           </div>
+
+          {/* product preview inside hero (DESIGN.md §9-1, §20) */}
+          <motion.div
+            initial={{ opacity: 0, y: 28 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.45, ease: [0.16, 1, 0.3, 1] }}
+            className="mt-14 md:mt-20 relative"
+          >
+            <div className="absolute -inset-8 rounded-[56px] bg-gradient-to-r from-[rgba(82,102,235,0.14)] via-[rgba(2,184,204,0.08)] to-[rgba(139,92,246,0.10)] blur-3xl pointer-events-none" />
+            <div className="relative dashboard-frame">
+              <Image
+                src="/dashboard-preview.png"
+                alt="UniDream ライブ推論ダッシュボード"
+                width={1400}
+                height={900}
+                priority
+                className="w-full h-auto"
+              />
+            </div>
+          </motion.div>
         </div>
       </section>
 
@@ -260,9 +282,9 @@ export default function HomepagePage() {
               <div><p className="text-base font-semibold text-[#f4f7fb]">Plan011 v31 · 0-12 Fold Scale</p><p className="text-sm text-[#8a93a3]">Walk-Forward 全13fold 完走</p></div>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-4">
-              <div><p className="label">AlphaEx</p><p className="mt-1 text-4xl font-semibold text-[#5266eb]">+41.79 pt</p></div>
-              <div><p className="label">MaxDDΔ</p><p className="mt-1 text-4xl font-semibold text-[#4ade80]">+0.20 pt</p></div>
-              <div><p className="label">Worst Fold</p><p className="mt-1 text-4xl font-semibold text-[#8b5cf6]">−1.28 pt</p></div>
+              <div><p className="label">AlphaEx</p><p className="mt-1 text-4xl font-semibold font-mono text-[#5266eb]">+41.79 pt</p></div>
+              <div><p className="label">MaxDDΔ</p><p className="mt-1 text-4xl font-semibold font-mono text-[#4ade80]">+0.20 pt</p></div>
+              <div><p className="label">Worst Fold</p><p className="mt-1 text-4xl font-semibold font-mono text-[#8b5cf6]">−1.28 pt</p></div>
             </div>
             <p className="mt-5 text-sm text-[#626b7a] leading-5">AlphaEx +41.79pt。最悪foldでも−1.28pt、大きく壊れるfoldなし。低回転で安定したB&Hオーバーレイ。</p>
           </AnimateInView>
@@ -273,8 +295,8 @@ export default function HomepagePage() {
                 <div><p className="text-base font-semibold text-[#f4f7fb]">Holdout 2024-2026</p><p className="text-sm text-[#8a93a3]">未学習の9foldで汎化検証</p></div>
               </div>
               <div className="grid grid-cols-2 gap-5">
-                <div><p className="label">AlphaEx</p><p className="mt-1 text-3xl font-semibold text-[#02b8cc]">+2.32 pt</p></div>
-                <div><p className="label">MaxDDΔ</p><p className="mt-1 text-3xl font-semibold text-[#4ade80]">+0.20 pt</p></div>
+                <div><p className="label">AlphaEx</p><p className="mt-1 text-3xl font-semibold font-mono text-[#02b8cc]">+2.32 pt</p></div>
+                <div><p className="label">MaxDDΔ</p><p className="mt-1 text-3xl font-semibold font-mono text-[#4ade80]">+0.20 pt</p></div>
               </div>
             </div>
             <p className="mt-5 text-sm text-[#626b7a] leading-5">未学習の2024-2026でもAlphaEx最大+11.35ptを記録。低回転（TO avg 0.60）で汎化性能を確認。</p>
@@ -318,44 +340,48 @@ export default function HomepagePage() {
         </div>
       </section>
 
+      {/* how it works (DESIGN.md §9-3, §11) */}
+      <section className="container-site py-12 md:py-16">
+        <div className="mb-8 max-w-[680px]">
+          <SectionLabel>HOW IT WORKS</SectionLabel>
+          <h2 className="text-[clamp(2rem,3.5vw,3rem)] font-semibold tracking-[-0.05em] leading-[1.05] text-[#f4f7fb]">
+            価格予測から状態学習へ
+          </h2>
+          <p className="mt-4 text-lg leading-8 text-[#8a93a3]">
+            OHLCV と特徴量から市場状態を学習し、Hindsight Oracle で教師を作り、Transformer 世界モデルと Actor-Critic で意思決定を最適化。検証セレクタが本番投入可否を判断するまでのパイプライン。
+          </p>
+        </div>
+        <PipelineFlow />
+      </section>
+
       {/* vision */}
       <section className="container-site py-12 md:py-16">
-        <div className="mb-6">
-          <SectionLabel>PIPELINE</SectionLabel>
-        </div>
-        <div className="relative mb-12">
-          <div className="absolute -inset-6 rounded-[56px] bg-gradient-to-r from-[rgba(82,102,235,0.15)] via-[rgba(2,184,204,0.10)] to-[rgba(82,102,235,0.12)] blur-3xl" />
-          <div className="relative rounded-card overflow-hidden border border-[rgba(255,255,255,0.08)] shadow-panel">
-            <Image src="/VISION_img.png" alt="UniDream pipeline diagram" width={2400} height={1350} className="w-full h-auto" />
-          </div>
-        </div>
         <div className="max-w-[680px]">
           <SectionLabel>VISION</SectionLabel>
           <h2 className="text-[clamp(2rem,3.5vw,3rem)] font-semibold tracking-[-0.05em] leading-[1.05] text-[#f4f7fb]">長期投資を、AIで再設計する</h2>
           <div className="mt-8 space-y-6 text-lg leading-8 text-[#8a93a3]">
             <p>従来の多くの予測モデルは、短期的な値動きの予測に焦点を当ててきました。しかし、実際の運用で重要なのは、いつリスクを取り、いつ守り、どの銘柄をどの比率で保有し、どのタイミングで調整するかです。</p>
             <p>UniDreamは<span className="font-semibold text-[#02b8cc]">「価格を当てるモデル」ではなく、「市場状態を学習し、その状態に応じた取引行動を最適化するモデル」</span>です。Transformer世界モデルによって市場の潜在状態を学習し、強化学習によって取引行動を最適化します。</p>
-            <p>目指すのは、Buy & Holdの長期的な強さを活かしながら、ドローダウンと機会損失を抑える次世代のAI運用エンジンです。</p>
+            <p>目指すのは、Buy &amp; Holdの長期的な強さを活かしながら、ドローダウンと機会損失を抑える次世代のAI運用エンジンです。</p>
           </div>
         </div>
       </section>
 
       {/* live demo (DESIGN.md §9-4) */}
       <section className="container-site py-12 md:py-16">
-        <div className="mb-6 max-w-[680px]">
-          <SectionLabel>LIVE DEMO</SectionLabel>
-          <h2 className="text-[clamp(2rem,3.5vw,3rem)] font-semibold tracking-[-0.05em] leading-[1.05] text-[#f4f7fb]">推論ダッシュボード</h2>
-          <p className="mt-4 text-lg leading-8 text-[#8a93a3]">長期投資の意思決定を最適化するAIの実際の推論結果をリアルタイムで確認</p>
-          <div className="mt-5 flex items-center gap-4 text-sm text-[#8a93a3]">
-            <span className="flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-[#4ade80]" />Live · next inference in ~15m</span>
-            <span className="flex items-center gap-2"><ArrowRight className="h-3 w-3 text-[#02b8cc]" />BTCUSDT · 15m</span>
+        <div className="card p-8 md:p-12 grid gap-8 md:grid-cols-[1.4fr_1fr] items-center">
+          <div>
+            <SectionLabel>LIVE DEMO</SectionLabel>
+            <h2 className="text-[clamp(2rem,3.5vw,3rem)] font-semibold tracking-[-0.05em] leading-[1.05] text-[#f4f7fb]">推論ダッシュボード</h2>
+            <p className="mt-4 text-lg leading-8 text-[#8a93a3] max-w-md">長期投資の意思決定を最適化するAIの実際の推論結果をリアルタイムで確認。</p>
+            <div className="mt-5 flex flex-wrap items-center gap-4 text-sm text-[#8a93a3]">
+              <span className="flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-[#4ade80] animate-pulse" />Live · next inference in ~15m</span>
+              <span className="flex items-center gap-2"><ArrowRight className="h-3 w-3 text-[#02b8cc]" />BTCUSDT · 15m</span>
+            </div>
           </div>
-          <div className="mt-6"><CtaButton href="/">デモを起動</CtaButton></div>
-        </div>
-        <div className="relative">
-          <div className="absolute -inset-8 rounded-[56px] bg-gradient-to-r from-[rgba(82,102,235,0.12)] via-[rgba(2,184,204,0.08)] to-[rgba(139,92,246,0.10)] blur-3xl" />
-          <div className="relative dashboard-frame">
-            <Image src="/dashboard-preview.png" alt="UniDream Demo dashboard" width={1400} height={900} className="w-full h-auto" />
+          <div className="flex flex-col gap-3 md:items-end">
+            <CtaButton href="/">デモを起動</CtaButton>
+            <CtaButton variant="secondary" href="https://github.com/shinji-ogasa/UniDream">研究レポートを見る</CtaButton>
           </div>
         </div>
       </section>

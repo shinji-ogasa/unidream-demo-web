@@ -16,7 +16,10 @@ body {
 
 /* Background system (DESIGN.md §7) */
 .site-bg {
-  background: linear-gradient(180deg, #08090a 0%, #0b0d12 45%, #08090a 100%);
+  background:
+    radial-gradient(circle at 18% 8%, rgba(82, 102, 235, 0.22), transparent 34rem),
+    radial-gradient(circle at 82% 14%, rgba(2, 184, 204, 0.12), transparent 30rem),
+    linear-gradient(180deg, #08090a 0%, #0b0d12 45%, #08090a 100%);
   position: relative;
   overflow: hidden;
 }
@@ -29,6 +32,16 @@ body {
   background-image: linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
   background-size: 64px 64px;
   mask-image: radial-gradient(circle at 50% 20%, black, transparent 72%);
+}
+
+.site-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.18;
+  mix-blend-mode: soft-light;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
 .hero-visual-bg {
