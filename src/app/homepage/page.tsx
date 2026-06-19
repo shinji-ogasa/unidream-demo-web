@@ -185,7 +185,7 @@ export default function HomepagePage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.15 }}
-              className="text-[clamp(2.4rem,7vw,5rem)] font-semibold tracking-[-0.04em] leading-[1.15] text-[#f4f7fb]"
+              className="text-[clamp(2.4rem,7vw,5rem)] md:text-[clamp(2.8rem,6vw,5rem)] font-semibold tracking-[-0.04em] md:tracking-[-0.05em] leading-[1.15] md:leading-[1.04] text-[#f4f7fb]"
             >
               市場の見えない構造を、<br className="hidden md:block" />世界モデルで読む。
             </motion.h1>
