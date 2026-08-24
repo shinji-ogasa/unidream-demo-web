@@ -7,18 +7,13 @@ import Link from "next/link";
 import { ANNUALIZATION, sortedAscending } from "@/lib/aggregate";
 import { fmtPercent, fmtTime, fmtUSD, pnlPercent } from "@/lib/format";
 import { computeMetrics } from "@/lib/metrics";
-import { getSupabase } from "@/lib/supabase";
 import {
   DISPLAY_MODEL_NAME,
   INITIAL_EQUITY,
-  RUN_ID,
   SYMBOL,
   TIMEFRAME,
-  type EquitySnapshot,
-  type Prediction,
-  type StrategyState,
-  type Trade,
 } from "@/lib/types";
+import { useLiveDashboard, type DashboardInitialData } from "@/hooks/useLiveDashboard";
 
 import { Countdown } from "./Countdown";
 import { LongShortBar } from "./LongShortBar";
@@ -28,7 +23,6 @@ import { PositionGauge } from "./PositionGauge";
 import { StatCard } from "./StatCard";
 import { TradesTable } from "./TradesTable";
 
-const TRADES_LIMIT = 10000;
 const POSITION_HISTORY_BARS = 96;
 
 const SIGNAL_TONE: Record<string, "good" | "bad" | "warn" | "default"> = {
@@ -40,12 +34,7 @@ const SIGNAL_TONE: Record<string, "good" | "bad" | "warn" | "default"> = {
 type Range = { startIndex: number; endIndex: number };
 
 type DashboardProps = {
-  initial: {
-    prediction: Prediction | null;
-    state: StrategyState | null;
-    snapshots: EquitySnapshot[];
-    trades: Trade[];
-  };
+  initial: DashboardInitialData;
 };
 
 function fullRange(length: number): Range | null {
@@ -54,10 +43,7 @@ function fullRange(length: number): Range | null {
 }
 
 export function Dashboard({ initial }: DashboardProps) {
-  const [prediction, setPrediction] = useState<Prediction | null>(initial.prediction);
-  const [state, setState] = useState<StrategyState | null>(initial.state);
-  const [snapshots, setSnapshots] = useState<EquitySnapshot[]>(initial.snapshots);
-  const [trades, setTrades] = useState<Trade[]>(initial.trades);
+  const { prediction, state, snapshots, trades } = useLiveDashboard(initial);
   const sortedSnapshots = useMemo(() => sortedAscending(snapshots), [snapshots]);
   const [range, setRange] = useState<Range | null>(() =>
     fullRange(sortedAscending(initial.snapshots).length),
@@ -76,74 +62,6 @@ export function Dashboard({ initial }: DashboardProps) {
       return prev;
     });
   }, [sortedSnapshots.length]);
-
-  useEffect(() => {
-    const supabase = getSupabase();
-    const channel = supabase
-      .channel("unidream-demo")
-      .on(
-        "postgres_changes",
-        { event: "INSERT", schema: "public", table: "predictions" },
-        (payload) => {
-          const next = payload.new as Prediction;
-          if (next.symbol === SYMBOL && next.timeframe === TIMEFRAME) {
-            setPrediction((prev) => {
-              if (!prev) return next;
-              const a = new Date(next.created_at).getTime();
-              const b = new Date(prev.created_at).getTime();
-              return a >= b ? next : prev;
-            });
-          }
-        },
-      )
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "strategy_state", filter: `id=eq.${RUN_ID}` },
-        (payload) => {
-          if (payload.new) setState(payload.new as StrategyState);
-        },
-      )
-      .on(
-        "postgres_changes",
-        {
-          event: "INSERT",
-          schema: "public",
-          table: "equity_snapshots",
-          filter: `run_id=eq.${RUN_ID}`,
-        },
-        (payload) => {
-          const next = payload.new as EquitySnapshot;
-          setSnapshots((prev) => {
-            if (prev.some((s) => s.id === next.id)) return prev;
-            return [...prev, next].sort(
-              (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime(),
-            );
-          });
-        },
-      )
-      .on(
-        "postgres_changes",
-        {
-          event: "INSERT",
-          schema: "public",
-          table: "trades",
-          filter: `run_id=eq.${RUN_ID}`,
-        },
-        (payload) => {
-          const next = payload.new as Trade;
-          if (Math.round(next.from_position * 10000) === Math.round(next.to_position * 10000)) return;
-          setTrades((prev) => {
-            if (prev.some((t) => t.id === next.id)) return prev;
-            return [next, ...prev].slice(0, TRADES_LIMIT);
-          });
-        },
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, []);
 
   const rafRef = useRef<number | null>(null);
   const pendingRangeRef = useRef<Range | null>(null);

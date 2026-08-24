@@ -19,24 +19,25 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import dotenv from "dotenv";
 import { setTimeout as sleep } from "node:timers/promises";
 
+import {
+  BARS_PER_DAY,
+  BINANCE_LIMIT,
+  FEATURE_WARMUP_BARS,
+  INITIAL_CASH,
+  MODEL_LOOKBACK_DAYS,
+  RUN_ID,
+  SYMBOL,
+  TIMEFRAME,
+} from "../supabase/functions/_shared/config.ts";
+import { applyFill, clampTargetPosition } from "../supabase/functions/_shared/paper_trading.ts";
+
 dotenv.config({ path: ".env.backfill" });
 
 // --- Config ---------------------------------------------------------------
 
-const SYMBOL = "BTCUSDT";
-const TIMEFRAME = "15m";
-const RUN_ID = "unidream_btcusdt_15m_main";
-const INITIAL_CASH = 10_000;
-const FEE_RATE = 0;
-const MAX_TARGET_POSITION = 1.12;
-const ALLOW_SHORT = false;
-const BARS_PER_DAY = 96;
-const MODEL_LOOKBACK_DAYS = 60;
-const FEATURE_WARMUP_BARS = 1488;
 const WINDOW_BARS = MODEL_LOOKBACK_DAYS * BARS_PER_DAY + FEATURE_WARMUP_BARS;
 const WARMUP_BARS = WINDOW_BARS;
 const MODEL_CONTEXT_DAYS = WINDOW_BARS / BARS_PER_DAY;
-const BINANCE_LIMIT = 1000;
 const SAMPLE_PROBES = 20;
 const FLUSH_EVERY = 50;
 const HF_RETRY_MAX = 3;
@@ -247,72 +248,6 @@ async function callPredict(
     }
   }
   throw lastErr instanceof Error ? lastErr : new Error(String(lastErr));
-}
-
-// --- Sim ------------------------------------------------------------------
-
-function clampTargetPosition(raw: unknown): number {
-  if (typeof raw !== "number" || !Number.isFinite(raw)) return 0;
-  let t = raw;
-  if (!ALLOW_SHORT && t < 0) t = 0;
-  if (t > MAX_TARGET_POSITION) t = MAX_TARGET_POSITION;
-  if (t < -1) t = -1;
-  return t;
-}
-
-type FillResult = {
-  next: { current_position: number; cash: number; asset_qty: number; equity: number };
-  trade: {
-    from_position: number;
-    to_position: number;
-    price: number;
-    trade_notional: number;
-    fee: number;
-  } | null;
-};
-
-function applyFill(prev: State, targetPosition: number, price: number): FillResult {
-  const equityAtPrice = prev.cash + prev.asset_qty * price;
-  const targetAssetQty = (targetPosition * equityAtPrice) / price;
-  const deltaQty = targetAssetQty - prev.asset_qty;
-  // No-op when target position rounds to the same micro-value.
-  // We ignore deltaQty because price movement always causes tiny drift.
-  const positionUnchanged =
-    Math.round(targetPosition * 1e6) === Math.round(prev.current_position * 1e6);
-
-  if (positionUnchanged) {
-    return {
-      next: {
-        current_position: prev.current_position,
-        cash: prev.cash,
-        asset_qty: prev.asset_qty,
-        equity: equityAtPrice,
-      },
-      trade: null,
-    };
-  }
-
-  // Round position to micro-precision to prevent floating-point drift
-  // from creating phantom trades. Model outputs 4 decimal places;
-  // use 6 so rounding error stays far below the model's resolution.
-  const current_position = Math.round(targetPosition * 1e6) / 1e6;
-
-  const tradeNotional = Math.abs(deltaQty) * price;
-  const fee = tradeNotional * FEE_RATE;
-  const cash = prev.cash - deltaQty * price - fee;
-  const asset_qty = targetAssetQty;
-  const equity = cash + asset_qty * price;
-
-  return {
-    next: { current_position, cash, asset_qty, equity },
-    trade: {
-      from_position: prev.current_position,
-      to_position: targetPosition,
-      price,
-      trade_notional: tradeNotional,
-      fee,
-    },
-  };
 }
 
 // --- Reset ----------------------------------------------------------------

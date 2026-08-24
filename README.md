@@ -23,16 +23,18 @@ Next.js page (Realtime subscribe)
 ```
 src/
   app/
-    layout.tsx
-    page.tsx              SSR で初期データ取得 + <Dashboard/>
+    page.tsx              SSR の入口だけを担当
     globals.css
   components/
-    Dashboard.tsx         Realtime 購読 + レイアウト
+    Dashboard.tsx         表示とチャート範囲だけを担当
     PerformanceChart.tsx  recharts のラインチャート
     StatCard.tsx
     TradesTable.tsx
+  hooks/
+    useLiveDashboard.ts   Supabase Realtime の購読と画面状態
   lib/
     supabase.ts           ブラウザ用クライアント (publishable key)
+    server/dashboardRepository.ts  SSR の初期データ取得
     types.ts              テーブル行の型 + run_id 定数
     format.ts
 supabase/
@@ -40,10 +42,16 @@ supabase/
     0001_predictions.sql        推論ログ
     0002_strategy_state.sql     strategy_state / equity_snapshots / trades
   functions/
+    _shared/
+      config.ts            Edge / backfill 共通の現行定数
+      paper_trading.ts     純粋な約定・position clamp
     run-unidream-inference/
-      index.ts                  Deno Edge Function
+      index.ts                  推論ジョブのオーケストレーション
+      binance.ts                Binance candle取得
+      inference.ts              HF Space API呼び出し
+      config.ts                 Edge環境変数とAPI用設定
 scripts/
-  backfill-history.ts           ローカル実行用の過去データ replay スクリプト
+  backfill-history.ts           共通paper-tradingを使う過去データ replay
 ```
 
 ## テーブル
@@ -152,7 +160,7 @@ Authorization ヘッダの渡し方はプロジェクトでの service role key 
 
 ライブ Cron だけだと履歴が空のままなので、初回だけローカルから過去 60 日ぶんの 15m candles を replay して `predictions` / `trades` / `equity_snapshots` / `strategy_state` を埋める用のスクリプトを用意した。Plan011 v31 の推論には 60日 window とは別に 1488 本の feature warmup が必要なので、実際の `/predict` には各 step で 7248 本を渡す。
 
-[scripts/backfill-history.ts](scripts/backfill-history.ts) は Edge Function と同じシミュレーションロジックをそのまま再利用する（`run_id = unidream_btcusdt_15m_main`, `INITIAL_CASH = 10_000`, `FEE_RATE = 0`, `ALLOW_SHORT = false`, `MAX_TARGET_POSITION = 1.12`）。
+[scripts/backfill-history.ts](scripts/backfill-history.ts) は Edge Function と同じ共通paper-tradingロジックを再利用する（`run_id = unidream_btcusdt_15m_main`, `INITIAL_CASH = 10_000`, `DEMO_FEE_RATE = 0`, `ALLOW_SHORT = false`, `MAX_TARGET_POSITION = 1.12`）。
 
 セットアップ:
 
@@ -224,7 +232,7 @@ npm run backfill -- --reset --max-steps 200
 
 - **二重処理防止**：Edge Function は `strategy_state.last_timestamp` を読んで、最新 15 分足が新しくなければスキップ。`equity_snapshots` の `(run_id, timestamp)` UNIQUE が二段構えの保険
 - **ポジション解釈**：`target_position` は B&H=1.0 を基準にしたエクスポージャー倍率。Plan011 v31 は continuous overlay を返すため、デモ側は最大 `1.12` まで許可している。マイナスは関数内の `ALLOW_SHORT = false` で flat に潰している。Space 側がショート対応したらフラグを立てる
-- **手数料・スリッページ**：リアルタイムデモでは表示の分かりやすさを優先して `FEE_RATE = 0`。研究repo側の評価 JSON では cost stress (`cost_x1` / `cost_x2` / `cost_x3`) を別途見る
+- **手数料・スリッページ**：リアルタイムデモでは表示の分かりやすさを優先して `DEMO_FEE_RATE = 0`。研究repo側の評価 JSON では cost stress (`cost_x1` / `cost_x2` / `cost_x3`) を別途見る
 - **初期状態**：マイグレーション `0002` で `strategy_state` を初期 cash 10,000 USDT・flat でシード。デモをリセットしたいときは:
   ```sql
   delete from trades            where run_id = 'unidream_btcusdt_15m_main';
