@@ -3,7 +3,7 @@
 UniDream のライブデモ。Next.js のフロントエンドと Supabase Edge Function を組み合わせて、15 分ごとに [unidream-space](../unidream-space) の HF Spaces 推論 API を叩き、仮想ペーパートレードの結果を表示する。現行モデルは Plan011 v31 neural overlay actor。Transformer WM -> BC -> AC の実モデル推論で、B&H=1.0 近傍の小さな continuous exposure を返す。
 
 ```
-Binance spot klines (15m) + USDⓈ-M Futures mark/funding
+Binance spot closed klines (15m) + USDⓈ-M Futures mark/funding
     ↓
 Supabase Cron (15m)
     ↓
@@ -21,13 +21,14 @@ Next.js page (Realtime subscribe)
 ## 推論データと時刻の契約
 
 `run-unidream-inference` が HF Space の `/predict` に送る各 `candles` 行は、
-Spot の 15 分足 OHLCV (`timestamp`, `open`, `high`, `low`, `close`, `volume`) に、
+Spot の **完全に close 済み**の 15 分足 OHLCV (`timestamp`, `open`, `high`, `low`, `close`, `volume`) に、
 USDⓈ-M Futures の `funding_rate` と `mark_close` を必ず加えたもの。派生データが欠けた場合は
 ゼロや `null` で補完せず、Edge Function は `/predict` を呼ばずに失敗する。
 
-- Spot OHLCV は `GET /api/v3/klines` を `TARGET_BARS` 本になるまで古い方向へページングする。
+- Spot OHLCV は 1 回の `fetchCandles` 呼び出し開始時に固定した observation cutoff を使い、
+  `closeTime <= cutoff` の完全足だけを `TARGET_BARS` 本になるまで古い方向へページングする。
   リクエストの `endTime` は直前ページの最古の open time より 1 ms 前に進め、重複を除去した後、
-  15 分間隔の連続性も検証する。
+  15 分間隔の連続性も検証する。現在進行中の足 (`closeTime > cutoff`) は除外される。
 - `mark_close` は `GET /fapi/v1/markPriceKlines` の mark kline の close を、Spot 行と同じ
   open-time に対して完全一致で結合する。別の時刻の mark 行を forward/back fill しない。
 - `funding_rate` は `GET /fapi/v1/fundingRate` の `fundingTime` が candle の timestamp 以下である
@@ -39,14 +40,15 @@ USDⓈ-M Futures の `funding_rate` と `mark_close` を必ず加えたもの。
 
 ### Observation cutoff と paper fill
 
-取得の observation cutoff は Binance API 応答を受け取った時刻。現在のオーケストレーターは従来の
-挙動を保ち、Spot API が返す最新行を prediction window に含める。その 15 分足がまだ進行中なら、
-OHLCV と mark close はその cutoff 時点の **partial observation** であり、完了した candle とは
-みなさない。`shift(1)` により当該行の未完了の値を同じ時刻の shifted feature として主張しない。
+`fetchCandles` は呼び出し開始時に observation cutoff (`Date.now()`) を 1 回だけ固定する。
+Binance の kline `closeTime` が cutoff と **同時刻またはそれ以前**なら完全足として採用し、cutoff より
+後なら現在進行中の partial observation として除外する。従って prediction window の `latest` は常に
+最後の完全足であり、その足の `close` を `/predict` と後続処理に使う。
 
-一方、paper fill は現在 `latest.close` と `latest.timestamp` を使う別の処理である。したがって、
-この timestamp は observation/paper-fill の記録時刻であって、candle completion 時刻の保証ではない。
-完了足だけで判断する運用が必要な場合は、オーケストレーター側で未完了行を除外する必要がある。
+paper fill は Space 推論後に同じ `latest.close` / `latest.timestamp` を使って計算するが、DB の
+`created_at` が記録されるのは RPC transaction の実行時である。`latest.timestamp` は bar の open 時刻、
+RPC の実行時刻は paper fill の観測・記録時刻であり、実際の取引所約定時刻や candle completion 時刻を
+装わない。`shift(1)` の特徴量タイミングとこの cutoff は別の契約として扱う。
 
 ### 参照した公式仕様
 
@@ -55,7 +57,7 @@ OHLCV と mark close はその cutoff 時点の **partial observation** であ�
 - [Binance USDⓈ-M Mark Price Kline/Candlestick data](https://developers.binance.com/docs/derivatives/usds-margined-futures/market-data/rest-api/Mark-Price-Kline-Candlestick-Data)
 - [Binance USDⓈ-M Funding Rate History](https://developers.binance.com/docs/derivatives/usds-margined-futures/market-data/rest-api/Get-Funding-Rate-History)
 - [Binance USDⓈ-M general API information and IP limits](https://developers.binance.com/docs/derivatives/usds-margined-futures/general-info)
-- [Supabase Edge Functions](https://supabase.com/docs/guides/functions) と [Supabase changelog](https://supabase.com/changelog.md)
+- [Supabase Edge Functions](https://supabase.com/docs/guides/functions)、[Supabase RPC](https://supabase.com/docs/reference/javascript/rpc)、[Supabase RLS](https://supabase.com/docs/guides/database/postgres/row-level-security)、[Supabase changelog](https://supabase.com/changelog.md)
 
 ## ディレクトリ構成
 
@@ -80,6 +82,7 @@ supabase/
   migrations/
     0001_predictions.sql        推論ログ
     0002_strategy_state.sql     strategy_state / equity_snapshots / trades
+    0003_atomic_inference.sql   4 表を 1 transaction で commit する RPC と冪等性制約
   functions/
     _shared/
       config.ts            Edge / backfill 共通の現行定数
@@ -89,16 +92,17 @@ supabase/
       binance.ts                Binance candle取得
       inference.ts              HF Space API呼び出し
       config.ts                 Edge環境変数とAPI用設定
+      atomic.ts                 CAS付き atomic RPC payload / 応答
 scripts/
   backfill-history.ts           共通paper-tradingを使う過去データ replay
 ```
 
 ## テーブル
 
-- `predictions` — 推論ごとの生出力ログ（signal, position, latest_close, model_version, raw jsonb など）
+- `predictions` — 推論ごとの生出力ログ（run_id, signal, position, latest_close, model_version, raw jsonb など）。`(run_id, latest_timestamp)` が UNIQUE
 - `strategy_state` — `run_id` ごとに 1 行。現在の cash / asset_qty / equity / current_position / last_timestamp を保持。マイグレーションで初期行をシード
 - `equity_snapshots` — 処理した 15 分足ごとに 1 行。資産推移チャートのデータ源。`(run_id, timestamp)` で UNIQUE を張ってあるので再実行しても安全
-- `trades` — `target_position` が前回と変わったときだけ追記
+- `trades` — `target_position` が前回と変わったときだけ追記。`(run_id, timestamp)` が UNIQUE
 
 Edge Function とフロントの両方が共通で使う run_id:
 `unidream_btcusdt_15m_main`（初期 cash 10,000 USDT、ポジションなし）
@@ -123,12 +127,17 @@ http://localhost:3000 で開く。
 
 ## Supabase のセットアップ
 
-マイグレーション適用（Studio の SQL editor または `supabase db push`）:
+マイグレーション適用（Studio の SQL editor または `supabase db push`）。`0001` → `0002` → `0003`
+の順で適用し、`0003` を成功させてから Edge Function をデプロイする:
 
 ```powershell
 supabase link --project-ref YOUR-PROJECT-REF
 supabase db push
 ```
+
+`0003_atomic_inference.sql` は既存 `predictions.run_id` を canonical run に backfill してから、
+`(run_id, latest_timestamp)` と `(run_id, timestamp)` の UNIQUE index を作る。既存重複がある場合は
+履歴を削除せず migration 全体を失敗させるので、下記の確認クエリで整理してから再実行する。
 
 Edge Function の secrets を設定。Supabase CLI は `SUPABASE_` で始まる名前を弾くので、プロジェクト URL/キーは `PROJECT_*` という名前で入れている:
 
@@ -145,6 +154,12 @@ supabase secrets set HF_INFERENCE_API_KEY=<HF Space 側の INFERENCE_API_KEY と
 supabase functions deploy run-unidream-inference
 supabase functions invoke run-unidream-inference
 ```
+
+Edge は state の読み取りと Space 推論の後、`record_unidream_inference` RPC を 1 回だけ呼ぶ。
+RPC は `strategy_state` の対象行を `FOR UPDATE` で直列化し、期待 state の CAS を検証してから
+`predictions` / `strategy_state` / `equity_snapshots` / `trades` を同一 transaction で書く。同じ
+`(run_id, latest_timestamp)` の再送は `already_processed` として安全に skip、stale state や
+既存の部分行は SQLSTATE `40001`（Edge HTTP 409）で fail closed する。
 
 成功するとこういう JSON が返る:
 
@@ -172,6 +187,36 @@ order by timestamp desc limit 5;
 
 select * from trades where run_id = 'unidream_btcusdt_15m_main'
 order by created_at desc limit 5;
+```
+
+### Atomic inference の deploy / rollback / observability
+
+- **Deploy**: まず `supabase db push` で `0003` を適用し、成功後に
+  `supabase functions deploy run-unidream-inference` を実行する。Studio で適用する場合も同じ
+  migration 全体を 1 回で実行する。`service_role` だけに RPC `EXECUTE` を許可し、`anon` /
+  `authenticated` には 4 表への write 権限も RPC 権限も与えない。
+- **Rollback**: `0003` に自動 down migration は用意しない。preflight の重複エラーなどで適用が
+  失敗した場合は transaction が戻るため、重複を確認して再実行する。適用後の緊急時は Cron を
+  一時停止してから互換性のある Edge revision を戻し、RPC / UNIQUE index / `run_id` を Edge が
+  動いている状態で drop しない。DB 側を戻す必要がある場合はバックアップとレビュー済み SQL を
+  使い、復旧後に atomic revision を再デプロイする。
+- **Observability**: Edge のログで `already_processed`（重複 skip）、HTTP 409 / SQLSTATE `40001`
+  （競合・部分行）、HTTP 500（市場データ / Space / RPC の予期せぬ失敗）を分けて監視する。最新
+  状態と書き込み進行は次で確認できる。
+
+```sql
+select id, last_timestamp, updated_at
+from strategy_state where id = 'unidream_btcusdt_15m_main';
+
+select run_id, latest_timestamp, count(*)
+from predictions
+where run_id = 'unidream_btcusdt_15m_main'
+group by run_id, latest_timestamp having count(*) > 1;
+
+select run_id, timestamp, count(*)
+from trades
+where run_id = 'unidream_btcusdt_15m_main'
+group by run_id, timestamp having count(*) > 1;
 ```
 
 Supabase Cron でスケジュール（毎時 1, 16, 31, 46 分に発火）:
@@ -269,7 +314,7 @@ npm run backfill -- --reset --max-steps 200
 
 ## 動作メモ
 
-- **二重処理防止**：Edge Function は `strategy_state.last_timestamp` を読んで、最新 15 分足が新しくなければスキップ。`equity_snapshots` の `(run_id, timestamp)` UNIQUE が二段構えの保険
+- **二重処理防止**：Edge Function は最後の完全 close 済み足だけを対象にし、`strategy_state.last_timestamp` が新しくなければスキップ。新規処理は RPC の `FOR UPDATE` + CAS と `(run_id, latest_timestamp)` / `(run_id, timestamp)` の UNIQUE index で直列化・冪等化する
 - **ポジション解釈**：`target_position` は B&H=1.0 を基準にしたエクスポージャー倍率。Plan011 v31 は continuous overlay を返すため、デモ側は最大 `1.12` まで許可している。マイナスは関数内の `ALLOW_SHORT = false` で flat に潰している。Space 側がショート対応したらフラグを立てる
 - **手数料・スリッページ**：リアルタイムデモでは表示の分かりやすさを優先して `DEMO_FEE_RATE = 0`。研究repo側の評価 JSON では cost stress (`cost_x1` / `cost_x2` / `cost_x3`) を別途見る
 - **初期状態**：マイグレーション `0002` で `strategy_state` を初期 cash 10,000 USDT・flat でシード。デモをリセットしたいときは:
