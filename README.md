@@ -3,7 +3,7 @@
 UniDream のライブデモ。Next.js のフロントエンドと Supabase Edge Function を組み合わせて、15 分ごとに [unidream-space](../unidream-space) の HF Spaces 推論 API を叩き、仮想ペーパートレードの結果を表示する。現行モデルは Plan011 v31 neural overlay actor。Transformer WM -> BC -> AC の実モデル推論で、B&H=1.0 近傍の小さな continuous exposure を返す。
 
 ```
-Binance klines (15m)
+Binance spot klines (15m) + USDⓈ-M Futures mark/funding
     ↓
 Supabase Cron (15m)
     ↓
@@ -17,6 +17,45 @@ Next.js page (Realtime subscribe)
 ```
 
 フロントエンドはモデルを持たないし、HF Spaces を直接叩くこともしない。画面上にも「research demo, not financial advice」のディスクレーマを出している。
+
+## 推論データと時刻の契約
+
+`run-unidream-inference` が HF Space の `/predict` に送る各 `candles` 行は、
+Spot の 15 分足 OHLCV (`timestamp`, `open`, `high`, `low`, `close`, `volume`) に、
+USDⓈ-M Futures の `funding_rate` と `mark_close` を必ず加えたもの。派生データが欠けた場合は
+ゼロや `null` で補完せず、Edge Function は `/predict` を呼ばずに失敗する。
+
+- Spot OHLCV は `GET /api/v3/klines` を `TARGET_BARS` 本になるまで古い方向へページングする。
+  リクエストの `endTime` は直前ページの最古の open time より 1 ms 前に進め、重複を除去した後、
+  15 分間隔の連続性も検証する。
+- `mark_close` は `GET /fapi/v1/markPriceKlines` の mark kline の close を、Spot 行と同じ
+  open-time に対して完全一致で結合する。別の時刻の mark 行を forward/back fill しない。
+- `funding_rate` は `GET /fapi/v1/fundingRate` の `fundingTime` が candle の timestamp 以下である
+  行のうち、最も新しいものを使う。最初の candle より前の as-of 行を先に取得してから、観測範囲の
+  履歴をページングするため、後から公表された funding を過去の candle に使わない。
+- Space 側の Plan011 feature pipeline が、この raw derivative 入力から `funding_rate`、`basis`、
+  `basis_mom`、`basis_abs` を生成する。学習時と同じ `shift(1)` の特徴量タイミングは Space 側で
+  維持される。
+
+### Observation cutoff と paper fill
+
+取得の observation cutoff は Binance API 応答を受け取った時刻。現在のオーケストレーターは従来の
+挙動を保ち、Spot API が返す最新行を prediction window に含める。その 15 分足がまだ進行中なら、
+OHLCV と mark close はその cutoff 時点の **partial observation** であり、完了した candle とは
+みなさない。`shift(1)` により当該行の未完了の値を同じ時刻の shifted feature として主張しない。
+
+一方、paper fill は現在 `latest.close` と `latest.timestamp` を使う別の処理である。したがって、
+この timestamp は observation/paper-fill の記録時刻であって、candle completion 時刻の保証ではない。
+完了足だけで判断する運用が必要な場合は、オーケストレーター側で未完了行を除外する必要がある。
+
+### 参照した公式仕様
+
+- [Binance Spot Kline/Candlestick data](https://developers.binance.com/docs/binance-spot-api-docs/rest-api/market-data-endpoints)
+- [Binance USDⓈ-M Kline/Candlestick data](https://developers.binance.com/docs/derivatives/usds-margined-futures/market-data/rest-api/Kline-Candlestick-Data)
+- [Binance USDⓈ-M Mark Price Kline/Candlestick data](https://developers.binance.com/docs/derivatives/usds-margined-futures/market-data/rest-api/Mark-Price-Kline-Candlestick-Data)
+- [Binance USDⓈ-M Funding Rate History](https://developers.binance.com/docs/derivatives/usds-margined-futures/market-data/rest-api/Get-Funding-Rate-History)
+- [Binance USDⓈ-M general API information and IP limits](https://developers.binance.com/docs/derivatives/usds-margined-futures/general-info)
+- [Supabase Edge Functions](https://supabase.com/docs/guides/functions) と [Supabase changelog](https://supabase.com/changelog.md)
 
 ## ディレクトリ構成
 
