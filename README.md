@@ -77,6 +77,7 @@ src/
     supabase.ts           ブラウザ用クライアント (publishable key)
     server/dashboardRepository.ts  SSR の初期データ取得
     types.ts              テーブル行の型 + run_id 定数
+    contract.ts           model / schema / parity / cutoff / atomic / cost の表示契約
     format.ts
 supabase/
   migrations/
@@ -102,7 +103,8 @@ scripts/
 - `predictions` — 推論ごとの生出力ログ（run_id, signal, position, latest_close, model_version, raw jsonb など）。`(run_id, latest_timestamp)` が UNIQUE
 - `strategy_state` — `run_id` ごとに 1 行。現在の cash / asset_qty / equity / current_position / last_timestamp を保持。マイグレーションで初期行をシード
 - `equity_snapshots` — 処理した 15 分足ごとに 1 行。資産推移チャートのデータ源。`(run_id, timestamp)` で UNIQUE を張ってあるので再実行しても安全
-- `trades` — `target_position` が前回と変わったときだけ追記。`(run_id, timestamp)` が UNIQUE
+- `trades` — `target_position` が前回と変わったときだけ追記。`(run_id, timestamp)` が UNIQUE。
+  `fee` は旧 DB 列名だが、現在は fee だけでなく half-spread と slippage を含む all-in の quote コストを格納する
 
 Edge Function とフロントの両方が共通で使う run_id:
 `unidream_btcusdt_15m_main`（初期 cash 10,000 USDT、ポジションなし）
@@ -176,8 +178,8 @@ RPC は `strategy_state` の対象行を `FOR UPDATE` で直列化し、期待 s
 DB に行が入っているか確認:
 
 ```sql
-select created_at, signal, position, latest_close, model_version
-from predictions order by created_at desc limit 1;
+select latest_timestamp, created_at, signal, position, latest_close, model_version
+from predictions order by latest_timestamp desc nulls last limit 1;
 
 select * from strategy_state where id = 'unidream_btcusdt_15m_main';
 
@@ -185,8 +187,9 @@ select timestamp, equity, position, price
 from equity_snapshots where run_id = 'unidream_btcusdt_15m_main'
 order by timestamp desc limit 5;
 
-select * from trades where run_id = 'unidream_btcusdt_15m_main'
-order by created_at desc limit 5;
+select timestamp, created_at, from_position, to_position, price, trade_notional, fee
+from trades where run_id = 'unidream_btcusdt_15m_main'
+order by timestamp desc limit 5;
 ```
 
 ### Atomic inference の deploy / rollback / observability
@@ -244,7 +247,7 @@ Authorization ヘッダの渡し方はプロジェクトでの service role key 
 
 ライブ Cron だけだと履歴が空のままなので、初回だけローカルから過去 60 日ぶんの 15m candles を replay して `predictions` / `trades` / `equity_snapshots` / `strategy_state` を埋める用のスクリプトを用意した。Plan011 v31 の推論には 60日 window とは別に 1488 本の feature warmup が必要なので、実際の `/predict` には各 step で 7248 本を渡す。
 
-[scripts/backfill-history.ts](scripts/backfill-history.ts) は Edge Function と同じ共通paper-tradingロジックを再利用する（`run_id = unidream_btcusdt_15m_main`, `INITIAL_CASH = 10_000`, `DEMO_FEE_RATE = 0`, `ALLOW_SHORT = false`, `MAX_TARGET_POSITION = 1.12`）。
+[scripts/backfill-history.ts](scripts/backfill-history.ts) は Edge Function と同じ closed-candle / derivative join / Plan011 raw-candle payload / 共通 paper-trading ロジックを再利用する（`run_id = unidream_btcusdt_15m_main`, `INITIAL_CASH = 10_000`, `ALLOW_SHORT = false`, `MAX_TARGET_POSITION = 1.12`）。各 replay step は `record_unidream_inference` RPC 1 回で predictions / strategy_state / equity_snapshots / trades を同一 transaction に commit する。`--reset` の削除・初期化だけは、ローカルの service key を使う管理用保守操作であり replay write path ではない。
 
 セットアップ:
 
@@ -277,18 +280,37 @@ npm run backfill -- --reset --max-steps 200
 スクリプトの動き:
 
 1. `--reset` 指定時は run_id に紐づく `predictions` / `trades` / `equity_snapshots` を削除し、`strategy_state` を初期値で再シード
-2. Binance public klines から replay 期間 + Plan011 context ぶんの 15m candles を取得（デフォルトなら ~135.5日 = 60日 replay + 75.5日 context）
+2. Binance public Spot OHLCV と USDⓈ-M Futures mark/funding から、replay 期間 + Plan011 context ぶんの **完全 close 済み** 15m candles を取得（デフォルトなら ~135.5日 = 60日 replay + 75.5日 context）。各 `/predict` 行には `funding_rate` と `mark_close` も必ず含める
 3. **Probe フェーズ**: replay 範囲から 20 個の index を均等サンプリングして HF `/predict` を叩き、`target_position` の unique 値をログに出す。全部 `1.0` だった場合は「trades 履歴は増えない」と warn を出す
-4. **Replay フェーズ**: Plan011 context（7248 本）以降の各 step で、直近 7248 本の candle を /predict に POST。クランプ後の target_position をもとに前回 state から仮想 fill を計算して、`predictions` / `equity_snapshots` / `trades` をバッファして 200 行ごとに flush
-5. すべて終わったら `strategy_state` を最終 state で upsert（以降のライブ Cron はその続きから動く）
+4. **Replay フェーズ**: Plan011 context（7248 本）以降の各 step で、直近 7248 本の candle を /predict に POST。クランプ後の position と前回 state から payload を作り、`record_unidream_inference` RPC を 1 回呼ぶ。DB の 4 表は RPC 内で同一 transaction に書かれるため、アプリ側のバッファ flush は行わない
+5. すべて終わった時点で最後に成功した RPC の state が canonical state になっている（以降のライブ Cron はその続きから動く）
 
 注意:
 
 - HF Spaces は 1 リクエスト数秒かかるので、60 日 replay は長時間実行になる。所要時間は probe フェーズの平均レイテンシから推定値を表示する
 - 同じ candle を二重処理しないよう `latest.openTimeMs <= strategy_state.last_timestamp` の step はスキップ
-- `predictions.created_at` を bar 時刻で上書きするので、チャート上で snapshots と整合する。ライブ Cron 側は `now()` のままなので backfill 行 → ライブ行の順序は保たれる
-- 途中で Ctrl+C しても直前の flush 分までは DB に入っている。再開したいときは `--reset` を付けずにもう一度叩けば、`last_timestamp` 以降だけ続きから処理される
+- bar の時刻は `predictions.latest_timestamp` / `equity_snapshots.timestamp` であり、`predictions.created_at` は RPC transaction の記録時刻。履歴の並びや最新 prediction の選択は bar 時刻を使う
+- 途中で Ctrl+C しても完了済み RPC transaction は DB に入っている。再開したいときは `--reset` を付けずにもう一度叩けば、`last_timestamp` 以降だけ続きから処理される
 - ライブ Cron が動いている最中に backfill を走らせると `strategy_state` の取り合いになるので、Cron は止めてから流すこと
+
+## Dashboard の比較・コスト契約
+
+デモの quote-currency コストは研究系の既定値に固定している。
+
+- `fee_rate = 0.0003`（3 bps）
+- `spread_bps = 3`（full spread。position change ごとに half-spread 1.5 bps）
+- `slippage_bps = 1`（position delta に適用）
+
+コストは `abs(position_delta) * equity_at_price` を notional base として、fee + half-spread + slippage の順に計算する。10,000 USDT の flat → 1.0 初回 entry は 3.0 + 1.5 + 1.0 = **5.5 USDT**。戦略の live fill は flat → 実際の target、B&H benchmark は flat → 1.0 へ入り、同じ cost model と初期 flat-state convention を対称に適用する。`trades.fee` は互換性のため残した DB 列名であり、UI では **cost (USDT)** と表示する。
+
+画面の期間指標は選択した最初の snapshot から最後の snapshot までの window 値である。
+
+- Return / Alpha は最初の表示 bar から最後までの window 比率で、one-time initial entry cost は含めない（B&H return は spot price ratio、net B&H curve は絶対 equity / MaxDD 用）
+- MaxDD は research と同じ負の比率（例 `-10%`）。`MaxDD Δ = abs(strategy) - abs(B&H)` なので負値が改善
+- Sharpe は 15 分足の log return と population volatility を `35040 = 96 × 365` で年率化する
+- Position turnover は quote notional ではなく、隣接 snapshot の `sum(abs(Δposition))`。research の action stats と同じく合成初回 entry は含めない
+
+画面の `Inference contract` バッジは model / 17-feature schema / research parity inputs / derivative join / closed-candle cutoff / atomic RPC / costs を表示する。ただし現行の public table には row 単位の provenance が保存されていないため、バッジは **source-configured** の契約表示であり、HF / Binance / Supabase の live health check やデプロイ revision の証明ではない。`Last closed bar`（観測 bar 時刻）と `recorded`（RPC 記録時刻）も分けて表示する。
 
 ## Vercel デプロイ
 
@@ -316,7 +338,8 @@ npm run backfill -- --reset --max-steps 200
 
 - **二重処理防止**：Edge Function は最後の完全 close 済み足だけを対象にし、`strategy_state.last_timestamp` が新しくなければスキップ。新規処理は RPC の `FOR UPDATE` + CAS と `(run_id, latest_timestamp)` / `(run_id, timestamp)` の UNIQUE index で直列化・冪等化する
 - **ポジション解釈**：`target_position` は B&H=1.0 を基準にしたエクスポージャー倍率。Plan011 v31 は continuous overlay を返すため、デモ側は最大 `1.12` まで許可している。マイナスは関数内の `ALLOW_SHORT = false` で flat に潰している。Space 側がショート対応したらフラグを立てる
-- **手数料・スリッページ**：リアルタイムデモでは表示の分かりやすさを優先して `DEMO_FEE_RATE = 0`。研究repo側の評価 JSON では cost stress (`cost_x1` / `cost_x2` / `cost_x3`) を別途見る
+- **手数料・スリッページ**：live / backfill とも `fee_rate = 0.0003`, `spread_bps = 3`（half 1.5 bps）, `slippage_bps = 1`。各 position delta に対する all-in quote cost を state の cash から控除する。研究repo側の評価 JSON では同じ既定値を基準に cost stress (`cost_x1` / `cost_x2` / `cost_x3`) を別途見る
+- **初期 entry の比較**：live strategy は flat state から最初の target position に入る際のコストを負担し、dashboard の B&H も flat → 1.0 の同じ初期 entry cost を負担する。期間指標の return は選択 window 内の最初の bar 基準、chart の絶対 equity は初期 cash から表示するので、両者の convention を混同しない
 - **初期状態**：マイグレーション `0002` で `strategy_state` を初期 cash 10,000 USDT・flat でシード。デモをリセットしたいときは:
   ```sql
   delete from trades            where run_id = 'unidream_btcusdt_15m_main';
