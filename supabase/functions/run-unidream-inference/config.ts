@@ -6,15 +6,17 @@ import {
 export {
   ALLOW_SHORT,
   BARS_PER_DAY,
-  DEMO_FEE_RATE,
+  DEMO_TRADING_COSTS,
   FEATURE_WARMUP_BARS,
   INITIAL_CASH,
   MAX_TARGET_POSITION,
   MODEL_LOOKBACK_DAYS,
+  RESEARCH_TRADING_COSTS,
   RUN_ID,
   SYMBOL,
   TARGET_BARS,
   TIMEFRAME,
+  type TradingCostContract,
 } from "../_shared/config.ts";
 
 export const MIN_BARS = CURRENT_TARGET_BARS;
