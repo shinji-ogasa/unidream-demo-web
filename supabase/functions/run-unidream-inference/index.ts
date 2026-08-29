@@ -17,8 +17,12 @@ import {
   type StrategyState,
   requireEnv,
 } from "./config.ts";
+import {
+  applyInferenceRpc,
+  buildAtomicInferencePayload,
+  InferenceRpcConflictError,
+} from "./atomic.ts";
 import { callPredict, fetchModelVersion } from "./inference.ts";
-import { applyFill, clampTargetPosition } from "../_shared/paper_trading.ts";
 
 Deno.serve(async () => {
   try {
@@ -70,99 +74,41 @@ Deno.serve(async () => {
       callPredict(spaceUrl, apiKey, candles),
       fetchModelVersion(spaceUrl),
     ]);
-    const rawTarget = typeof prediction?.position === "number" ? prediction.position : 0;
-    const targetPosition = clampTargetPosition(rawTarget);
-    const { next, trade } = applyFill(previous, targetPosition, latest.close);
-
-    const predictionRow = {
-      symbol: SYMBOL,
-      timeframe: TIMEFRAME,
-      signal: typeof prediction?.signal === "string" ? prediction.signal : "unknown",
-      position: typeof prediction?.position === "number" ? prediction.position : null,
-      score: typeof prediction?.score === "number" ? prediction.score : null,
-      confidence: typeof prediction?.confidence === "number" ? prediction.confidence : null,
-      latest_close: latest.close,
-      latest_timestamp: latest.timestamp,
-      model_version: typeof prediction?.model_version === "string"
-        ? prediction.model_version
-        : modelVersion,
-      feature_version: typeof prediction?.feature_version === "string"
-        ? prediction.feature_version
-        : null,
-      raw: prediction,
-    };
-    const snapshotRow = {
-      run_id: RUN_ID,
-      symbol: SYMBOL,
-      timeframe: TIMEFRAME,
-      timestamp: latest.timestamp,
-      equity: next.equity,
-      cash: next.cash,
-      asset_qty: next.asset_qty,
-      position: next.current_position,
-      price: latest.close,
-    };
-    const stateRow = {
-      id: RUN_ID,
-      symbol: SYMBOL,
-      timeframe: TIMEFRAME,
-      current_position: next.current_position,
-      cash: next.cash,
-      asset_qty: next.asset_qty,
-      equity: next.equity,
-      last_price: latest.close,
-      last_timestamp: latest.timestamp,
-      updated_at: new Date().toISOString(),
-    };
-
-    const predictionInsert = await supabase.from("predictions").insert(predictionRow);
-    if (predictionInsert.error) {
-      throw new Error(`predictions insert failed: ${predictionInsert.error.message}`);
-    }
-    const stateUpsert = await supabase.from("strategy_state").upsert(stateRow);
-    if (stateUpsert.error) {
-      throw new Error(`strategy_state upsert failed: ${stateUpsert.error.message}`);
-    }
-    const snapshotUpsert = await supabase
-      .from("equity_snapshots")
-      .upsert(snapshotRow, { onConflict: "run_id,timestamp" });
-    if (snapshotUpsert.error) {
-      throw new Error(`equity_snapshots upsert failed: ${snapshotUpsert.error.message}`);
-    }
-    if (trade) {
-      const tradeInsert = await supabase.from("trades").insert({
-        run_id: RUN_ID,
-        symbol: SYMBOL,
-        timeframe: TIMEFRAME,
-        timestamp: latest.timestamp,
-        ...trade,
+    const atomicPayload = buildAtomicInferencePayload(previous, latest, prediction, modelVersion);
+    const rpcResult = await applyInferenceRpc(supabase, atomicPayload);
+    if (rpcResult.status === "already_processed") {
+      return Response.json({
+        ok: true,
+        skipped: true,
+        reason: "already_processed",
+        candles: candles.length,
+        latest_timestamp: latest.timestamp,
       });
-      if (tradeInsert.error) throw new Error(`trades insert failed: ${tradeInsert.error.message}`);
     }
 
     return Response.json({
       ok: true,
       candles: candles.length,
       prediction: {
-        signal: predictionRow.signal,
-        raw_position: predictionRow.position,
-        target_position: targetPosition,
+        signal: atomicPayload.prediction.signal,
+        raw_position: atomicPayload.prediction.position,
+        target_position: atomicPayload.target_position,
         latest_close: latest.close,
         latest_timestamp: latest.timestamp,
-        model_version: predictionRow.model_version,
+        model_version: atomicPayload.prediction.model_version,
       },
       state: {
-        equity: next.equity,
-        cash: next.cash,
-        asset_qty: next.asset_qty,
-        position: next.current_position,
+        equity: atomicPayload.next_state.equity,
+        cash: atomicPayload.next_state.cash,
+        asset_qty: atomicPayload.next_state.asset_qty,
+        position: atomicPayload.next_state.current_position,
       },
-      traded: trade !== null,
+      traded: rpcResult.traded,
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     return new Response(JSON.stringify({ ok: false, error: message }), {
-      status: 500,
+      status: error instanceof InferenceRpcConflictError ? 409 : 500,
       headers: { "Content-Type": "application/json" },
     });
   }
