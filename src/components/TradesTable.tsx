@@ -30,7 +30,7 @@ export function TradesTable({ trades }: Props) {
   return (
     <div className="flex flex-col gap-3">
       <div className="rounded-[32px] border border-white/[0.08] bg-gradient-to-b from-white/[0.07] to-white/[0.02] backdrop-blur-md overflow-x-auto shadow-panel">
-        <table className="w-full text-sm font-mono min-w-[520px]">
+        <table className="w-full text-sm font-mono min-w-[620px]">
           <thead className="bg-white/[0.04] text-text-muted text-xs uppercase tracking-[0.14em]">
             <tr>
               <th className="text-left px-4 py-3">time</th>
@@ -38,6 +38,9 @@ export function TradesTable({ trades }: Props) {
               <th className="text-right px-4 py-3">to</th>
               <th className="text-right px-4 py-3">price</th>
               <th className="text-right px-4 py-3">notional</th>
+              <th className="text-right px-4 py-3" title="Fee + half-spread + slippage in quote currency">
+                cost (USDT)
+              </th>
             </tr>
           </thead>
           <tbody className="text-base">
@@ -66,7 +69,13 @@ export function TradesTable({ trades }: Props) {
                     {fmtUSD(t.price)}
                   </td>
                   <td className="px-4 py-2.5 text-right text-[#d0d6e0]">
-                    {fmtNumber(t.trade_notional ?? 0)}
+                    {fmtNumber(t.trade_notional)}
+                  </td>
+                  <td
+                    className="px-4 py-2.5 text-right text-[#d0d6e0]"
+                    title="Legacy fee column; all-in quote transaction cost"
+                  >
+                    {fmtUSD(t.fee)}
                   </td>
                 </tr>
               );

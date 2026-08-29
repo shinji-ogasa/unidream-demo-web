@@ -54,25 +54,25 @@ export function MetricsRow({ metrics }: Props) {
       <Cell
         label="Alpha (excess)"
         value={fmtPercent(metrics.alphaEx, 2, true)}
-        hint={`strat ${fmtPercent(metrics.stratReturn, 2, true)} · B&H ${fmtPercent(metrics.bnhReturn, 2, true)}`}
+        hint={`window · strat ${fmtPercent(metrics.stratReturn, 2, true)} · B&H ${fmtPercent(metrics.bnhReturn, 2, true)}`}
         tone={tone(metrics.alphaEx, true)}
       />
       <Cell
         label="Sharpe Δ"
         value={fmtSigned(metrics.sharpeDelta, 2)}
-        hint={`strat ${metrics.sharpeStrat.toFixed(2)} · B&H ${metrics.sharpeBnh.toFixed(2)}`}
+        hint={`annualized log-return · strat ${metrics.sharpeStrat.toFixed(2)} · B&H ${metrics.sharpeBnh.toFixed(2)}`}
         tone={tone(metrics.sharpeDelta, true)}
       />
       <Cell
-        label="MaxDD Δ"
+        label="MaxDD Δ (abs)"
         value={fmtPercent(metrics.maxDDDelta, 2, true)}
-        hint={`strat ${fmtPercent(metrics.maxDDStrat)} · B&H ${fmtPercent(metrics.maxDDBnh)}`}
+        hint={`negative is better · strat ${fmtPercent(metrics.maxDDStrat)} · B&H ${fmtPercent(metrics.maxDDBnh)}`}
         tone={tone(metrics.maxDDDelta, false)}
       />
       <Cell
-        label="Turnover"
-        value={`${metrics.turnover.toFixed(2)}x`}
-        hint={`${metrics.trades} trades · ${metrics.bars} bars`}
+        label="Position turnover"
+        value={metrics.turnover.toFixed(2)}
+        hint={`sum |Δposition| · ${metrics.trades} trades · ${metrics.bars} bars`}
       />
     </div>
   );

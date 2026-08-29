@@ -16,6 +16,7 @@ import {
 
 import { tickLabel } from "@/lib/aggregate";
 import { fmtUSD } from "@/lib/format";
+import { buildBuyAndHoldEquity } from "@/lib/metrics";
 import { INITIAL_EQUITY, type EquitySnapshot, type Trade } from "@/lib/types";
 
 type Range = { startIndex: number; endIndex: number };
@@ -40,7 +41,7 @@ type Row = {
 export function PerformanceChart({ snapshots, trades, range, onRangeChange }: Props) {
   const data: Row[] = useMemo(() => {
     if (snapshots.length === 0) return [];
-    const firstPrice = snapshots[0].price > 0 ? snapshots[0].price : 1;
+    const bnhEquities = buildBuyAndHoldEquity(snapshots, INITIAL_EQUITY);
     const sortedTrades = [...trades].sort(
       (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime(),
     );
@@ -66,7 +67,7 @@ export function PerformanceChart({ snapshots, trades, range, onRangeChange }: Pr
         t,
         label: tickLabel(t),
         equity: s.equity,
-        bnh: (s.price / firstPrice) * INITIAL_EQUITY,
+        bnh: bnhEquities[rows.length] ?? 0,
         buyMarker,
         sellMarker,
       });
@@ -88,7 +89,7 @@ export function PerformanceChart({ snapshots, trades, range, onRangeChange }: Pr
         <div className="flex items-center gap-2">
           <span className="h-1.5 w-1.5 rounded-full bg-cyan" />
           <div className="text-base font-semibold tracking-tight text-text">
-            Performance vs Buy &amp; Hold
+            Performance vs Buy &amp; Hold (net entry cost)
           </div>
         </div>
         <div className="text-sm font-mono text-text-muted">15m bars</div>
@@ -128,7 +129,7 @@ export function PerformanceChart({ snapshots, trades, range, onRangeChange }: Pr
                 formatter={(v: number, name: string) => {
                   if (name === "buyMarker") return [fmtUSD(v), "buy"];
                   if (name === "sellMarker") return [fmtUSD(v), "sell"];
-                  if (name === "bnh") return [fmtUSD(v), "B&H"];
+                  if (name === "bnh") return [fmtUSD(v), "B&H (net entry)"];
                   return [fmtUSD(v), "strategy"];
                 }}
               />
@@ -188,7 +189,7 @@ export function PerformanceChart({ snapshots, trades, range, onRangeChange }: Pr
       </div>
       <div className="flex flex-wrap items-center gap-x-5 gap-y-1 text-sm font-mono text-text-muted">
         <LegendSwatch color="#02b8cc" label="strategy" />
-        <LegendSwatch color="rgba(255,255,255,0.25)" label="B&H" />
+        <LegendSwatch color="rgba(255,255,255,0.25)" label="B&H (net entry cost)" />
         <LegendTriangle color="#5266eb" label="buy" up />
         <LegendTriangle color="#ff6467" label="sell" />
       </div>

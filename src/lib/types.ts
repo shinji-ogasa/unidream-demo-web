@@ -51,6 +51,7 @@ export type Trade = {
   to_position: number;
   price: number;
   trade_notional: number | null;
+  /** Legacy database column; stores all-in quote cost (fee + spread + slippage). */
   fee: number | null;
   created_at: string;
 };

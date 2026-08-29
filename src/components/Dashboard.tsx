@@ -8,7 +8,6 @@ import { ANNUALIZATION, sortedAscending } from "@/lib/aggregate";
 import { fmtPercent, fmtTime, fmtUSD, pnlPercent } from "@/lib/format";
 import { computeMetrics } from "@/lib/metrics";
 import {
-  DISPLAY_MODEL_NAME,
   INITIAL_EQUITY,
   SYMBOL,
   TIMEFRAME,
@@ -43,7 +42,7 @@ function fullRange(length: number): Range | null {
 }
 
 export function Dashboard({ initial }: DashboardProps) {
-  const { prediction, state, snapshots, trades } = useLiveDashboard(initial);
+  const { prediction, state, snapshots, trades, contract } = useLiveDashboard(initial);
   const sortedSnapshots = useMemo(() => sortedAscending(snapshots), [snapshots]);
   const [range, setRange] = useState<Range | null>(() =>
     fullRange(sortedAscending(initial.snapshots).length),
@@ -117,6 +116,8 @@ export function Dashboard({ initial }: DashboardProps) {
     pnl > 0.001 ? "good" : pnl < -0.001 ? "bad" : "default";
   const signalKey = (prediction?.signal ?? "").toLowerCase();
   const signalTone = SIGNAL_TONE[signalKey] ?? "default";
+  const modelName = prediction?.model_version ?? contract.model;
+  const costs = contract.tradingCosts;
 
   return (
     <div className="min-h-screen bg-bg-deep text-text antialiased">
@@ -151,7 +152,7 @@ export function Dashboard({ initial }: DashboardProps) {
           </div>
           <div className="flex items-center flex-wrap gap-x-5 gap-y-2">
             <span className="text-xs md:text-sm font-mono text-text-muted">
-              model <span className="text-text">{DISPLAY_MODEL_NAME}</span>
+              model <span className="text-text">{modelName}</span>
             </span>
             <span className="flex items-center gap-2 text-xs text-text-muted">
               <span className="h-1.5 w-1.5 rounded-full bg-success animate-pulse" />
@@ -164,6 +165,34 @@ export function Dashboard({ initial }: DashboardProps) {
         <p className="text-xs md:text-sm text-warning/80 px-1">
           This is a research demo, not financial advice. Virtual paper-trading only.
         </p>
+
+        <section
+          aria-label="Inference contract"
+          className="rounded-[28px] border border-white/[0.08] bg-white/[0.03] px-4 py-3 flex flex-col gap-2"
+        >
+          <div className="flex items-center justify-between gap-3 flex-wrap">
+            <span className="text-xs font-semibold tracking-[0.2em] uppercase text-text-muted">
+              Inference contract
+            </span>
+            <span className="text-xs font-mono text-text-muted">source-configured</span>
+          </div>
+          <div className="flex flex-wrap gap-x-5 gap-y-1.5 text-xs font-mono text-text-soft">
+            <span>model {modelName}</span>
+            <span>schema {contract.featureSchema}</span>
+            <span>parity {contract.featureParity}</span>
+            <span>derivatives {contract.derivativeInputs}</span>
+            <span>cutoff {contract.observationCutoff}</span>
+            <span>write {contract.atomicCommit}</span>
+            <span>
+              costs fee {(costs.fee_rate * 10_000).toFixed(1)}bps · spread {costs.spread_bps.toFixed(1)}bps
+              (half {(costs.spread_bps / 2).toFixed(1)}) · slippage {costs.slippage_bps.toFixed(1)}bps
+            </span>
+          </div>
+          <p className="text-[11px] text-text-muted">
+            Contract badges describe the deployed source contract; the current public rows do not
+            persist per-row provenance or a live health verdict.
+          </p>
+        </section>
 
         {/* stats */}
         <section className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
@@ -260,7 +289,8 @@ export function Dashboard({ initial }: DashboardProps) {
 
         <footer className="text-sm text-text-muted px-1">
           Data: Binance public API · Inference: UniDream HF Space · Storage &amp; realtime: Supabase ·
-          Last inference {fmtTime(prediction?.created_at)} · Alpha (excess) ={" "}
+          Last closed bar {fmtTime(lastTimestamp)} · recorded {fmtTime(prediction?.created_at)} ·
+          Alpha (window excess) ={" "}
           {fmtPercent(metrics.alphaEx, 2, true)}
         </footer>
       </div>
