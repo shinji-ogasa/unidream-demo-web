@@ -1,4 +1,6 @@
-import type { EquitySnapshot, Trade } from "./types";
+import { INITIAL_EQUITY, type EquitySnapshot, type Trade } from "./types";
+import { DEMO_TRADING_COSTS } from "../../supabase/functions/_shared/config.ts";
+import { computeTransactionCosts } from "../../supabase/functions/_shared/paper_trading.ts";
 
 export type WindowMetrics = {
   stratReturn: number;
@@ -37,10 +39,10 @@ const ZERO_METRICS: WindowMetrics = {
 };
 
 function sharpe(returns: number[], annualization: number): number {
-  if (returns.length < 2) return 0;
+  if (returns.length < 2 || !Number.isFinite(annualization) || annualization <= 0) return 0;
   const mean = returns.reduce((a, b) => a + b, 0) / returns.length;
   const variance =
-    returns.reduce((a, b) => a + (b - mean) * (b - mean), 0) / (returns.length - 1);
+    returns.reduce((a, b) => a + (b - mean) * (b - mean), 0) / returns.length;
   const std = Math.sqrt(variance);
   if (std < 1e-12) return 0;
   return (mean / std) * Math.sqrt(annualization);
@@ -53,24 +55,48 @@ function maxDrawdown(equities: number[]): number {
   for (const e of equities) {
     if (e > peak) peak = e;
     if (peak > 0) {
-      const dd = (peak - e) / peak;
-      if (dd > mdd) mdd = dd;
+      const dd = (e - peak) / peak;
+      if (dd < mdd) mdd = dd;
     }
   }
   return mdd;
+}
+
+/**
+ * Build a net buy-and-hold equity curve with the same flat -> 1.0 initial
+ * entry convention as the live strategy. The entry cost is quote currency;
+ * subsequent bars only mark the unchanged benchmark quantity to spot price.
+ */
+export function buildBuyAndHoldEquity(
+  snapshots: readonly EquitySnapshot[],
+  initialCapital = INITIAL_EQUITY,
+): number[] {
+  if (snapshots.length === 0) return [];
+  if (!Number.isFinite(initialCapital) || initialCapital <= 0) {
+    throw new Error(`initial capital must be positive and finite, got ${initialCapital}`);
+  }
+  const firstPrice = snapshots[0].price;
+  if (!Number.isFinite(firstPrice) || firstPrice <= 0) return snapshots.map(() => 0);
+  const entryCost = computeTransactionCosts(1, initialCapital).total;
+  const investedCash = initialCapital - entryCost;
+  return snapshots.map((snapshot) =>
+    investedCash * (Number.isFinite(snapshot.price) ? snapshot.price : 0) / firstPrice,
+  );
 }
 
 export function computeMetrics(
   snapshots: EquitySnapshot[],
   trades: Trade[],
   annualization: number,
+  initialCapital = INITIAL_EQUITY,
 ): WindowMetrics {
   if (snapshots.length < 2) return { ...ZERO_METRICS, bars: snapshots.length };
 
   const first = snapshots[0];
   const last = snapshots[snapshots.length - 1];
   const stratReturn = first.equity > 0 ? last.equity / first.equity - 1 : 0;
-  const bnhReturn = first.price > 0 ? last.price / first.price - 1 : 0;
+  const bnhEqs = buildBuyAndHoldEquity(snapshots, initialCapital);
+  const bnhReturn = bnhEqs[0] > 0 ? bnhEqs[bnhEqs.length - 1] / bnhEqs[0] - 1 : 0;
   const alphaEx = stratReturn - bnhReturn;
 
   const stratR: number[] = [];
@@ -78,28 +104,29 @@ export function computeMetrics(
   for (let i = 1; i < snapshots.length; i++) {
     const prev = snapshots[i - 1];
     const cur = snapshots[i];
-    if (prev.equity > 0) stratR.push(cur.equity / prev.equity - 1);
-    if (prev.price > 0) bnhR.push(cur.price / prev.price - 1);
+    if (prev.equity > 0 && cur.equity > 0) stratR.push(Math.log(cur.equity / prev.equity));
+    if (bnhEqs[i - 1] > 0 && bnhEqs[i] > 0) bnhR.push(Math.log(bnhEqs[i] / bnhEqs[i - 1]));
   }
   const sharpeStrat = sharpe(stratR, annualization);
   const sharpeBnh = sharpe(bnhR, annualization);
 
   const stratEqs = snapshots.map((s) => s.equity);
-  const bnhEqs = snapshots.map((s) =>
-    first.price > 0 ? (s.price / first.price) * first.equity : 0,
-  );
   const maxDDStrat = maxDrawdown(stratEqs);
   const maxDDBnh = maxDrawdown(bnhEqs);
 
-  const meanEq = stratEqs.reduce((a, b) => a + b, 0) / stratEqs.length;
   const startMs = new Date(first.timestamp).getTime();
   const endMs = new Date(last.timestamp).getTime();
   const inWindow = trades.filter((t) => {
     const ts = new Date(t.timestamp).getTime();
     return ts >= startMs && ts <= endMs;
   });
-  const totalNotional = inWindow.reduce((a, t) => a + Math.abs(t.trade_notional ?? 0), 0);
-  const turnover = meanEq > 0 ? totalNotional / meanEq : 0;
+  // Research action_stats defines turnover as the sum of adjacent absolute
+  // position changes. It is an exposure-ratio unit, not quote notional, and
+  // deliberately excludes the synthetic initial flat -> target entry.
+  let turnover = 0;
+  for (let i = 1; i < snapshots.length; i++) {
+    turnover += Math.abs(snapshots[i].position - snapshots[i - 1].position);
+  }
 
   let longCount = 0;
   let shortCount = 0;
@@ -120,7 +147,9 @@ export function computeMetrics(
     sharpeDelta: sharpeStrat - sharpeBnh,
     maxDDStrat,
     maxDDBnh,
-    maxDDDelta: maxDDStrat - maxDDBnh,
+    // Research reports abs(strategy MaxDD) - abs(B&H MaxDD); negative means
+    // the strategy's drawdown is smaller.
+    maxDDDelta: Math.abs(maxDDStrat) - Math.abs(maxDDBnh),
     turnover,
     longPct: longCount / total,
     shortPct: shortCount / total,
