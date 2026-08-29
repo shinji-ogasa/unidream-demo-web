@@ -183,6 +183,9 @@ begin
     or v_next_cash is null
     or v_next_asset_qty is null
     or v_next_equity is null
+    or lower(v_latest_timestamp::text) in ('infinity', '-infinity')
+    or (v_expected_last_timestamp is not null
+      and lower(v_expected_last_timestamp::text) in ('infinity', '-infinity'))
     or v_latest_close <= 0
     or lower(v_latest_close::text) in ('nan', 'infinity', '-infinity')
     or lower(v_expected_current_position::text) in ('nan', 'infinity', '-infinity')
@@ -246,6 +249,8 @@ begin
     or lower(v_state.cash::text) in ('nan', 'infinity', '-infinity')
     or lower(v_state.asset_qty::text) in ('nan', 'infinity', '-infinity')
     or lower(v_state.equity::text) in ('nan', 'infinity', '-infinity')
+    or (v_state.last_timestamp is not null
+      and lower(v_state.last_timestamp::text) in ('infinity', '-infinity'))
     or (v_state.last_price is not null
       and lower(v_state.last_price::text) in ('nan', 'infinity', '-infinity'))
   then

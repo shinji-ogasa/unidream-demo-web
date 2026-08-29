@@ -110,6 +110,7 @@ test("atomic migration statically declares the locked RPC, idempotency keys, and
   assert.match(sql, /status', 'already_processed'/i);
   assert.match(sql, /using errcode = '40001'/i);
   assert.match(sql, /lower\(v_latest_close::text\) in \('nan', 'infinity', '-infinity'\)/i);
+  assert.match(sql, /lower\(v_latest_timestamp::text\) in \('infinity', '-infinity'\)/i);
   assert.match(sql, /lower\(v_expected_last_price::text\) in \('nan', 'infinity', '-infinity'\)/i);
   assert.match(sql, /lower\(v_score::text\) in \('nan', 'infinity', '-infinity'\)/i);
   assert.match(sql, /lower\(v_trade_fee::text\) in \('nan', 'infinity', '-infinity'\)/i);
