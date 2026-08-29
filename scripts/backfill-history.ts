@@ -1,7 +1,8 @@
-// One-time backfill: replay UniDream predictions over historical Binance 15m
+// One-time backfill: replay UniDream predictions over closed Binance 15m
 // candles so the demo has a populated equity curve and trade history before
-// the live Cron starts. Mirrors the simulation logic from the Edge Function
-// `run-unidream-inference`, but runs locally against `.env.backfill`.
+// the live Cron starts. It deliberately reuses the Edge data/feature contract
+// and the same atomic paper-trading RPC instead of maintaining a second
+// OHLCV-only write path. It runs locally against `.env.backfill`.
 //
 // Usage:
 //   npm run backfill -- --reset
@@ -11,8 +12,8 @@
 // Notes:
 //   - Sequential HF /predict calls, ~1-5s each. The script fetches the requested
 //     replay span plus Plan011 context, then replays only the requested span.
-//     Expect a long-running job; flush every 200 steps so partial progress is
-//     preserved on Ctrl+C.
+//     Each replay step is one all-or-nothing `record_unidream_inference` RPC;
+//     completed steps remain durable if the process is interrupted.
 //   - Run before the live Cron is enabled, or pause the Cron during the run.
 
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
@@ -21,7 +22,6 @@ import { setTimeout as sleep } from "node:timers/promises";
 
 import {
   BARS_PER_DAY,
-  BINANCE_LIMIT,
   FEATURE_WARMUP_BARS,
   INITIAL_CASH,
   MODEL_LOOKBACK_DAYS,
@@ -29,7 +29,18 @@ import {
   SYMBOL,
   TIMEFRAME,
 } from "../supabase/functions/_shared/config.ts";
-import { applyFill, clampTargetPosition } from "../supabase/functions/_shared/paper_trading.ts";
+import { clampTargetPosition } from "../supabase/functions/_shared/paper_trading.ts";
+import {
+  applyInferenceRpc,
+  buildAtomicInferencePayload,
+} from "../supabase/functions/run-unidream-inference/atomic.ts";
+import {
+  fetchCandles as fetchClosedCandles,
+} from "../supabase/functions/run-unidream-inference/binance.ts";
+import type {
+  Candle as EdgeCandle,
+  StrategyState,
+} from "../supabase/functions/run-unidream-inference/config.ts";
 
 dotenv.config({ path: ".env.backfill" });
 
@@ -39,31 +50,12 @@ const WINDOW_BARS = MODEL_LOOKBACK_DAYS * BARS_PER_DAY + FEATURE_WARMUP_BARS;
 const WARMUP_BARS = WINDOW_BARS;
 const MODEL_CONTEXT_DAYS = WINDOW_BARS / BARS_PER_DAY;
 const SAMPLE_PROBES = 20;
-const FLUSH_EVERY = 50;
 const HF_RETRY_MAX = 3;
 const HF_RETRY_BASE_MS = 1500;
-const BINANCE_PACING_MS = 150;
 
 // --- Types ----------------------------------------------------------------
 
-type Candle = {
-  timestamp: string;
-  open: number;
-  high: number;
-  low: number;
-  close: number;
-  volume: number;
-  openTimeMs: number;
-};
-
-type State = {
-  current_position: number;
-  cash: number;
-  asset_qty: number;
-  equity: number;
-  last_price: number | null;
-  last_timestamp: string | null;
-};
+type Candle = EdgeCandle & { openTimeMs: number };
 
 type PredResponse = Record<string, unknown> & {
   position?: number;
@@ -123,59 +115,37 @@ function requireEnv(name: string): string {
 
 // --- Binance --------------------------------------------------------------
 
-async function fetchBinanceBatch(endTimeMs: number | null, limit: number): Promise<unknown[][]> {
-  const params = new URLSearchParams({
-    symbol: SYMBOL,
-    interval: TIMEFRAME,
-    limit: String(limit),
-  });
-  if (endTimeMs !== null) params.set("endTime", String(endTimeMs));
-  const url = `https://api.binance.com/api/v3/klines?${params.toString()}`;
-  const resp = await fetch(url);
-  if (!resp.ok) {
-    const body = await resp.text();
-    throw new Error(`binance klines failed: ${resp.status} ${body.slice(0, 200)}`);
-  }
-  return (await resp.json()) as unknown[][];
+async function fetchCandles(days: number): Promise<Candle[]> {
+  const targetBars = Math.ceil(days * BARS_PER_DAY) + 1;
+  const closed = await fetchClosedCandles(targetBars);
+  return closed.map((candle) => ({
+    ...candle,
+    openTimeMs: new Date(candle.timestamp).getTime(),
+  }));
 }
 
-async function fetchCandles(days: number): Promise<Candle[]> {
-  const targetSpanMs = days * 24 * 60 * 60 * 1000;
-  const acc: unknown[][] = [];
-  let endTimeMs: number | null = null;
-  let oldest = Number.POSITIVE_INFINITY;
-  let newest = Number.NEGATIVE_INFINITY;
+function defaultState(): StrategyState {
+  return {
+    id: RUN_ID,
+    symbol: SYMBOL,
+    timeframe: TIMEFRAME,
+    current_position: 0,
+    cash: INITIAL_CASH,
+    asset_qty: 0,
+    equity: INITIAL_CASH,
+    last_price: null,
+    last_timestamp: null,
+  };
+}
 
-  while (true) {
-    const batch = await fetchBinanceBatch(endTimeMs, BINANCE_LIMIT);
-    if (batch.length === 0) break;
-    acc.push(...batch);
-    const firstOpen = Number(batch[0][0]);
-    const lastOpen = Number(batch[batch.length - 1][0]);
-    oldest = Math.min(oldest, firstOpen);
-    newest = Math.max(newest, lastOpen);
-    if (newest - oldest >= targetSpanMs) break;
-    if (batch.length < BINANCE_LIMIT) break;
-    endTimeMs = firstOpen - 1;
-    await sleep(BINANCE_PACING_MS);
-  }
-
-  const byOpenTime = new Map<number, unknown[]>();
-  for (const k of acc) byOpenTime.set(Number(k[0]), k);
-  const sorted = [...byOpenTime.values()].sort(
-    (a, b) => Number(a[0]) - Number(b[0]),
-  );
-  const targetBars = Math.ceil(days * BARS_PER_DAY) + 1;
-  const clipped = sorted.slice(-targetBars);
-  return clipped.map((k) => ({
-    timestamp: new Date(Number(k[0])).toISOString(),
-    open: Number(k[1]),
-    high: Number(k[2]),
-    low: Number(k[3]),
-    close: Number(k[4]),
-    volume: Number(k[5]),
-    openTimeMs: Number(k[0]),
-  }));
+async function loadState(supabase: SupabaseClient): Promise<StrategyState> {
+  const stateRes = await supabase
+    .from("strategy_state")
+    .select("*")
+    .eq("id", RUN_ID)
+    .maybeSingle();
+  if (stateRes.error) throw new Error(`strategy_state read failed: ${stateRes.error.message}`);
+  return stateRes.data ? stateRes.data as StrategyState : defaultState();
 }
 
 // --- HF Space -------------------------------------------------------------
@@ -219,6 +189,8 @@ async function callPredict(
       low: c.low,
       close: c.close,
       volume: c.volume,
+      funding_rate: c.funding_rate,
+      mark_close: c.mark_close,
     })),
     tail: 32,
   };
@@ -266,7 +238,7 @@ async function deleteBatched(
     const { data, error } = await query.limit(batchSize);
     if (error) throw error;
     if (!data || data.length === 0) break;
-    const ids: number[] = data.map((r: { id: number }) => r.id);
+    const ids: Array<string | number> = data.map((r: { id: string | number }) => r.id);
     const { error: delErr } = await supabase.from(table).delete().in("id", ids);
     if (delErr) throw delErr;
     console.log(`  deleted ${ids.length} from ${table}`);
@@ -363,26 +335,7 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 
-  const stateRes = await supabase.from("strategy_state").select("*").eq("id", RUN_ID).maybeSingle();
-  if (stateRes.error) throw new Error(`strategy_state read failed: ${stateRes.error.message}`);
-
-  let curState: State = stateRes.data
-    ? {
-        current_position: stateRes.data.current_position,
-        cash: stateRes.data.cash,
-        asset_qty: stateRes.data.asset_qty,
-        equity: stateRes.data.equity,
-        last_price: stateRes.data.last_price,
-        last_timestamp: stateRes.data.last_timestamp,
-      }
-    : {
-        current_position: 0,
-        cash: INITIAL_CASH,
-        asset_qty: 0,
-        equity: INITIAL_CASH,
-        last_price: null,
-        last_timestamp: null,
-      };
+  let curState = await loadState(supabase);
 
   const modelVersion = await fetchModelVersion(spaceUrl);
   console.log(`[hf] model_version=${modelVersion ?? "unknown"}`);
@@ -429,38 +382,13 @@ async function main(): Promise<void> {
     console.log(`[replay] total steps = ${totalSteps}`);
   }
 
-  const predBuf: Record<string, unknown>[] = [];
-  const snapBuf: Record<string, unknown>[] = [];
-  const tradeBuf: Record<string, unknown>[] = [];
   let predCount = 0;
   let tradeCount = 0;
   let processed = 0;
   let skipped = 0;
   const t0 = Date.now();
 
-  async function flush(): Promise<void> {
-    if (predBuf.length) {
-      const { error } = await supabase.from("predictions").insert(predBuf);
-      if (error) throw new Error(`predictions insert failed: ${error.message}`);
-      predCount += predBuf.length;
-      predBuf.length = 0;
-    }
-    if (snapBuf.length) {
-      const { error } = await supabase
-        .from("equity_snapshots")
-        .upsert(snapBuf, { onConflict: "run_id,timestamp" });
-      if (error) throw new Error(`equity_snapshots upsert failed: ${error.message}`);
-      snapBuf.length = 0;
-    }
-    if (tradeBuf.length) {
-      const { error } = await supabase.from("trades").insert(tradeBuf);
-      if (error) throw new Error(`trades insert failed: ${error.message}`);
-      tradeCount += tradeBuf.length;
-      tradeBuf.length = 0;
-    }
-  }
-
-  const lastTsMs = curState.last_timestamp ? new Date(curState.last_timestamp).getTime() : -Infinity;
+  let lastTsMs = curState.last_timestamp ? new Date(curState.last_timestamp).getTime() : -Infinity;
 
   for (let i = firstStep; i <= lastStep; i++) {
     if (processed >= opts.maxSteps) break;
@@ -476,66 +404,36 @@ async function main(): Promise<void> {
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       console.error(`[replay] step idx=${i} (${latest.timestamp}) failed after retries: ${msg}`);
-      await flush();
       throw err;
     }
 
-    const target = clampTargetPosition(pickTarget(pred));
-    const price = latest.close;
-    const { next, trade } = applyFill(curState, target, price);
     const stepModelVersion =
       typeof pred.model_version === "string" ? pred.model_version : modelVersion;
-
-    predBuf.push({
-      symbol: SYMBOL,
-      timeframe: TIMEFRAME,
-      signal: typeof pred.signal === "string" ? pred.signal : "unknown",
-      position: typeof pred.position === "number" ? pred.position : null,
-      score: typeof pred.score === "number" ? pred.score : null,
-      confidence: typeof pred.confidence === "number" ? pred.confidence : null,
-      latest_close: price,
-      latest_timestamp: latest.timestamp,
-      model_version: stepModelVersion,
-      feature_version: typeof pred.feature_version === "string" ? pred.feature_version : null,
-      raw: pred,
-      // Anchor predictions to the bar time so the chart aligns with snapshots.
-      created_at: latest.timestamp,
-    });
-
-    snapBuf.push({
-      run_id: RUN_ID,
-      symbol: SYMBOL,
-      timeframe: TIMEFRAME,
-      timestamp: latest.timestamp,
-      equity: next.equity,
-      cash: next.cash,
-      asset_qty: next.asset_qty,
-      position: next.current_position,
-      price,
-    });
-
-    if (trade) {
-      tradeBuf.push({
-        run_id: RUN_ID,
-        symbol: SYMBOL,
-        timeframe: TIMEFRAME,
-        timestamp: latest.timestamp,
-        ...trade,
-      });
+    const atomicPayload = buildAtomicInferencePayload(curState, latest, pred, stepModelVersion);
+    const rpcResult = await applyInferenceRpc(supabase, atomicPayload);
+    if (rpcResult.status === "already_processed") {
+      // A prior process may have committed this bar after our state read. Read
+      // the canonical state before continuing so the next CAS is fresh.
+      curState = await loadState(supabase);
+      lastTsMs = curState.last_timestamp
+        ? new Date(curState.last_timestamp).getTime()
+        : -Infinity;
+      skipped += 1;
+      continue;
     }
 
     curState = {
-      current_position: next.current_position,
-      cash: next.cash,
-      asset_qty: next.asset_qty,
-      equity: next.equity,
-      last_price: price,
+      ...curState,
+      ...atomicPayload.next_state,
+      last_price: latest.close,
       last_timestamp: latest.timestamp,
     };
+    lastTsMs = latest.openTimeMs;
+    predCount += 1;
+    if (rpcResult.traded) tradeCount += 1;
     processed += 1;
 
-    if (predBuf.length >= FLUSH_EVERY) {
-      await flush();
+    if (processed % 50 === 0 || processed === totalSteps) {
       const elapsed = (Date.now() - t0) / 1000;
       const rate = processed / Math.max(elapsed, 1e-6);
       const remain = totalSteps - processed;
@@ -547,23 +445,6 @@ async function main(): Promise<void> {
       );
     }
   }
-
-  await flush();
-
-  const finalRow = {
-    id: RUN_ID,
-    symbol: SYMBOL,
-    timeframe: TIMEFRAME,
-    current_position: curState.current_position,
-    cash: curState.cash,
-    asset_qty: curState.asset_qty,
-    equity: curState.equity,
-    last_price: curState.last_price,
-    last_timestamp: curState.last_timestamp,
-    updated_at: new Date().toISOString(),
-  };
-  const { error: upErr } = await supabase.from("strategy_state").upsert(finalRow);
-  if (upErr) throw new Error(`strategy_state upsert failed: ${upErr.message}`);
 
   const elapsed = (Date.now() - t0) / 1000;
   console.log("");
