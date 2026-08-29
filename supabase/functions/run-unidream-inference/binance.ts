@@ -11,6 +11,7 @@ import {
 
 export type SpotCandle = {
   openTime: number;
+  closeTime: number;
   open: number;
   high: number;
   low: number;
@@ -28,12 +29,15 @@ export type BinanceRequestOptions = {
   fetchImpl?: typeof fetch;
   spotBaseUrl?: string;
   futuresBaseUrl?: string;
+  /** Fixed observation cutoff; defaults to Date.now() for live runs. */
+  nowMs?: number;
 };
 
 type ResolvedRequestOptions = {
   fetchImpl: typeof fetch;
   spotBaseUrl: string;
   futuresBaseUrl: string;
+  nowMs: number;
 };
 
 /** A Binance response that should be retried/backed off by the caller. */
@@ -67,11 +71,16 @@ export class BinanceApiError extends Error {
 }
 
 function resolveOptions(options: BinanceRequestOptions = {}): ResolvedRequestOptions {
+  const nowMs = options.nowMs ?? Date.now();
+  if (!Number.isFinite(nowMs) || !Number.isInteger(nowMs) || nowMs < 0) {
+    throw new Error(`observation cutoff must be a non-negative integer timestamp, got ${nowMs}`);
+  }
   return {
     // Resolve fetch at invocation time so tests can replace globalThis.fetch.
     fetchImpl: options.fetchImpl ?? ((...args) => globalThis.fetch(...args)),
     spotBaseUrl: options.spotBaseUrl ?? BINANCE_SPOT_BASE_URL,
     futuresBaseUrl: options.futuresBaseUrl ?? BINANCE_FUTURES_BASE_URL,
+    nowMs,
   };
 }
 
@@ -140,17 +149,23 @@ function parseIntervalMs(interval: string): number {
 const BAR_MS = parseIntervalMs(TIMEFRAME);
 
 function parseSpotKline(value: unknown): SpotCandle {
-  if (!Array.isArray(value) || value.length < 6) {
+  if (!Array.isArray(value) || value.length < 7) {
     throw new Error("binance spot klines returned a malformed row");
   }
   return {
     openTime: asTimestampMs(value[0], "spot open time"),
+    closeTime: asTimestampMs(value[6], "spot close time"),
     open: asFiniteNumber(value[1], "spot open"),
     high: asFiniteNumber(value[2], "spot high"),
     low: asFiniteNumber(value[3], "spot low"),
     close: asFiniteNumber(value[4], "spot close"),
     volume: asFiniteNumber(value[5], "spot volume"),
   };
+}
+
+/** A Binance kline is complete exactly at and after its reported close time. */
+export function isCandleClosed(closeTimeMs: number, nowMs: number): boolean {
+  return closeTimeMs <= nowMs;
 }
 
 function parseMarkKline(value: unknown): MarkPriceObservation {
@@ -203,10 +218,12 @@ async function collectSpotCandles(
   const firstLimit = Math.min(BINANCE_PAGE_LIMIT, target);
   const newest = await fetchSpotPage(null, firstLimit, options);
   const byOpenTime = new Map<number, SpotCandle>();
-  for (const row of newest) byOpenTime.set(row.openTime, row);
-  if (byOpenTime.size === 0) throw new Error("binance spot klines returned no rows");
+  for (const row of newest) {
+    if (isCandleClosed(row.closeTime, options.nowMs)) byOpenTime.set(row.openTime, row);
+  }
+  if (newest.length === 0) throw new Error("binance spot klines returned no rows");
 
-  let oldestOpen = Math.min(...byOpenTime.keys());
+  let oldestOpen = Math.min(...newest.map((row) => row.openTime));
   while (byOpenTime.size < target) {
     const remaining = Math.min(BINANCE_PAGE_LIMIT, target - byOpenTime.size);
     const older = await fetchSpotPage(oldestOpen - 1, remaining, options);
@@ -217,7 +234,7 @@ async function collectSpotCandles(
       if (row.openTime >= previousOldest) {
         throw new Error("binance spot pagination did not move backwards");
       }
-      byOpenTime.set(row.openTime, row);
+      if (isCandleClosed(row.closeTime, options.nowMs)) byOpenTime.set(row.openTime, row);
     }
     oldestOpen = Math.min(...older.map((row) => row.openTime));
     if (oldestOpen >= previousOldest) throw new Error("binance spot pagination stalled");

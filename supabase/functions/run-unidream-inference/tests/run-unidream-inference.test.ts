@@ -4,14 +4,30 @@ import test from "node:test";
 import {
   alignDerivativeInputs,
   fetchCandles,
+  isCandleClosed,
   type BinanceRequestOptions,
 } from "../binance.ts";
 import { callPredict } from "../inference.ts";
 
 const BAR_MS = 15 * 60 * 1000;
 
-function spotRow(openTime: number, close = 100): [number, string, string, string, string, string] {
-  return [openTime, String(close - 1), String(close + 1), String(close - 2), String(close), "10"];
+test("closed-candle gate includes the exact close boundary only", () => {
+  const closeTime = 1_700_000_000_000;
+  assert.equal(isCandleClosed(closeTime, closeTime - 1), false);
+  assert.equal(isCandleClosed(closeTime, closeTime), true);
+  assert.equal(isCandleClosed(closeTime, closeTime + 1), true);
+});
+
+function spotRow(openTime: number, close = 100): [number, string, string, string, string, string, number] {
+  return [
+    openTime,
+    String(close - 1),
+    String(close + 1),
+    String(close - 2),
+    String(close),
+    "10",
+    openTime + BAR_MS - 1,
+  ];
 }
 
 function markRow(openTime: number, close = 100): [number, string, string, string, string] {
@@ -21,6 +37,7 @@ function markRow(openTime: number, close = 100): [number, string, string, string
 function spotCandles(start = 0) {
   return [0, 1, 2].map((index) => ({
     openTime: start + index * BAR_MS,
+    closeTime: start + index * BAR_MS + BAR_MS - 1,
     open: 99 + index,
     high: 101 + index,
     low: 98 + index,
@@ -83,6 +100,58 @@ test("missing derivative coverage fails closed", () => {
     ),
     /missing funding-rate coverage/,
   );
+});
+
+test("fetchCandles excludes the unclosed latest row while retaining TARGET_BARS", async () => {
+  const firstOpen = 1_700_000_000_000;
+  const allSpots = [0, 1, 2, 3].map((index) => spotRow(firstOpen + index * BAR_MS, 100 + index));
+  const latest = allSpots[3];
+  const cutoff = latest[0] + BAR_MS - 2;
+  latest[6] = cutoff + 1;
+  const requests: URL[] = [];
+  const fetchImpl: NonNullable<BinanceRequestOptions["fetchImpl"]> = async (input) => {
+    const url = new URL(String(input));
+    requests.push(url);
+    if (url.pathname === "/api/v3/klines") {
+      const endTime = url.searchParams.get("endTime");
+      const rows = endTime === null
+        ? allSpots.slice(1)
+        : allSpots.filter((row) => row[0] <= Number(endTime));
+      return new Response(JSON.stringify(rows), { status: 200 });
+    }
+    if (url.pathname === "/fapi/v1/markPriceKlines") {
+      return new Response(JSON.stringify(allSpots.slice(0, 3).map((row) => markRow(row[0], Number(row[4]) + 0.5))), { status: 200 });
+    }
+    if (url.pathname === "/fapi/v1/fundingRate") {
+      const prior = { fundingTime: firstOpen - BAR_MS, fundingRate: "0.001" };
+      const current = { fundingTime: firstOpen + 2 * BAR_MS, fundingRate: "0.002" };
+      return new Response(
+        JSON.stringify(url.searchParams.has("startTime") ? [prior, current] : [prior]),
+        { status: 200 },
+      );
+    }
+    return new Response("not found", { status: 404 });
+  };
+
+  const candles = await fetchCandles(3, {
+    fetchImpl,
+    nowMs: cutoff,
+    spotBaseUrl: "https://spot.test",
+    futuresBaseUrl: "https://futures.test",
+  });
+
+  assert.equal(candles.length, 3);
+  assert.deepEqual(candles.map((candle) => candle.timestamp), [
+    new Date(firstOpen).toISOString(),
+    new Date(firstOpen + BAR_MS).toISOString(),
+    new Date(firstOpen + 2 * BAR_MS).toISOString(),
+  ]);
+  assert.equal(candles.at(-1)?.close, 102);
+  assert.equal(candles.some((candle) => candle.close === 103), false);
+  const spotRequests = requests.filter((url) => url.pathname === "/api/v3/klines");
+  assert.equal(spotRequests.length, 2);
+  assert.equal(spotRequests[0].searchParams.get("limit"), "3");
+  assert.equal(spotRequests[1].searchParams.get("endTime"), String(firstOpen + BAR_MS - 1));
 });
 
 test("fetchCandles requests spot, mark, and funding history and returns all raw fields", async () => {
