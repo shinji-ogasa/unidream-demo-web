@@ -64,8 +64,9 @@ function maxDrawdown(equities: number[]): number {
 
 /**
  * Build a net buy-and-hold equity curve with the same flat -> 1.0 initial
- * entry convention as the live strategy. The entry cost is quote currency;
- * subsequent bars only mark the unchanged benchmark quantity to spot price.
+ * entry convention as the live strategy. The entry cost is quote currency and
+ * is deducted from cash once; subsequent bars only mark the unchanged
+ * benchmark quantity to spot price (the cost must not scale with price).
  */
 export function buildBuyAndHoldEquity(
   snapshots: readonly EquitySnapshot[],
@@ -78,9 +79,8 @@ export function buildBuyAndHoldEquity(
   const firstPrice = snapshots[0].price;
   if (!Number.isFinite(firstPrice) || firstPrice <= 0) return snapshots.map(() => 0);
   const entryCost = computeTransactionCosts(1, initialCapital).total;
-  const investedCash = initialCapital - entryCost;
   return snapshots.map((snapshot) =>
-    investedCash * (Number.isFinite(snapshot.price) ? snapshot.price : 0) / firstPrice,
+    initialCapital * (Number.isFinite(snapshot.price) ? snapshot.price : 0) / firstPrice - entryCost,
   );
 }
 
@@ -96,7 +96,10 @@ export function computeMetrics(
   const last = snapshots[snapshots.length - 1];
   const stratReturn = first.equity > 0 ? last.equity / first.equity - 1 : 0;
   const bnhEqs = buildBuyAndHoldEquity(snapshots, initialCapital);
-  const bnhReturn = bnhEqs[0] > 0 ? bnhEqs[bnhEqs.length - 1] / bnhEqs[0] - 1 : 0;
+  // Window returns start at the first displayed bar, so the one-time entry
+  // cost is intentionally outside this ratio (the net curve still carries
+  // it for absolute equity and drawdown comparisons).
+  const bnhReturn = first.price > 0 ? last.price / first.price - 1 : 0;
   const alphaEx = stratReturn - bnhReturn;
 
   const stratR: number[] = [];
@@ -105,7 +108,7 @@ export function computeMetrics(
     const prev = snapshots[i - 1];
     const cur = snapshots[i];
     if (prev.equity > 0 && cur.equity > 0) stratR.push(Math.log(cur.equity / prev.equity));
-    if (bnhEqs[i - 1] > 0 && bnhEqs[i] > 0) bnhR.push(Math.log(bnhEqs[i] / bnhEqs[i - 1]));
+    if (prev.price > 0 && cur.price > 0) bnhR.push(Math.log(cur.price / prev.price));
   }
   const sharpeStrat = sharpe(stratR, annualization);
   const sharpeBnh = sharpe(bnhR, annualization);

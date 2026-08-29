@@ -3,6 +3,7 @@ import test from "node:test";
 
 import { buildBuyAndHoldEquity, computeMetrics } from "../../../../src/lib/metrics.ts";
 import type { EquitySnapshot, Trade } from "../../../../src/lib/types.ts";
+import { applyFill } from "../../_shared/paper_trading.ts";
 
 const timestamps = [
   "2026-08-30T00:00:00.000Z",
@@ -53,13 +54,27 @@ function trade(
 }
 
 test("buy-and-hold charges the same flat-to-one entry cost as the strategy", () => {
+  const flat = {
+    current_position: 0,
+    cash: 10_000,
+    asset_qty: 0,
+    equity: 10_000,
+    last_price: null,
+    last_timestamp: null,
+  };
+  const strategyEntry = applyFill(flat, 1, 100);
+  const strategyHold = applyFill(
+    { ...flat, ...strategyEntry.next, current_position: 1 },
+    1,
+    110,
+  );
   const curve = buildBuyAndHoldEquity([
     snapshot(0, 100, 9_994.5, 1),
     snapshot(1, 110, 10_994.5, 1),
   ]);
 
-  assert.equal(curve[0], 9_994.5);
-  assert.equal(curve[1], 10_993.95);
+  assert.equal(curve[0], strategyEntry.next.equity);
+  assert.equal(curve[1], strategyHold.next.equity);
 });
 
 test("dashboard metrics use net B&H, research MaxDD sign, and position turnover units", () => {
@@ -80,9 +95,13 @@ test("dashboard metrics use net B&H, research MaxDD sign, and position turnover 
   );
 
   assert.ok(Math.abs(metrics.bnhReturn - (-0.01)) < 1e-12);
-  assert.ok(Math.abs(metrics.maxDDBnh - (-0.1)) < 1e-12);
+  const expectedBnhMaxDd = 9_894.5 / 10_994.5 - 1;
+  assert.ok(Math.abs(metrics.maxDDBnh - expectedBnhMaxDd) < 1e-12);
   assert.ok(metrics.maxDDStrat < 0);
-  assert.ok(Math.abs(metrics.maxDDDelta - (Math.abs(metrics.maxDDStrat) - 0.1)) < 1e-12);
+  assert.ok(
+    Math.abs(metrics.maxDDDelta - (Math.abs(metrics.maxDDStrat) - Math.abs(expectedBnhMaxDd)))
+      < 1e-12,
+  );
   assert.equal(metrics.turnover, 0.5);
 });
 
@@ -99,4 +118,3 @@ test("metrics Sharpe uses annualized log returns with population volatility", ()
   const expected = mean / Math.sqrt(variance);
   assert.ok(Math.abs(metrics.sharpeBnh - expected) < 1e-12);
 });
-
