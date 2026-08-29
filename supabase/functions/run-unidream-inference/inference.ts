@@ -1,5 +1,22 @@
 import { SYMBOL, TIMEFRAME, type Candle } from "./config.ts";
 
+function validatePredictCandles(candles: readonly Candle[]): void {
+  if (candles.length === 0) throw new Error("/predict requires at least one candle");
+  for (const [index, candle] of candles.entries()) {
+    if (!candle || typeof candle.timestamp !== "string" || candle.timestamp.length === 0) {
+      throw new Error(`/predict candle ${index} is missing timestamp`);
+    }
+    for (const field of ["open", "high", "low", "close", "volume", "funding_rate", "mark_close"] as const) {
+      if (typeof candle[field] !== "number" || !Number.isFinite(candle[field])) {
+        throw new Error(`/predict candle ${index} is missing finite ${field}`);
+      }
+    }
+    if (candle.mark_close <= 0) {
+      throw new Error(`/predict candle ${index} has non-positive mark_close`);
+    }
+  }
+}
+
 function shortModelVersion(run: Record<string, unknown> | null | undefined): string | null {
   if (!run || typeof run !== "object") return null;
   const explicit = run.name ?? run.run_id;
@@ -25,6 +42,7 @@ export async function fetchModelVersion(spaceUrl: string): Promise<string | null
 }
 
 export async function callPredict(spaceUrl: string, apiKey: string, candles: Candle[]) {
+  validatePredictCandles(candles);
   const response = await fetch(`${spaceUrl.replace(/\/+$/, "")}/predict`, {
     method: "POST",
     headers: {

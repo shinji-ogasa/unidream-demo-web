@@ -1,4 +1,7 @@
-import { TARGET_BARS as CURRENT_TARGET_BARS } from "../_shared/config.ts";
+import {
+  BINANCE_LIMIT as CURRENT_BINANCE_LIMIT,
+  TARGET_BARS as CURRENT_TARGET_BARS,
+} from "../_shared/config.ts";
 
 export {
   ALLOW_SHORT,
@@ -16,6 +19,13 @@ export {
 
 export const MIN_BARS = CURRENT_TARGET_BARS;
 
+// Public market-data endpoints used by the Edge function. Spot candles remain
+// the model's OHLCV input; USDⓈ-M Futures supplies the derivative observations
+// required by the Plan011 feature pipeline.
+export const BINANCE_SPOT_BASE_URL = "https://api.binance.com";
+export const BINANCE_FUTURES_BASE_URL = "https://fapi.binance.com";
+export const BINANCE_PAGE_LIMIT = CURRENT_BINANCE_LIMIT;
+
 export type Candle = {
   timestamp: string;
   open: number;
@@ -23,6 +33,20 @@ export type Candle = {
   low: number;
   close: number;
   volume: number;
+  /** Latest funding observation published at or before timestamp. */
+  funding_rate: number;
+  /** Mark-price kline close for the exact timestamp bar. */
+  mark_close: number;
+};
+
+export type FundingRateObservation = {
+  fundingTime: number;
+  fundingRate: number;
+};
+
+export type MarkPriceObservation = {
+  openTime: number;
+  markClose: number;
 };
 
 export type StrategyState = {
@@ -38,7 +62,10 @@ export type StrategyState = {
 };
 
 export function requireEnv(name: string): string {
-  const value = Deno.env.get(name);
+  const runtime = globalThis as typeof globalThis & {
+    Deno?: { env: { get(key: string): string | undefined } };
+  };
+  const value = runtime.Deno?.env.get(name);
   if (!value) throw new Error(`missing required env: ${name}`);
   return value;
 }
