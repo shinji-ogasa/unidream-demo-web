@@ -3111,8 +3111,8 @@ textarea {
 }
 
 .marketing-hero__content {
-  grid-template-columns: minmax(0, 0.92fr) minmax(420px, 0.88fr);
-  gap: clamp(36px, 6vw, 96px);
+  grid-template-columns: minmax(0, 1.1fr) minmax(460px, 0.83fr);
+  gap: clamp(36px, 6vw, 76px);
 }
 
 .marketing-hero h1 {
@@ -3120,6 +3120,17 @@ textarea {
   font-size: clamp(4rem, 7.2vw, 7.5rem);
   letter-spacing: -0.09em;
   line-height: 0.95;
+}
+
+@media (min-width: 821px) and (max-width: 1100px) {
+  .marketing-hero__content {
+    grid-template-columns: minmax(0, 1fr) minmax(420px, 0.9fr);
+    gap: 38px;
+  }
+
+  .marketing-hero h1 {
+    font-size: clamp(3.8rem, 6.2vw, 5.8rem);
+  }
 }
 
 .marketing-hero__lead {
@@ -3551,10 +3562,14 @@ textarea {
 }
 
 @media (max-width: 560px) {
+  .marketing-hero h1 br.display-break {
+    display: block;
+  }
+
   .marketing-hero h1 {
     margin-top: 24px;
-    font-size: clamp(3.2rem, 14vw, 4.5rem);
-    letter-spacing: -0.085em;
+    font-size: clamp(3rem, 12.2vw, 4.5rem);
+    letter-spacing: -0.09em;
   }
 
   .marketing-hero__lead {
@@ -4408,6 +4423,10 @@ textarea {
   scrollbar-width: thin;
 }
 
+.dashboard-trades-table__mobile {
+  display: none;
+}
+
 .dashboard-trades-table table {
   width: 100%;
   min-width: 700px;
@@ -4866,6 +4885,73 @@ textarea {
   .dashboard-trades-table th,
   .dashboard-trades-table td {
     padding: 12px;
+  }
+
+  .dashboard-trades-table__scroll {
+    overflow: visible;
+    border: 0;
+  }
+
+  .dashboard-trades-table__scroll > table {
+    display: none;
+  }
+
+  .dashboard-trades-table__mobile {
+    display: grid;
+    gap: 8px;
+  }
+
+  .dashboard-trade-card {
+    display: grid;
+    gap: 13px;
+    padding: 14px;
+    border: 1px solid var(--line-soft);
+    border-radius: 14px;
+    background: rgba(6, 12, 20, 0.55);
+  }
+
+  .dashboard-trade-card__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    color: var(--ink-soft);
+    font-family: "Geist Mono", "SFMono-Regular", Consolas, monospace;
+    font-size: 10px;
+  }
+
+  .dashboard-trade-card__head span {
+    font-size: 9px;
+    letter-spacing: 0.1em;
+  }
+
+  .dashboard-trade-card dl {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px 10px;
+    margin: 0;
+  }
+
+  .dashboard-trade-card dl > div {
+    display: grid;
+    min-width: 0;
+    gap: 5px;
+  }
+
+  .dashboard-trade-card dt {
+    color: var(--ink-faint);
+    font-family: "Geist Mono", "SFMono-Regular", Consolas, monospace;
+    font-size: 8px;
+    letter-spacing: 0.12em;
+  }
+
+  .dashboard-trade-card dd {
+    min-width: 0;
+    margin: 0;
+    color: var(--ink-soft);
+    font-family: "Geist Mono", "SFMono-Regular", Consolas, monospace;
+    font-size: 10px;
+    overflow-wrap: anywhere;
   }
 
   .dashboard-trades-table__footer {

@@ -168,7 +168,7 @@ export function Dashboard({ initial }: DashboardProps) {
             </p>
           </div>
 
-          <div className="dashboard-intro__readout" aria-label="Current B&H overlay readout">
+          <div className="dashboard-intro__readout" role="group" aria-label="Current B&H overlay readout">
             <div>
               <span>BASELINE / B&amp;H</span>
               <strong>1.0000</strong>

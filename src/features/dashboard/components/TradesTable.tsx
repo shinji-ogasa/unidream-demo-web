@@ -76,6 +76,31 @@ export function TradesTable({ trades }: Props) {
             })}
           </tbody>
         </table>
+        <div className="dashboard-trades-table__mobile" role="group" aria-label="Recent trades mobile view">
+          {visible.map((t) => {
+            const from = Math.round(t.from_position * 10000) / 10000;
+            const to = Math.round(t.to_position * 10000) / 10000;
+            const direction = to - from;
+            const directionLabel = direction > 0 ? "INCREASE" : direction < 0 ? "DECREASE" : "UNCHANGED";
+            return (
+              <article className="dashboard-trade-card" key={t.id}>
+                <div className="dashboard-trade-card__head">
+                  <time>{fmtTime(t.timestamp)}</time>
+                  <span className={direction > 0 ? "trade-to--up" : direction < 0 ? "trade-to--down" : ""}>
+                    {directionLabel}
+                  </span>
+                </div>
+                <dl>
+                  <div><dt>FROM</dt><dd>{fmtPosition(from)}</dd></div>
+                  <div><dt>TO</dt><dd className={direction > 0 ? "trade-to--up" : direction < 0 ? "trade-to--down" : ""}>{fmtPosition(to)}</dd></div>
+                  <div><dt>PRICE</dt><dd>{fmtUSD(t.price)}</dd></div>
+                  <div><dt>NOTIONAL</dt><dd>{fmtNumber(t.trade_notional)}</dd></div>
+                  <div><dt>COST</dt><dd>{fmtUSD(t.fee)}</dd></div>
+                </dl>
+              </article>
+            );
+          })}
+        </div>
       </div>
       <div className="dashboard-trades-table__footer">
         <span>

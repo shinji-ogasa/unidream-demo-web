@@ -70,7 +70,7 @@ function StatusDot({ tone = "cyan" }: { tone?: "cyan" | "lime" | "blue" }) {
 
 function HeroConsole() {
   return (
-    <div className="hero-concept" aria-label="Buy and Holdを基準にしたAIオーバーレイのビジョン">
+    <div className="hero-concept" role="group" aria-label="Buy and Holdを基準にしたAIオーバーレイのビジョン">
       <div className="hero-concept__topbar">
         <div className="hero-console__window-dots" aria-hidden="true">
           <span />
@@ -292,7 +292,7 @@ function ContractMatrix() {
   ];
 
   return (
-    <div className="contract-matrix" aria-label="現行推論バンドルの検証済み契約">
+    <div className="contract-matrix" role="group" aria-label="現行推論バンドルの検証済み契約">
       {rows.map((row) => (
         <div className="contract-matrix__row" key={row.label}>
           <span className="contract-matrix__label">{row.label}</span>
