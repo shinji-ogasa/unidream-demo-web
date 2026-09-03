@@ -61,24 +61,38 @@ RPC の実行時刻は paper fill の観測・記録時刻であり、実際の�
 
 ## ディレクトリ構成
 
+画面単位の責務を `features/` にまとめ、App Router の page はルートの入口だけを担当する。
+
 ```
 src/
   app/
-    page.tsx              SSR の入口だけを担当
-    globals.css
-  components/
-    Dashboard.tsx         表示とチャート範囲だけを担当
-    PerformanceChart.tsx  recharts のラインチャート
-    StatCard.tsx
-    TradesTable.tsx
-  hooks/
-    useLiveDashboard.ts   Supabase Realtime の購読と画面状態
+    page.tsx                         ライブダッシュボードの SSR 入口
+    homepage/page.tsx                マーケティングページのルート入口
+    homepage/contact/page.tsx        お問い合わせページのルート入口
+    globals.css                      全画面のテーマとレスポンシブスタイル
+  features/
+    marketing/
+      MarketingPage.tsx              ヒーロー、研究、検証、デモ、CTA の構成
+      ContactPage.tsx                お問い合わせ画面
+      data.ts                         ナビ、メトリクス、研究パイプラインの表示データ
+      components/
+        SiteChrome.tsx               ヘッダー、ブランド、リンク、フッター
+        ResearchPipeline.tsx          研究パイプラインの表示
+    dashboard/
+      components/
+        Dashboard.tsx                Realtime 表示とチャート範囲の状態
+        PerformanceChart.tsx         recharts のラインチャート
+        StatCard.tsx / MetricsRow.tsx
+        PositionGauge.tsx / LongShortBar.tsx
+        TradesTable.tsx / Countdown.tsx
+      hooks/
+        useLiveDashboard.ts           Supabase Realtime の購読と画面状態
   lib/
-    supabase.ts           ブラウザ用クライアント (publishable key)
-    server/dashboardRepository.ts  SSR の初期データ取得
-    types.ts              テーブル行の型 + run_id 定数
-    contract.ts           model / schema / parity / cutoff / atomic / cost の表示契約
-    format.ts
+    supabase.ts                       ブラウザ用クライアント (publishable key)
+    server/dashboardRepository.ts    SSR の初期データ取得
+    types.ts                          テーブル行の型 + run_id 定数
+    contract.ts                       model / schema / parity / cutoff / atomic / cost の表示契約
+    format.ts / aggregate.ts / metrics.ts
 supabase/
   migrations/
     0001_predictions.sql        推論ログ
@@ -125,7 +139,7 @@ npm install
 npm run dev
 ```
 
-http://localhost:3000 で開く。
+`http://localhost:3000` でライブダッシュボード、`http://localhost:3000/homepage` で新しいマーケティング画面を開く。
 
 ## Supabase のセットアップ
 

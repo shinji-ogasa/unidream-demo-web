@@ -1,4 +1,4 @@
-import { Dashboard } from "@/components/Dashboard";
+import { Dashboard } from "@/features/dashboard/components/Dashboard";
 import { loadInitialDashboard } from "@/lib/server/dashboardRepository";
 
 export const dynamic = "force-dynamic";

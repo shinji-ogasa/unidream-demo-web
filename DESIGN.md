@@ -176,7 +176,7 @@ Good headline patterns:
 - `市場の隠れた構造を、世界モデルで読む。`
 - `From market history to imagined futures.`
 - `Backtests are not enough. Learn the regime.`
-- `Research-grade AI for adaptive market decisions.`
+- `Evidence-first market modeling.`
 
 Bad headline patterns:
 
@@ -273,7 +273,7 @@ Use this recipe:
 
 ### Background Image Rules
 
-If using `hero-bg.png`:
+The current implementation uses the generated `ai-finance-hero.png` brand asset:
 
 - Put it on a pseudo-element, not as a normal `<img>` object.
 - Use `background-size: cover`.
@@ -290,7 +290,7 @@ Example:
   inset: 0;
   background-image:
     linear-gradient(180deg, rgba(8,9,10,0.20), rgba(8,9,10,0.92)),
-    url("/hero-bg.png");
+    url("/ai-finance-hero.png");
   background-size: cover;
   background-position: center top;
   opacity: 0.72;
@@ -413,8 +413,8 @@ Example:
 
 ```txt
 AlphaEx
-+12.97 pt
-vs B&H baseline / test aggregate
++0.11 pt
+vs B&H baseline / untouched holdout mean, folds 15–23
 ```
 
 ---
@@ -451,9 +451,9 @@ Recommended homepage order:
 
 5. **Evidence / Scorecard**
    - Fold-level metrics
-   - B&H comparison
-   - Sharpe / MaxDD / AlphaEx
-   - PBO and regime breakdown
+   - B&H-relative comparison
+   - AlphaEx / SharpeDelta / MaxDDDelta
+   - Fold-level holdout breakdown
    - Be explicit about limitations.
 
 6. **Use Cases**
@@ -490,8 +490,8 @@ Good hero structure:
 世界モデルで読む。
 
 [subcopy]
-UniDreamはOHLCVと特徴量から市場状態を学習し、
-想像ロールアウトと検証セレクタで、B&Hを超える意思決定を探索する研究開発プロダクトです。
+UniDreamは価格・ボリューム・デリバティブ時系列から市場状態を学習し、
+強化学習と検証ゲートを通じて、意思決定へ変換する研究開発プロダクトです。
 
 [CTA]
 デモを見る
@@ -500,7 +500,7 @@ UniDreamはOHLCVと特徴量から市場状態を学習し、
 
 Rules:
 
-- Max 2 lines for headline on desktop.
+- Break headlines at semantic phrase boundaries; the current Japanese headline uses three visual lines on desktop to keep `構造を、` together with the world-model statement.
 - Subcopy max 2–3 lines.
 - Avoid buzzword stack in hero.
 - Put technical pipeline below, not in headline.
@@ -544,7 +544,7 @@ accept / reject / cooldown
 
 06 Report
 Test Scorecard
-M2 / PBO / regime
+AlphaEx / MaxDDΔ / turnover
 ```
 
 Visual rules:
@@ -565,7 +565,7 @@ Rules:
 - Dark chart background.
 - Thin grid lines with `rgba(255,255,255,0.06)`.
 - Label axes.
-- B&H baseline must be visible.
+- If a B&H-relative chart is shown, label the zero line as the B&H baseline.
 - Avoid fake overfit-looking hockey-stick curves.
 - Use annotations for regime changes.
 - Use colors consistently:
@@ -654,7 +654,7 @@ Backtestの勝ち負けではなく、どの市場状態で効いたのかまで
 ```
 
 ```txt
-B&Hに対する差分、MaxDD、PBO、regime別の崩れ方を同じ画面で確認する。
+B&Hに対する差分、MaxDD、回転率、fold別の崩れ方を同じ画面で確認する。
 ```
 
 ---
@@ -774,19 +774,26 @@ colors: {
 }
 ```
 
-Component naming:
+Current feature-oriented component layout:
 
 ```txt
-components/
-  SiteHeader.tsx
-  HeroSection.tsx
-  ProductPreview.tsx
-  MetricCard.tsx
-  PipelineFlow.tsx
-  EvidenceSection.tsx
-  ResearchSection.tsx
-  CTASection.tsx
-  SiteFooter.tsx
+features/
+  marketing/
+    MarketingPage.tsx
+    ContactPage.tsx
+    data.ts
+    components/
+      SiteChrome.tsx
+      ResearchPipeline.tsx
+  dashboard/
+    components/
+      Dashboard.tsx
+      PerformanceChart.tsx
+      StatCard.tsx
+      PositionGauge.tsx
+      TradesTable.tsx
+    hooks/
+      useLiveDashboard.ts
 ```
 
 ---

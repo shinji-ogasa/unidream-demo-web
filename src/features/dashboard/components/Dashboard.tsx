@@ -12,7 +12,7 @@ import {
   SYMBOL,
   TIMEFRAME,
 } from "@/lib/types";
-import { useLiveDashboard, type DashboardInitialData } from "@/hooks/useLiveDashboard";
+import { useLiveDashboard, type DashboardInitialData } from "@/features/dashboard/hooks/useLiveDashboard";
 
 import { Countdown } from "./Countdown";
 import { LongShortBar } from "./LongShortBar";
