@@ -84,24 +84,25 @@ export function PerformanceChart({ snapshots, trades, range, onRangeChange }: Pr
     : lastIdx;
 
   return (
-    <div className="rounded-[32px] border border-white/[0.08] bg-gradient-to-b from-white/[0.07] to-white/[0.02] backdrop-blur-md p-5 flex flex-col gap-4 shadow-panel">
-      <div className="flex items-center justify-between flex-wrap gap-2">
-        <div className="flex items-center gap-2">
-          <span className="h-1.5 w-1.5 rounded-full bg-cyan" />
-          <div className="text-base font-semibold tracking-tight text-text">
-            Performance vs Buy &amp; Hold (net entry cost)
+    <section className="dashboard-chart dashboard-panel">
+      <div className="dashboard-panel__header">
+        <div>
+          <div className="dashboard-panel__label">
+            <span className="dashboard-panel__dot dashboard-panel__dot--cyan" />
+            <span>Performance vs Buy &amp; Hold</span>
           </div>
+          <h2>Net equity, same window</h2>
         </div>
-        <div className="text-sm font-mono text-text-muted">15m bars</div>
+        <span className="dashboard-panel__meta">15m bars · entry cost included</span>
       </div>
-      <div className="h-80 md:h-[480px]">
+      <div className="dashboard-chart__canvas">
         {data.length === 0 ? (
-          <div className="h-full flex items-center justify-center text-zinc-500 text-base">
+          <div className="dashboard-chart__empty">
             No equity history yet. Run the backfill or trigger the Edge Function.
           </div>
         ) : (
           <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart data={data} margin={{ top: 12, right: 24, bottom: 8, left: 12 }}>
+            <ComposedChart data={data} margin={{ top: 14, right: 18, bottom: 8, left: 4 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#222831" />
               <XAxis
                 dataKey="label"
@@ -187,13 +188,13 @@ export function PerformanceChart({ snapshots, trades, range, onRangeChange }: Pr
           </ResponsiveContainer>
         )}
       </div>
-      <div className="flex flex-wrap items-center gap-x-5 gap-y-1 text-sm font-mono text-text-muted">
+      <div className="dashboard-chart__legend">
         <LegendSwatch color="#02b8cc" label="strategy" />
         <LegendSwatch color="rgba(255,255,255,0.25)" label="B&H (net entry cost)" />
         <LegendTriangle color="#5266eb" label="buy" up />
         <LegendTriangle color="#ff6467" label="sell" />
       </div>
-    </div>
+    </section>
   );
 }
 

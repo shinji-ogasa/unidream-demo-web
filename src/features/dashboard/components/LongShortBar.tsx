@@ -10,46 +10,46 @@ export function LongShortBar({ longPct, shortPct, flatPct }: Props) {
   const flatW = Math.max(0, 100 - longW - shortW);
 
   return (
-    <div className="rounded-[28px] border border-white/[0.08] bg-gradient-to-b from-white/[0.06] to-white/[0.02] backdrop-blur-sm p-4 flex flex-col gap-3 shadow-panel">
-      <div className="flex items-center gap-2">
-        <span className="h-1.5 w-1.5 rounded-full bg-warning" />
-        <div className="label">Long / Short / Flat</div>
+    <div className="dashboard-exposure">
+      <div className="dashboard-panel__label">
+        <span className="dashboard-panel__dot dashboard-panel__dot--warning" />
+        <span>Long / Short / Flat</span>
       </div>
-      <div className="flex h-4 rounded-full overflow-hidden bg-white/[0.05] mt-1">
+      <div className="dashboard-exposure__bar">
         {longW > 0 && (
           <div
             style={{ width: `${longW}%` }}
-            className="bg-[#4ade80]"
+            className="dashboard-exposure__segment dashboard-exposure__segment--long"
             title={`long ${longW.toFixed(1)}%`}
           />
         )}
         {flatW > 0 && (
           <div
             style={{ width: `${flatW}%` }}
-            className="bg-[#626b7a]"
+            className="dashboard-exposure__segment dashboard-exposure__segment--flat"
             title={`flat ${flatW.toFixed(1)}%`}
           />
         )}
         {shortW > 0 && (
           <div
             style={{ width: `${shortW}%` }}
-            className="bg-[#ff6467]"
+            className="dashboard-exposure__segment dashboard-exposure__segment--short"
             title={`short ${shortW.toFixed(1)}%`}
           />
         )}
       </div>
-      <div className="grid grid-cols-3 gap-2 text-sm font-mono mt-1">
-        <div>
-          <div className="text-[#4ade80]">long</div>
-          <div className="text-[#f4f7fb] text-base">{longW.toFixed(1)}%</div>
+      <div className="dashboard-exposure__legend">
+        <div className="dashboard-exposure__legend-item dashboard-exposure__legend-item--long">
+          <span>long</span>
+          <strong>{longW.toFixed(1)}%</strong>
         </div>
-        <div>
-          <div className="text-[#8a93a3]">flat</div>
-          <div className="text-[#f4f7fb] text-base">{flatW.toFixed(1)}%</div>
+        <div className="dashboard-exposure__legend-item dashboard-exposure__legend-item--flat">
+          <span>flat</span>
+          <strong>{flatW.toFixed(1)}%</strong>
         </div>
-        <div>
-          <div className="text-[#ff6467]">short</div>
-          <div className="text-[#f4f7fb] text-base">{shortW.toFixed(1)}%</div>
+        <div className="dashboard-exposure__legend-item dashboard-exposure__legend-item--short">
+          <span>short</span>
+          <strong>{shortW.toFixed(1)}%</strong>
         </div>
       </div>
     </div>

@@ -22,57 +22,51 @@ export function TradesTable({ trades }: Props) {
   const visible = trades.slice(startIdx, startIdx + PAGE_SIZE);
 
   if (trades.length === 0) {
-    return <div className="rounded-[32px] border border-white/[0.08] bg-gradient-to-b from-white/[0.07] to-white/[0.02] p-6 text-text-muted text-base shadow-panel">No trades yet.</div>;
+    return <div className="dashboard-empty">No trades yet.</div>;
   }
 
   const showingTo = Math.min(startIdx + PAGE_SIZE, trades.length);
 
   return (
-    <div className="flex flex-col gap-3">
-      <div className="rounded-[32px] border border-white/[0.08] bg-gradient-to-b from-white/[0.07] to-white/[0.02] backdrop-blur-md overflow-x-auto shadow-panel">
-        <table className="w-full text-sm font-mono min-w-[620px]">
-          <thead className="bg-white/[0.04] text-text-muted text-xs uppercase tracking-[0.14em]">
+    <div className="dashboard-trades-table">
+      <div className="dashboard-trades-table__scroll">
+        <table>
+          <thead>
             <tr>
-              <th className="text-left px-4 py-3">time</th>
-              <th className="text-right px-4 py-3">from</th>
-              <th className="text-right px-4 py-3">to</th>
-              <th className="text-right px-4 py-3">price</th>
-              <th className="text-right px-4 py-3">notional</th>
-              <th className="text-right px-4 py-3" title="Fee + half-spread + slippage in quote currency">
+              <th>time</th>
+              <th>from</th>
+              <th>to</th>
+              <th>price</th>
+              <th>notional</th>
+              <th title="Fee + half-spread + slippage in quote currency">
                 cost (USDT)
               </th>
             </tr>
           </thead>
-          <tbody className="text-base">
+          <tbody>
             {visible.map((t) => {
               const from = Math.round(t.from_position * 10000) / 10000;
               const to = Math.round(t.to_position * 10000) / 10000;
               const direction = to - from;
-              const tone =
-                direction > 0
-                  ? "text-[#4ade80]"
-                  : direction < 0
-                    ? "text-[#ff6467]"
-                    : "text-[#8a93a3]";
               return (
-                <tr key={t.id} className="border-t border-[rgba(255,255,255,0.08)]">
-                  <td className="px-4 py-2.5 text-[#d0d6e0] whitespace-nowrap">
+                <tr key={t.id}>
+                  <td className="trade-time">
                     {fmtTime(t.timestamp)}
                   </td>
-                  <td className="px-4 py-2.5 text-right text-[#8a93a3]">
+                  <td className="trade-from">
                     {fmtPosition(t.from_position)}
                   </td>
-                  <td className={`px-4 py-2.5 text-right ${tone}`}>
+                  <td className={`trade-to ${direction > 0 ? "trade-to--up" : direction < 0 ? "trade-to--down" : ""}`}>
                     {fmtPosition(t.to_position)}
                   </td>
-                  <td className="px-4 py-2.5 text-right whitespace-nowrap">
+                  <td className="trade-number">
                     {fmtUSD(t.price)}
                   </td>
-                  <td className="px-4 py-2.5 text-right text-[#d0d6e0]">
+                  <td className="trade-number">
                     {fmtNumber(t.trade_notional)}
                   </td>
                   <td
-                    className="px-4 py-2.5 text-right text-[#d0d6e0]"
+                    className="trade-number"
                     title="Legacy fee column; all-in quote transaction cost"
                   >
                     {fmtUSD(t.fee)}
@@ -83,27 +77,27 @@ export function TradesTable({ trades }: Props) {
           </tbody>
         </table>
       </div>
-      <div className="flex items-center justify-between text-sm font-mono text-[#8a93a3] px-1 flex-wrap gap-2">
+      <div className="dashboard-trades-table__footer">
         <span>
           {startIdx + 1}–{showingTo} of {trades.length}
         </span>
-        <div className="flex items-center gap-2">
+        <div className="dashboard-pagination">
           <button
             type="button"
             onClick={() => setPage((p) => Math.max(0, p - 1))}
             disabled={safePage === 0}
-            className="px-3 py-1 rounded border border-[rgba(255,255,255,0.08)] text-[#d0d6e0] hover:text-[#f4f7fb] hover:border-[#3a4150] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            className="dashboard-pagination__button"
           >
             ← prev
           </button>
-          <span className="text-[#d0d6e0] tabular-nums px-1">
+          <span className="dashboard-pagination__count">
             {safePage + 1} / {totalPages}
           </span>
           <button
             type="button"
             onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
             disabled={safePage >= totalPages - 1}
-            className="px-3 py-1 rounded border border-[rgba(255,255,255,0.08)] text-[#d0d6e0] hover:text-[#f4f7fb] hover:border-[#3a4150] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            className="dashboard-pagination__button"
           >
             next →
           </button>

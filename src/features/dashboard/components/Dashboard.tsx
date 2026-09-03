@@ -116,22 +116,19 @@ export function Dashboard({ initial }: DashboardProps) {
     pnl > 0.001 ? "good" : pnl < -0.001 ? "bad" : "default";
   const signalKey = (prediction?.signal ?? "").toLowerCase();
   const signalTone = SIGNAL_TONE[signalKey] ?? "default";
-  const modelName = prediction?.model_version ?? contract.model;
+  // Some public rows contain a long JSON artifact in model_version. The
+  // source contract is the stable display label and keeps layout bounded.
+  const modelName = contract.model;
   const costs = contract.tradingCosts;
 
   return (
-    <div className="min-h-screen bg-bg-deep text-text antialiased">
-      {/* ambient background */}
-      <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(82,102,235,0.08),transparent_50%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_80%,rgba(2,184,204,0.06),transparent_50%)]" />
-      </div>
+    <main className="dashboard-shell">
+      <div className="dashboard-shell__ambient" aria-hidden="true" />
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-10 flex flex-col gap-5 md:gap-6">
-        {/* header */}
-        <header className="rounded-[32px] border border-white/[0.08] bg-gradient-to-b from-white/[0.07] to-white/[0.02] backdrop-blur-md p-4 md:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-panel">
-          <div className="flex items-center gap-4">
-            <Link href="/homepage" className="flex items-center shrink-0">
+      <div className="dashboard-container">
+        <header className="dashboard-header">
+          <div className="dashboard-header__brand-group">
+            <Link href="/homepage" className="dashboard-header__brand" aria-label="Zeniq / UniDream">
               <Image
                 src="/Zeniq-logo.png"
                 alt="Zeniq"
@@ -139,67 +136,62 @@ export function Dashboard({ initial }: DashboardProps) {
                 width={224}
                 priority
                 unoptimized
-                className="h-8 md:h-10 w-auto brightness-0 invert"
+                className="dashboard-header__logo"
               />
             </Link>
-            <div className="h-6 w-px bg-white/[0.12] hidden md:block" />
-            <div className="hidden md:flex flex-col">
-              <span className="text-sm font-semibold tracking-tight">UniDream Live</span>
-              <span className="text-xs font-mono text-text-muted">
-                {SYMBOL} · {TIMEFRAME}
-              </span>
+            <span className="dashboard-header__divider" aria-hidden="true" />
+            <div className="dashboard-header__context">
+              <span>UNIDREAM / PAPER TRADING</span>
+              <strong>{SYMBOL} · {TIMEFRAME}</strong>
             </div>
           </div>
-          <div className="flex items-center flex-wrap gap-x-5 gap-y-2">
-            <span className="text-xs md:text-sm font-mono text-text-muted">
-              model <span className="text-text">{modelName}</span>
-            </span>
-            <span className="flex items-center gap-2 text-xs text-text-muted">
-              <span className="h-1.5 w-1.5 rounded-full bg-success animate-pulse" />
-              Live
-            </span>
+
+          <div className="dashboard-header__status">
+            <span className="dashboard-model"><small>MODEL</small>{modelName}</span>
             <Countdown />
           </div>
         </header>
 
-        <p className="text-xs md:text-sm text-warning/80 px-1">
-          This is a research demo, not financial advice. Virtual paper-trading only.
-        </p>
+        <div className="dashboard-alert">
+          <span className="dashboard-alert__dot" aria-hidden="true" />
+          <p>This is a research demo, not financial advice. Virtual paper-trading only.</p>
+          <Link href="/homepage">Company overview <span aria-hidden="true">↗</span></Link>
+        </div>
 
-        <section
-          aria-label="Inference contract"
-          className="rounded-[28px] border border-white/[0.08] bg-white/[0.03] px-4 py-3 flex flex-col gap-2"
-        >
-          <div className="flex items-center justify-between gap-3 flex-wrap">
-            <span className="text-xs font-semibold tracking-[0.2em] uppercase text-text-muted">
-              Inference contract
-            </span>
-            <span className="text-xs font-mono text-text-muted">source-configured</span>
+        <section className="dashboard-intro" aria-labelledby="dashboard-title">
+          <div className="dashboard-intro__copy">
+            <p className="dashboard-kicker">LIVE SURFACE / B&amp;H-RELATIVE VIEW</p>
+            <h1 id="dashboard-title">B&amp;Hを基準に、<br /><em>AIの差分を見る。</em></h1>
+            <p className="dashboard-intro__lead">
+              Buy &amp; Holdを1.0の基準に置き、ライブのequity、position、tradesを同じ時間軸で確認します。
+              ここで表示するのは仮想ペーパートレードの観測値です。
+            </p>
           </div>
-          <div className="flex flex-wrap gap-x-5 gap-y-1.5 text-xs font-mono text-text-soft">
-            <span>model {modelName}</span>
-            <span>schema {contract.featureSchema}</span>
-            <span>parity {contract.featureParity}</span>
-            <span>derivatives {contract.derivativeInputs}</span>
-            <span>cutoff {contract.observationCutoff}</span>
-            <span>write {contract.atomicCommit}</span>
-            <span>
-              costs fee {(costs.fee_rate * 10_000).toFixed(1)}bps · spread {costs.spread_bps.toFixed(1)}bps
-              (half {(costs.spread_bps / 2).toFixed(1)}) · slippage {costs.slippage_bps.toFixed(1)}bps
-            </span>
+
+          <div className="dashboard-intro__readout" aria-label="Current B&H overlay readout">
+            <div>
+              <span>BASELINE / B&amp;H</span>
+              <strong>1.0000</strong>
+              <small>reference position</small>
+            </div>
+            <div>
+              <span>CURRENT TARGET</span>
+              <strong>{currentPosition.toFixed(3)}</strong>
+              <small>live strategy position</small>
+            </div>
+            <div>
+              <span>LAST CLOSED BAR</span>
+              <strong>{fmtTime(lastTimestamp)}</strong>
+              <small>{SYMBOL} · {TIMEFRAME}</small>
+            </div>
           </div>
-          <p className="text-[11px] text-text-muted">
-            Contract badges describe the deployed source contract; the current public rows do not
-            persist per-row provenance or a live health verdict.
-          </p>
         </section>
 
-        {/* stats */}
-        <section className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+        <section className="dashboard-kpi-grid" aria-label="Live account snapshot">
           <StatCard
             label="Equity"
             value={fmtUSD(equity)}
-            hint={`PnL ${pnl >= 0 ? "+" : ""}${pnl.toFixed(2)}%`}
+            hint={`PnL ${pnl >= 0 ? "+" : ""}${pnl.toFixed(2)}% from start`}
             tone={pnlTone}
           />
           <StatCard
@@ -207,93 +199,98 @@ export function Dashboard({ initial }: DashboardProps) {
             value={fmtUSD(cash)}
             hint={`asset_qty ${assetQty.toFixed(6)}`}
           />
-          <StatCard label="Last Price" value={fmtUSD(lastPrice)} hint={fmtTime(lastTimestamp)} />
+          <StatCard label="Last price" value={fmtUSD(lastPrice)} hint={fmtTime(lastTimestamp)} />
           <StatCard
-            label="Latest Signal"
+            label="Latest signal"
             value={prediction?.signal ?? "—"}
             hint={`raw position ${prediction?.position?.toFixed(3) ?? "—"}`}
             tone={signalTone}
           />
         </section>
 
-        {/* position + metrics */}
-        <section className="grid grid-cols-1 lg:grid-cols-[1fr_2fr] gap-4 md:gap-5">
-          <PositionGauge
-            position={currentPosition}
-            equity={equity}
-            cash={cash}
-            assetQty={assetQty}
-            positionHistory={positionHistory}
-          />
-          <div className="flex flex-col gap-4 justify-between">
-            <MetricsRow metrics={metrics} />
+        <section className="dashboard-primary-grid" aria-label="Performance and current position">
+          <div className="dashboard-primary-grid__chart">
+            <PerformanceChart
+              snapshots={sortedSnapshots}
+              trades={trades}
+              range={range}
+              onRangeChange={handleRangeChange}
+            />
+          </div>
+          <aside className="dashboard-primary-grid__aside">
+            <PositionGauge
+              position={currentPosition}
+              equity={equity}
+              cash={cash}
+              assetQty={assetQty}
+              positionHistory={positionHistory}
+            />
             <LongShortBar
               longPct={metrics.longPct}
               shortPct={metrics.shortPct}
               flatPct={metrics.flatPct}
             />
-          </div>
+          </aside>
         </section>
 
-        {/* chart */}
-        <PerformanceChart
-          snapshots={sortedSnapshots}
-          trades={trades}
-          range={range}
-          onRangeChange={handleRangeChange}
-        />
-
-        {/* trades */}
-        <section className="flex flex-col gap-3">
-          <div className="flex items-center gap-2 px-1">
-            <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-            <div className="text-xs font-semibold tracking-[0.2em] uppercase text-text-muted">
-              Recent Trades
+        <section className="dashboard-section" aria-labelledby="metrics-title">
+          <div className="dashboard-section__heading">
+            <div>
+              <p className="dashboard-kicker">WINDOW METRICS</p>
+              <h2 id="metrics-title">B&amp;Hとの差分を、同じ窓で読む。</h2>
             </div>
+            <span>selected chart window · {metrics.bars.toLocaleString()} bars</span>
+          </div>
+          <MetricsRow metrics={metrics} />
+        </section>
+
+        <section className="dashboard-section dashboard-trades" aria-labelledby="trades-title">
+          <div className="dashboard-section__heading">
+            <div>
+              <p className="dashboard-kicker">EXECUTION TRACE</p>
+              <h2 id="trades-title">Recent trades</h2>
+            </div>
+            <span>paper fills · latest first</span>
           </div>
           <TradesTable trades={trades} />
         </section>
 
-        {/* info + footer */}
-        <section className="rounded-[32px] border border-white/[0.08] bg-gradient-to-b from-white/[0.05] to-white/[0.02] backdrop-blur-sm p-5 md:p-6 flex flex-col gap-4 shadow-panel">
-          <p className="text-sm text-text-soft leading-relaxed">
-            Both the research codebase and the inference server behind this demo are open source.
-            The trained model bundle is published alongside the code, so anyone can reproduce or
-            extend the same experiments end to end.
-          </p>
-          <div className="flex flex-wrap gap-x-6 gap-y-2 font-mono text-sm">
-            <a
-              href="https://github.com/shinji-ogasa/UniDream"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-text-soft hover:text-success underline-offset-4 hover:underline transition-colors"
-            >
-              → UniDream (research repo) on GitHub
-            </a>
-            <a
-              href="https://huggingface.co/spaces/ShinjiAA/unidream-space"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-text-soft hover:text-success underline-offset-4 hover:underline transition-colors"
-            >
-              → unidream-space on Hugging Face
-            </a>
-            <Link
-              href="/homepage"
-              className="text-text-soft hover:text-primary underline-offset-4 hover:underline transition-colors"
-            >
-              → Zeniq (Company Overview)
-            </Link>
+        <section className="dashboard-contract" aria-labelledby="contract-title">
+          <div className="dashboard-section__heading">
+            <div>
+              <p className="dashboard-kicker">PROVENANCE / DISPLAY CONTRACT</p>
+              <h2 id="contract-title">推論を、表示契約まで戻れる形にする。</h2>
+            </div>
+            <span className="dashboard-contract__badge">SOURCE-CONFIGURED</span>
           </div>
+
+          <dl className="dashboard-contract__grid">
+            <div><dt>MODEL</dt><dd>{contract.model}</dd></div>
+            <div><dt>SCHEMA</dt><dd>{contract.featureSchema}</dd></div>
+            <div><dt>PARITY</dt><dd>{contract.featureParity}</dd></div>
+            <div><dt>DERIVATIVES</dt><dd>{contract.derivativeInputs}</dd></div>
+            <div><dt>CUTOFF</dt><dd>{contract.observationCutoff}</dd></div>
+            <div><dt>WRITE PATH</dt><dd>{contract.atomicCommit}</dd></div>
+            <div>
+              <dt>COSTS</dt>
+              <dd>fee {(costs.fee_rate * 10_000).toFixed(1)}bps · spread {costs.spread_bps.toFixed(1)}bps · slippage {costs.slippage_bps.toFixed(1)}bps</dd>
+            </div>
+          </dl>
+          <p className="dashboard-contract__note">
+            These fields describe the deployed source contract. The current public rows do not persist per-row provenance or a live health verdict.
+          </p>
         </section>
 
-        <footer className="text-sm text-text-muted px-1">
-          Data: Binance public API · Inference: UniDream HF Space · Storage &amp; realtime: Supabase ·
-          Last closed bar {fmtTime(lastTimestamp)} · recorded {fmtTime(prediction?.created_at)} ·
-          Alpha (window excess) ={" "}
-          {fmtPercent(metrics.alphaEx, 2, true)}
+        <footer className="dashboard-footer">
+          <div className="dashboard-footer__links">
+            <a href="https://github.com/shinji-ogasa/UniDream" target="_blank" rel="noopener noreferrer">Research repo ↗</a>
+            <a href="https://huggingface.co/spaces/ShinjiAA/unidream-space" target="_blank" rel="noopener noreferrer">Inference Space ↗</a>
+            <Link href="/homepage">Company overview ↗</Link>
+          </div>
+          <p>Data: Binance public API · Inference: UniDream HF Space · Storage &amp; realtime: Supabase</p>
+          <p>Last closed bar {fmtTime(lastTimestamp)} · recorded {fmtTime(prediction?.created_at)} · Alpha (window excess) {fmtPercent(metrics.alphaEx, 2, true)}</p>
         </footer>
       </div>
-    </div>
+    </main>
   );
 }

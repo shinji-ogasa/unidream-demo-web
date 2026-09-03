@@ -13,18 +13,6 @@ function tone(value: number, betterIsHigher: boolean): Tone {
   return value < 0 ? "good" : "bad";
 }
 
-const TONE_CLASS: Record<Tone, string> = {
-  good: "text-[#4ade80]",
-  bad: "text-[#ff6467]",
-  default: "text-[#d0d6e0]",
-};
-
-const TONE_DOT: Record<Tone, string> = {
-  good: "bg-[#4ade80]",
-  bad: "bg-[#ff6467]",
-  default: "bg-white/30",
-};
-
 function Cell({
   label,
   value,
@@ -37,20 +25,20 @@ function Cell({
   tone?: Tone;
 }) {
   return (
-    <div className="rounded-[28px] border border-white/[0.08] bg-gradient-to-b from-white/[0.06] to-white/[0.02] backdrop-blur-sm p-4 flex flex-col gap-1.5 hover:-translate-y-0.5 transition-transform duration-200 shadow-panel">
-      <div className="flex items-center gap-2">
-        <span className={`h-1.5 w-1.5 rounded-full ${TONE_DOT[t]}`} />
-        <div className="label">{label}</div>
+    <div className={`dashboard-metric-cell dashboard-metric-cell--${t}`}>
+      <div className="dashboard-metric-cell__label">
+        <span className="dashboard-metric-cell__dot" />
+        <span>{label}</span>
       </div>
-      <div className={`text-2xl font-mono leading-tight ${TONE_CLASS[t]}`}>{value}</div>
-      {hint && <div className="text-sm font-mono text-[#8a93a3] leading-snug">{hint}</div>}
+      <div className="dashboard-metric-cell__value">{value}</div>
+      {hint && <div className="dashboard-metric-cell__hint">{hint}</div>}
     </div>
   );
 }
 
 export function MetricsRow({ metrics }: Props) {
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+    <div className="dashboard-metrics-grid">
       <Cell
         label="Alpha (excess)"
         value={fmtPercent(metrics.alphaEx, 2, true)}

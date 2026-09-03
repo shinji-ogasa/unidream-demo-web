@@ -25,7 +25,7 @@ export function PositionGauge({
   const isFlat = Math.abs(position) < 1e-6;
   const isLong = position > 0;
   const ringColor = isFlat ? "#626b7a" : isLong ? "#4ade80" : "#ff6467";
-  const labelTone = isFlat ? "text-[#8a93a3]" : isLong ? "text-[#4ade80]" : "text-[#ff6467]";
+  const positionTone = isFlat ? "flat" : isLong ? "long" : "short";
   const labelText = isFlat ? "FLAT" : isLong ? "LONG" : "SHORT";
 
   const sparkPoints = useSparkPoints(positionHistory);
@@ -34,14 +34,14 @@ export function PositionGauge({
   const sparkSpanLabel = sparkSpan(sparkBars);
 
   return (
-    <div className="rounded-[32px] border border-white/[0.08] bg-gradient-to-b from-white/[0.07] to-white/[0.02] backdrop-blur-md p-5 flex flex-col gap-3 shadow-panel">
-      <div className="flex items-center gap-2">
-        <span className={`h-1.5 w-1.5 rounded-full ${ringColor}`} />
-        <div className="label">Position</div>
+    <div className="dashboard-position">
+      <div className="dashboard-panel__label">
+        <span className={`dashboard-panel__dot dashboard-panel__dot--${positionTone}`} />
+        <span>Position</span>
       </div>
-      <div className="flex items-center gap-4">
-        <div className="relative w-[124px] h-[124px] shrink-0">
-          <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">
+      <div className="dashboard-position__summary">
+        <div className="dashboard-position__gauge">
+          <svg viewBox="0 0 100 100" className="dashboard-position__ring -rotate-90">
             <circle cx="50" cy="50" r={r} stroke="rgba(255,255,255,0.08)" strokeWidth="9" fill="none" />
             <circle
               cx="50"
@@ -55,32 +55,30 @@ export function PositionGauge({
               style={{ transition: "stroke-dasharray 400ms ease-out, stroke 200ms ease-out" }}
             />
           </svg>
-          <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <div className={`text-2xl font-mono leading-none ${labelTone}`}>
+          <div className="dashboard-position__gauge-label">
+            <div className={`dashboard-position__percent dashboard-position__percent--${positionTone}`}>
               {(fraction * 100).toFixed(0)}%
             </div>
-            <div className={`text-[11px] tracking-[0.22em] mt-1 ${labelTone}`}>{labelText}</div>
+            <div className={`dashboard-position__side dashboard-position__side--${positionTone}`}>{labelText}</div>
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-sm font-mono w-full">
-          <div className="text-[#8a93a3]">target</div>
-          <div className="text-right text-[#d0d6e0]">{position.toFixed(3)}</div>
-          <div className="text-[#8a93a3]">cash</div>
-          <div className="text-right text-[#d0d6e0]">{fmtUSD(cash)}</div>
-          <div className="text-[#8a93a3]">qty</div>
-          <div className="text-right text-[#d0d6e0]">{fmtNumber(assetQty, 6)}</div>
-          <div className="text-[#8a93a3]">equity</div>
-          <div className="text-right text-[#f4f7fb]">{fmtUSD(equity)}</div>
+        <div className="dashboard-position__details">
+          <span>target</span>
+          <strong>{position.toFixed(3)}</strong>
+          <span>cash</span>
+          <strong>{fmtUSD(cash)}</strong>
+          <span>qty</span>
+          <strong>{fmtNumber(assetQty, 6)}</strong>
+          <span>equity</span>
+          <strong>{fmtUSD(equity)}</strong>
         </div>
       </div>
-      <div className="mt-auto pt-2 border-t border-[rgba(255,255,255,0.08)] flex flex-col gap-1.5">
-        <div className="flex items-center justify-between text-xs">
-          <span className="uppercase tracking-[0.18em] text-[#8a93a3]">
-            position history
-          </span>
-          <span className="font-mono text-[#8a93a3]">{sparkSpanLabel}</span>
+      <div className="dashboard-position__history">
+        <div className="dashboard-position__history-head">
+          <span>POSITION HISTORY</span>
+          <span>{sparkSpanLabel}</span>
         </div>
-        <svg viewBox="0 0 100 30" preserveAspectRatio="none" className="w-full h-9">
+        <svg viewBox="0 0 100 30" preserveAspectRatio="none" className="dashboard-position__sparkline">
           <line
             x1="0"
             y1="2"
