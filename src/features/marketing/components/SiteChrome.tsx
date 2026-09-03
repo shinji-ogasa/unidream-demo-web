@@ -133,8 +133,8 @@ export function SiteFooter() {
           <div>
             <BrandMark />
             <p className="site-footer__statement">
-              市場の隠れた構造を読み、<br className="display-break" />
-              検証可能な意思決定へ。
+              B&amp;Hを基準に、<br className="display-break" />
+              検証可能なAIオーバーレイへ。
             </p>
           </div>
           <div className="site-footer__links">

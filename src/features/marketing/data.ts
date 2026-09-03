@@ -8,8 +8,8 @@ export type PipelineNode = {
 };
 
 export const MARKETING_NAV = [
-  { label: "プロダクト", href: "#product" },
-  { label: "研究", href: "#research" },
+  { label: "ビジョン", href: "#product" },
+  { label: "オーバーレイ", href: "#research" },
   { label: "技術", href: "#technology" },
   { label: "検証", href: "#evidence" },
   { label: "デモ", href: "#demo" },
@@ -23,10 +23,10 @@ export const HERO_READOUTS = [
 ] as const;
 
 export const METRIC_RAIL = [
-  { label: "MARKET", value: "BTCUSDT · 15m", detail: "2018-01-01 → 2026-04-17" },
-  { label: "MODEL", value: "Plan011 v31", detail: "WM → BC → AC overlay" },
-  { label: "VALIDATION", value: "FOLDS 0–12", detail: "development walk-forward" },
-  { label: "HOLDOUT", value: "FOLDS 15–23", detail: "untouched · report-only" },
+  { label: "BASELINE", value: "B&H · 1.0000", detail: "the reference position" },
+  { label: "NORTH STAR", value: "AlphaEx+ · MaxDDΔ−", detail: "two conditions together" },
+  { label: "HOLDOUT", value: "+0.11pt AlphaEx", detail: "mean · folds 15–23 · 3/9 positive" },
+  { label: "OPEN LIMIT", value: "+0.20pt MaxDDΔ", detail: "mean · DD improved 0/9" },
 ];
 
 export const BUNDLE_CONTRACT = {
@@ -131,20 +131,20 @@ export const PIPELINE_NODES: PipelineNode[] = [
 export const PRINCIPLES = [
   {
     index: "A",
-    title: "状態を読む",
-    body: "短期の値当てではなく、ボラティリティ・流動性・トレンドの組み合わせを潜在状態として捉える。",
+    title: "B&Hを基準にする",
+    body: "Buy & Holdを捨てず、まず1.0の基準線を置く。AIの判断は、その差分として読む。",
     tone: "cyan",
   },
   {
     index: "B",
-    title: "行動を選ぶ",
-    body: "予測値を直接売買に変換せず、状態に応じたポジションとリスク制御を方策として学習する。",
+    title: "AIを上に重ねる",
+    body: "市場状態に応じてポジションを調整する、低回転のオーバーレイを研究する。",
     tone: "blue",
   },
   {
     index: "C",
-    title: "検証で止める",
-    body: "未使用holdout、B&H比較、ドローダウン、回転率を揃え、条件を満たさない候補は採用せず、testはレポートに限定する。",
+    title: "証跡で判断する",
+    body: "AlphaEx、MaxDDΔ、回転率、未使用holdoutを揃え、目標を満たさない結果もそのまま残す。",
     tone: "lime",
   },
 ];

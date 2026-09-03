@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "UniDream — Market Intelligence",
-  description: "Transformer世界モデルと強化学習で市場状態を読む、UniDreamの研究・ペーパートレードデモ。",
+  title: "UniDream — B&HをAIで再設計する",
+  description: "Buy & Holdを基準に、AIオーバーレイとB&H-relative evidenceを検証するUniDreamの研究・ペーパートレードデモ。",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

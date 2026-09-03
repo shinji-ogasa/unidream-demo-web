@@ -6,7 +6,6 @@ import {
   ArrowDown,
   ArrowRight,
   Check,
-  CircleDashed,
   Database,
   GitBranch,
   ScanLine,
@@ -19,7 +18,6 @@ import { useRef, type ReactNode } from "react";
 import {
   BUNDLE_CONTRACT,
   DEV_SUMMARY,
-  HERO_READOUTS,
   HOLDOUT_FOLDS,
   HOLDOUT_SUMMARY,
   METRIC_RAIL,
@@ -72,65 +70,74 @@ function StatusDot({ tone = "cyan" }: { tone?: "cyan" | "lime" | "blue" }) {
 
 function HeroConsole() {
   return (
-    <div className="hero-console" aria-label="UniDreamの現行推論バンドル契約">
-      <div className="hero-console__topbar">
+    <div className="hero-concept" aria-label="Buy and Holdを基準にしたAIオーバーレイのビジョン">
+      <div className="hero-concept__topbar">
         <div className="hero-console__window-dots" aria-hidden="true">
           <span />
           <span />
           <span />
         </div>
-        <span>UNIDREAM / BUNDLE CONTRACT</span>
-        <span className="hero-console__topbar-index">FOLD {BUNDLE_CONTRACT.fold}</span>
+        <span>UNIDREAM / THE NEW B&amp;H</span>
+        <span className="hero-concept__topbar-index">VISION 01</span>
       </div>
 
-      <div className="hero-console__body">
-        <div className="hero-console__heading">
+      <div className="hero-concept__body">
+        <div className="hero-concept__heading">
           <div>
-            <span className="micro-label">DEPLOYED INFERENCE BUNDLE</span>
-            <strong>Plan011 v31 / AC overlay</strong>
+            <span className="micro-label">BASELINE + INTELLIGENCE</span>
+            <strong>Buy &amp; Hold / AI overlay</strong>
           </div>
-          <span className="console-live"><StatusDot tone="lime" /> SAMPLE VERIFIED</span>
+          <span className="console-live console-live--blue"><StatusDot tone="blue" /> RESEARCH DIRECTION</span>
         </div>
 
-        <div className="hero-console__readout">
-          <span className="micro-label">LAST EXPORTED SAMPLE POSITION</span>
-          <strong>{BUNDLE_CONTRACT.lastSamplePosition}</strong>
-          <span className="hero-console__delta">benchmark {BUNDLE_CONTRACT.benchmarkPosition}</span>
-        </div>
-
-        <div className="hero-console__contract-grid" aria-label="現行バンドルの入力契約">
-          <div>
-            <span>OBS DIM</span>
-            <strong>{BUNDLE_CONTRACT.featureCount}</strong>
-            <small>features</small>
+        <div className="hero-concept__baseline">
+          <div className="hero-concept__baseline-item hero-concept__baseline-item--base">
+            <span className="micro-label">BASELINE POSITION</span>
+            <strong>1.0000</strong>
+            <small>Buy &amp; Hold</small>
           </div>
-          <div>
-            <span>SEQ LEN</span>
-            <strong>{BUNDLE_CONTRACT.sequenceLength}</strong>
-            <small>bars</small>
-          </div>
-          <div>
-            <span>MAX ABS DIFF</span>
-            <strong>{BUNDLE_CONTRACT.maxAbsDiff}</strong>
-            <small>sample strict</small>
+          <div className="hero-concept__arrow" aria-hidden="true"><ArrowRight /></div>
+          <div className="hero-concept__baseline-item hero-concept__baseline-item--overlay">
+            <span className="micro-label">AI OVERLAY SAMPLE</span>
+            <strong>{BUNDLE_CONTRACT.lastSamplePosition}</strong>
+            <small>fold 23 · benchmark {BUNDLE_CONTRACT.benchmarkPosition}</small>
           </div>
         </div>
 
-        <div className="hero-console__rows">
-          {HERO_READOUTS.map((readout) => (
-            <div className="hero-console__row" key={readout.label}>
-              <span><StatusDot tone={readout.tone} />{readout.label}</span>
-              <strong className={`console-value console-value--${readout.tone}`}>{readout.value}</strong>
-            </div>
-          ))}
+        <div className="hero-concept__path" aria-hidden="true">
+          <span className="hero-concept__path-line" />
+          <span className="hero-concept__path-point hero-concept__path-point--one" />
+          <span className="hero-concept__path-point hero-concept__path-point--two" />
+          <span className="hero-concept__path-point hero-concept__path-point--three" />
+          <span className="hero-concept__path-label hero-concept__path-label--base">B&amp;H BASE</span>
+          <span className="hero-concept__path-label hero-concept__path-label--state">MARKET STATE</span>
+          <span className="hero-concept__path-label hero-concept__path-label--overlay">CONTROLLED OVERLAY</span>
         </div>
 
-        <div className="hero-console__footer">
-          <span><CircleDashed aria-hidden="true" /> {BUNDLE_CONTRACT.status}</span>
-          <span>{BUNDLE_CONTRACT.symbol} · {BUNDLE_CONTRACT.interval} · seq {BUNDLE_CONTRACT.sequenceLength}</span>
+        <div className="hero-concept__north-star">
+          <div>
+            <span className="micro-label">NORTH STAR / TARGET</span>
+            <strong>AlphaEx <b>+</b></strong>
+            <small>return above B&amp;H</small>
+          </div>
+          <div>
+            <span className="micro-label">NORTH STAR / TARGET</span>
+            <strong>MaxDDΔ <b>−</b></strong>
+            <small>smaller drawdown</small>
+          </div>
+        </div>
+
+        <div className="hero-concept__evidence">
+          <span className="micro-label">CURRENT HOLDOUT / FOLDS 15–23</span>
+          <strong>{HOLDOUT_SUMMARY.alphaExMean} AlphaEx mean</strong>
+          <p>MaxDDΔ {HOLDOUT_SUMMARY.maxDdDeltaMean} mean · drawdown improvement {HOLDOUT_SUMMARY.improvedDrawdown}</p>
+        </div>
+
+        <div className="hero-concept__footer">
+          <span>B&amp;H is the base. AI is the overlay.</span>
+          <span>VISION ≠ RESULT</span>
         </div>
       </div>
-      <div className="hero-console__scanline" aria-hidden="true" />
     </div>
   );
 }
@@ -187,7 +194,7 @@ function Hero() {
             transition={{ duration: 0.55, delay: 0.1 }}
           >
             <StatusDot />
-            <span>EVIDENCE-FIRST MARKET MODELING</span>
+            <span>LONG-TERM INVESTING / B&amp;H OVERLAY</span>
             <span className="hero-kicker__line" aria-hidden="true" />
             <span>2026.09</span>
           </motion.div>
@@ -198,13 +205,9 @@ function Hero() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.18, ease: [0.16, 1, 0.3, 1] }}
           >
-            市場の隠れた
+            長期投資を、
             <br className="display-break" />
-            <span>
-              構造を、
-              <br className="display-break" />
-              世界モデルで読む。
-            </span>
+            <span>AIで再設計する。</span>
           </motion.h1>
 
           <motion.p
@@ -213,9 +216,9 @@ function Hero() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
           >
-            UniDreamは、Transformer世界モデルで市場状態を学習し、
+            Buy &amp; Holdを捨てずに、投資の基準として置く。
             <br className="desktop-only" />
-            強化学習と検証ゲートを通じて、意思決定へ変換する研究開発プロダクトです。
+            その上にAIの判断レイヤーを重ね、B&amp;Hとの差分を検証可能にします。
           </motion.p>
 
           <motion.div
@@ -224,8 +227,8 @@ function Hero() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.55, delay: 0.42 }}
           >
-            <ArrowLink href="/">ライブデモを見る</ArrowLink>
-            <ArrowLink href="#research" variant="secondary">仕組みを知る</ArrowLink>
+            <ArrowLink href="#evidence">B&amp;Hとの差分を見る</ArrowLink>
+            <ArrowLink href="#research" variant="secondary">オーバーレイの仕組み</ArrowLink>
           </motion.div>
 
           <motion.div
@@ -234,8 +237,8 @@ function Hero() {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.58 }}
           >
-            <span><Database aria-hidden="true" /> DATA / 15m CLOSED BARS</span>
-            <span><ShieldCheck aria-hidden="true" /> PAPER-TRADING ONLY</span>
+            <span><Database aria-hidden="true" /> B&amp;H / BASELINE 1.0000</span>
+            <span><ShieldCheck aria-hidden="true" /> VISION + EVIDENCE</span>
           </motion.div>
         </div>
 
@@ -245,7 +248,7 @@ function Hero() {
           animate={{ opacity: 1, x: 0, rotate: 0 }}
           transition={{ duration: 0.9, delay: 0.24, ease: [0.16, 1, 0.3, 1] }}
         >
-          <div className="hero-visual__index">01 / MODEL CONTRACT</div>
+          <div className="hero-visual__index">01 / THE NEW B&amp;H</div>
           <HeroConsole />
           <div className="hero-visual__stamp">
             <span>BUNDLE</span>
@@ -308,39 +311,39 @@ function StateSection() {
     <section id="research" className="content-section state-section" aria-labelledby="state-title">
       <div className="site-container">
         <div className="section-topline">
-          <Eyebrow index="01">MARKET STATE</Eyebrow>
-          <span className="section-topline__aside">FROM PRICE HISTORY TO LATENT STRUCTURE</span>
+          <Eyebrow index="01">THE OVERLAY IDEA</Eyebrow>
+          <span className="section-topline__aside">BASELINE → STATE → CONTROLLED ACTION</span>
         </div>
 
         <div className="state-section__intro">
           <Reveal className="state-section__headline" x={-24} y={0}>
             <h2 id="state-title">
-              動きを追うのではなく、
+              B&amp;Hを、
               <br className="display-break" />
-              <em>状態を読む。</em>
+              <em>判断の基準にする。</em>
             </h2>
           </Reveal>
           <Reveal className="state-section__copy" delay={0.12} x={24} y={0}>
             <p>
-              UniDreamは価格・ボリューム・デリバティブ時系列を17特徴量に整形し、64本の15分足を1サンプルとして世界モデルに渡します。
+              Buy &amp; Holdは、置き換える対象ではなく比較の基準です。UniDreamは、その1.0を起点に市場状態を読み、ポジションの差分をAIオーバーレイとして考えます。
             </p>
             <p className="muted-copy">
-              ここで表示するのは、現行バンドルの契約とサンプル検証結果です。市場の局面や将来の収益を断定する表示ではありません。
+              現行の入力契約はBTCUSDTの15分足、17特徴量、64本の系列です。ここでのサンプル値は仕組みの確認であり、将来の収益を示すものではありません。
             </p>
-            <div className="inline-status"><StatusDot tone="cyan" /> MODEL CONTRACT / EXPLICIT</div>
+            <div className="inline-status"><StatusDot tone="cyan" /> BASELINE / OVERLAY / EVIDENCE</div>
           </Reveal>
         </div>
 
         <Reveal className="state-board" y={30}>
           <div className="state-board__header">
             <div>
-              <span className="micro-label">BUNDLE CONTRACT / VERIFIED SAMPLE</span>
-              <strong>{BUNDLE_CONTRACT.symbol} · {BUNDLE_CONTRACT.interval} · FOLD {BUNDLE_CONTRACT.fold}</strong>
+              <span className="micro-label">B&amp;H OVERLAY / VERIFIED SAMPLE</span>
+              <strong>base {BUNDLE_CONTRACT.benchmarkPosition} → sample {BUNDLE_CONTRACT.lastSamplePosition}</strong>
             </div>
             <div className="state-board__header-right">
               <span><StatusDot tone="cyan" /> {BUNDLE_CONTRACT.featureCount} FEATURES</span>
               <span><StatusDot tone="blue" /> SEQ {BUNDLE_CONTRACT.sequenceLength}</span>
-              <span className="state-board__run"><StatusDot tone="lime" /> SAMPLE / STRICT OK</span>
+                <span className="state-board__run"><StatusDot tone="lime" /> SAMPLE / STRICT OK</span>
             </div>
           </div>
           <div className="state-board__body">
@@ -349,25 +352,25 @@ function StateSection() {
               <div className="state-note state-note--active">
                 <span className="state-note__marker">01</span>
                 <div>
-                  <span className="micro-label">BUNDLE</span>
-                  <strong>Plan011 v31 / AC overlay</strong>
-                  <p>fold 23 · latest_holdout_candidate</p>
+                  <span className="micro-label">B&amp;H BASELINE</span>
+                  <strong>Buy &amp; Hold = 1.00000000</strong>
+                  <p>比較の起点。AIの差分をここから読む。</p>
                 </div>
               </div>
               <div className="state-note">
                 <span className="state-note__marker">17</span>
                 <div>
-                  <span className="micro-label">FEATURE CONTRACT</span>
+                  <span className="micro-label">MARKET STATE INPUT</span>
                   <strong>17 features × 64 bars</strong>
-                  <p>z-score window 60d. The sample follows the explicit bundle schema.</p>
+                  <p>BTCUSDT · 15m · z-score window 60d。</p>
                 </div>
               </div>
               <div className="state-note">
                 <span className="state-note__marker">Δ</span>
                 <div>
-                  <span className="micro-label">SAMPLE VERIFICATION</span>
+                  <span className="micro-label">AI OVERLAY SAMPLE</span>
                   <strong>max_abs_diff = {BUNDLE_CONTRACT.maxAbsDiff}</strong>
-                  <p>strict_ok=true · last exported position {BUNDLE_CONTRACT.lastSamplePosition}; benchmark position {BUNDLE_CONTRACT.benchmarkPosition}.</p>
+                  <p>strict_ok=true · sample position {BUNDLE_CONTRACT.lastSamplePosition}; benchmark {BUNDLE_CONTRACT.benchmarkPosition}。</p>
                 </div>
               </div>
             </div>
@@ -384,14 +387,14 @@ function TechnologySection() {
       <div className="site-container">
         <div className="section-topline">
           <Eyebrow index="02">RESEARCH PIPELINE</Eyebrow>
-          <span className="section-topline__aside">TRACEABLE TRAINING · INFERENCE · TEST</span>
+          <span className="section-topline__aside">STATE → POSITION → B&amp;H-RELATIVE TEST</span>
         </div>
         <div className="technology-section__intro">
           <Reveal x={-24} y={0}>
-            <h2 id="technology-title">データから、検証可能な<br className="display-break" /><em>意思決定まで。</em></h2>
+            <h2 id="technology-title">AIの判断を、<br className="display-break" /><em>検証可能な線にする。</em></h2>
           </Reveal>
           <Reveal className="technology-section__copy" delay={0.12} x={24} y={0}>
-            <p>学習・推論・検証を一つの線として扱い、各段階の入力、状態、判定を追跡できるように設計しています。</p>
+            <p>Transformer世界モデルから方策、検証ゲートまでを一つの線にし、B&amp;Hとの差分をどの段階で生んだか追跡できるようにします。</p>
             <span className="inline-status inline-status--blue"><GitBranch aria-hidden="true" /> WALK-FORWARD / RIGHT-EXCLUSIVE</span>
           </Reveal>
         </div>
@@ -463,20 +466,44 @@ function EvidenceSection() {
         </div>
         <div className="evidence-section__intro">
           <Reveal x={-24} y={0}>
-            <h2 id="evidence-title">検証を、数字だけでなく<br className="display-break" /><em>アーティファクトで追う。</em></h2>
+            <h2 id="evidence-title">AlphaExは、<br className="display-break" /><em>B&amp;Hとの差分。</em></h2>
           </Reveal>
           <Reveal className="evidence-section__copy" delay={0.12} x={24} y={0}>
-            <p>見栄えのよいバックテスト曲線だけでは、運用判断には進めません。fold、比較対象、ドローダウン、回転率、未学習期間を同じスコアカードに残します。</p>
+            <p>目指すのは、B&amp;Hを上回るAlphaExと、より小さいMaxDDΔを同時に満たすこと。現行holdoutはその途中にあり、平均値と未達条件を同じ画面で示します。</p>
             <ArrowLink href="https://github.com/shinji-ogasa/UniDream/blob/main/docs/plan011_v31_investor_evidence.md" variant="text">研究レポートの原文を見る</ArrowLink>
           </Reveal>
         </div>
+
+        <Reveal className="evidence-thesis" y={24}>
+          <div className="evidence-thesis__vision">
+            <span className="micro-label">NORTH STAR / TARGET</span>
+            <div className="evidence-thesis__values">
+              <strong>AlphaEx <b>+</b></strong>
+              <strong>MaxDDΔ <b>−</b></strong>
+            </div>
+            <p>B&amp;Hよりリターンを増やし、ドローダウンを小さくする。</p>
+          </div>
+          <div className="evidence-thesis__current">
+            <span className="micro-label">CURRENT HOLDOUT / FOLDS 15–23</span>
+            <div className="evidence-thesis__values">
+              <strong>{HOLDOUT_SUMMARY.alphaExMean}<small> AlphaEx mean</small></strong>
+              <strong>{HOLDOUT_SUMMARY.maxDdDeltaMean}<small> MaxDDΔ mean</small></strong>
+            </div>
+            <p>AlphaExは平均プラス。一方、MaxDDΔは負が改善で、現行はDD改善 {HOLDOUT_SUMMARY.improvedDrawdown}。</p>
+          </div>
+          <div className="evidence-thesis__read">
+            <span className="micro-label">HOW TO READ</span>
+            <strong>Visionと結果を混ぜない。</strong>
+            <p>これは将来目標と、現時点の9 fold集計を分けて読むための表示です。</p>
+          </div>
+        </Reveal>
 
         <div className="evidence-grid">
           <Reveal className="scorecard" x={-20} y={18}>
             <div className="scorecard__topline">
               <div>
                 <span className="micro-label">PLAN011 V31 / HISTORICAL SNAPSHOT</span>
-                <strong>UNTOUCHED HOLDOUT / SCORECARD</strong>
+                <strong>UNTOUCHED HOLDOUT / B&amp;H COMPARISON</strong>
               </div>
               <span className="status-badge status-badge--cyan"><Check aria-hidden="true" /> HISTORICAL RECORD</span>
             </div>
@@ -573,15 +600,15 @@ function PrinciplesSection() {
     <section className="content-section principles-section" aria-labelledby="principles-title">
       <div className="site-container">
         <div className="section-topline">
-          <Eyebrow index="04">DESIGN PRINCIPLES</Eyebrow>
-          <span className="section-topline__aside">CALM · PRECISE · EXPLICIT</span>
+          <Eyebrow index="04">THE NEW B&amp;H</Eyebrow>
+          <span className="section-topline__aside">BASELINE · OVERLAY · EVIDENCE</span>
         </div>
         <div className="principles-section__intro">
           <Reveal x={-24} y={0}>
-            <h2 id="principles-title">長期投資の判断を、<br className="display-break" /><em>静かに強くする。</em></h2>
+            <h2 id="principles-title">新しいB&amp;Hを、<br className="display-break" /><em>基準と判断から。</em></h2>
           </Reveal>
           <Reveal className="principles-section__copy" delay={0.12} x={24} y={0}>
-            <p>UniDreamが目指すのは、派手な予測画面ではありません。状態、行動、検証の境界を明確にし、人間が判断を追える運用基盤です。</p>
+            <p>UniDreamが描くのは、未来を言い当てる機械ではありません。B&amp;Hを基準に、AIがどれだけ差分を作り、どこで限界に当たったかを人間が追えるプロダクトです。</p>
           </Reveal>
         </div>
         <div className="principles-grid">
@@ -610,10 +637,10 @@ function DemoSection() {
         </div>
         <div className="demo-section__intro">
           <Reveal x={-24} y={0}>
-            <h2 id="demo-title">状態が、ポジションと<br className="display-break" /><em>証跡に変わる場所。</em></h2>
+            <h2 id="demo-title">ライブデモで、<br className="display-break" /><em>B&amp;Hとの差分を追う。</em></h2>
           </Reveal>
           <Reveal className="demo-section__copy" delay={0.12} x={24} y={0}>
-            <p>ダッシュボードでは、推論結果だけでなく、equity、position、trades、データ時刻、推論契約をひとつの画面で確認できます。</p>
+            <p>通常のデモ画面では、AIのequityとB&amp;Hを同じチャートに重ね、position、trades、データ時刻、推論契約まで一つの画面で確認できます。</p>
             <div className="demo-section__actions">
               <ArrowLink href="/">ダッシュボードを起動</ArrowLink>
               <span className="inline-status inline-status--blue"><StatusDot tone="blue" /> PAPER TRADING / DEMO</span>
@@ -639,7 +666,7 @@ function DemoSection() {
           </div>
           <div className="demo-stage__caption">
             <span>ARCHIVED UI PREVIEW</span>
-            <span>visual structure only · research values are shown in the scorecard above</span>
+            <span>visual structure only · live values are shown in the dashboard</span>
           </div>
           <div className="demo-stage__float demo-stage__float--one">
             <span className="micro-label">MODEL</span>
@@ -665,7 +692,7 @@ function ContactSection() {
           <div className="contact-panel__field" aria-hidden="true"><span>OPEN</span><span>RESEARCH</span></div>
           <div className="contact-panel__content">
             <Eyebrow index="06">OPEN A CONVERSATION</Eyebrow>
-            <h2 id="contact-title">共同検証を、<br className="display-break" /><em>次の実験へ。</em></h2>
+            <h2 id="contact-title">新しいB&amp;Hを、<br className="display-break" /><em>共同検証する。</em></h2>
             <p>PoC導入、共同研究、デモの試用について、目的と検証したい課題をお聞かせください。</p>
             <div className="contact-panel__actions">
               <ArrowLink href="/homepage/contact">お問い合わせ</ArrowLink>
