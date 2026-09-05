@@ -9,8 +9,7 @@ export type PipelineNode = {
 
 export const MARKETING_NAV = [
   { label: "ビジョン", href: "#product" },
-  { label: "オーバーレイ", href: "#research" },
-  { label: "技術", href: "#technology" },
+  { label: "仕組み", href: "#research" },
   { label: "検証", href: "#evidence" },
   { label: "デモ", href: "#demo" },
   { label: "コンタクト", href: "#contact" },
@@ -21,13 +20,6 @@ export const HERO_READOUTS = [
   { label: "SCHEMA", value: "17 FEATURES", tone: "cyan" },
   { label: "VERIFY", value: "1.1920929e-7 MAX DIFF", tone: "lime" },
 ] as const;
-
-export const METRIC_RAIL = [
-  { label: "BASELINE", value: "B&H · 1.0000", detail: "the reference position" },
-  { label: "NORTH STAR", value: "AlphaEx+ · MaxDDΔ−", detail: "two conditions together" },
-  { label: "HOLDOUT", value: "+0.11pt AlphaEx", detail: "mean · folds 15–23 · 3/9 positive" },
-  { label: "OPEN LIMIT", value: "+0.20pt MaxDDΔ", detail: "mean · DD improved 0/9" },
-];
 
 export const BUNDLE_CONTRACT = {
   bundle: "plan011_v31_overlay_actor",
@@ -124,27 +116,6 @@ export const PIPELINE_NODES: PipelineNode[] = [
     title: "Test Scorecard",
     detail: "Fold, regime and B&H-relative evidence.",
     artifact: "AlphaEx · MaxDDΔ",
-    tone: "lime",
-  },
-];
-
-export const PRINCIPLES = [
-  {
-    index: "A",
-    title: "B&Hを基準にする",
-    body: "Buy & Holdを捨てず、まず1.0の基準線を置く。AIの判断は、その差分として読む。",
-    tone: "cyan",
-  },
-  {
-    index: "B",
-    title: "AIを上に重ねる",
-    body: "市場状態に応じてポジションを調整する、低回転のオーバーレイを研究する。",
-    tone: "blue",
-  },
-  {
-    index: "C",
-    title: "証跡で判断する",
-    body: "AlphaEx、MaxDDΔ、回転率、未使用holdoutを揃え、目標を満たさない結果もそのまま残す。",
     tone: "lime",
   },
 ];

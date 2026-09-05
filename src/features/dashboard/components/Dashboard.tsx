@@ -141,7 +141,7 @@ export function Dashboard({ initial }: DashboardProps) {
             </Link>
             <span className="dashboard-header__divider" aria-hidden="true" />
             <div className="dashboard-header__context">
-              <span>UNIDREAM / PAPER TRADING</span>
+              <span>UNIDREAM / B&amp;H RELATIVE</span>
               <strong>{SYMBOL} · {TIMEFRAME}</strong>
             </div>
           </div>
@@ -160,10 +160,10 @@ export function Dashboard({ initial }: DashboardProps) {
 
         <section className="dashboard-intro" aria-labelledby="dashboard-title">
           <div className="dashboard-intro__copy">
-            <p className="dashboard-kicker">LIVE SURFACE / B&amp;H-RELATIVE VIEW</p>
-            <h1 id="dashboard-title">B&amp;Hを基準に、<br /><em>AIの差分を見る。</em></h1>
+            <p className="dashboard-kicker">LIVE RESULT / SAME BASELINE</p>
+            <h1 id="dashboard-title">B&amp;H = 1.0。<br /><em>AIの差分を見る。</em></h1>
             <p className="dashboard-intro__lead">
-              Buy &amp; Holdを1.0の基準に置き、ライブのequity、position、tradesを同じ時間軸で確認します。
+              チャートのAI equityとBuy &amp; Holdを同じ時間軸で重ね、positionと直近の観測時刻まで一度に確認します。
               ここで表示するのは仮想ペーパートレードの観測値です。
             </p>
           </div>
@@ -185,27 +185,6 @@ export function Dashboard({ initial }: DashboardProps) {
               <small>{SYMBOL} · {TIMEFRAME}</small>
             </div>
           </div>
-        </section>
-
-        <section className="dashboard-kpi-grid" aria-label="Live account snapshot">
-          <StatCard
-            label="Equity"
-            value={fmtUSD(equity)}
-            hint={`PnL ${pnl >= 0 ? "+" : ""}${pnl.toFixed(2)}% from start`}
-            tone={pnlTone}
-          />
-          <StatCard
-            label="Cash"
-            value={fmtUSD(cash)}
-            hint={`asset_qty ${assetQty.toFixed(6)}`}
-          />
-          <StatCard label="Last price" value={fmtUSD(lastPrice)} hint={fmtTime(lastTimestamp)} />
-          <StatCard
-            label="Latest signal"
-            value={prediction?.signal ?? "—"}
-            hint={`raw position ${prediction?.position?.toFixed(3) ?? "—"}`}
-            tone={signalTone}
-          />
         </section>
 
         <section className="dashboard-primary-grid" aria-label="Performance and current position">
@@ -231,6 +210,27 @@ export function Dashboard({ initial }: DashboardProps) {
               flatPct={metrics.flatPct}
             />
           </aside>
+        </section>
+
+        <section className="dashboard-kpi-grid" aria-label="Live account snapshot">
+          <StatCard
+            label="Equity"
+            value={fmtUSD(equity)}
+            hint={`PnL ${pnl >= 0 ? "+" : ""}${pnl.toFixed(2)}% from start`}
+            tone={pnlTone}
+          />
+          <StatCard
+            label="Cash"
+            value={fmtUSD(cash)}
+            hint={`asset_qty ${assetQty.toFixed(6)}`}
+          />
+          <StatCard label="Last price" value={fmtUSD(lastPrice)} hint={fmtTime(lastTimestamp)} />
+          <StatCard
+            label="Latest signal"
+            value={prediction?.signal ?? "—"}
+            hint={`raw position ${prediction?.position?.toFixed(3) ?? "—"}`}
+            tone={signalTone}
+          />
         </section>
 
         <section className="dashboard-section" aria-labelledby="metrics-title">
