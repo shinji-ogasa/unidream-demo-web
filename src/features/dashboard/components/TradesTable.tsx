@@ -5,7 +5,7 @@ import { useState } from "react";
 import type { Trade } from "@/lib/types";
 import { fmtNumber, fmtPosition, fmtTime, fmtUSD } from "@/lib/format";
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 6;
 
 type Props = {
   // Trades sorted descending by timestamp (latest first).
@@ -49,7 +49,10 @@ export function TradesTable({ trades }: Props) {
               const to = Math.round(t.to_position * 10000) / 10000;
               const direction = to - from;
               return (
-                <tr key={t.id}>
+                <tr
+                  className={`trade-row ${direction > 0 ? "trade-row--up" : direction < 0 ? "trade-row--down" : "trade-row--flat"}`}
+                  key={t.id}
+                >
                   <td className="trade-time">
                     {fmtTime(t.timestamp)}
                   </td>
@@ -57,6 +60,12 @@ export function TradesTable({ trades }: Props) {
                     {fmtPosition(t.from_position)}
                   </td>
                   <td className={`trade-to ${direction > 0 ? "trade-to--up" : direction < 0 ? "trade-to--down" : ""}`}>
+                    <span
+                      className="trade-direction"
+                      aria-label={direction > 0 ? "increase" : direction < 0 ? "decrease" : "unchanged"}
+                    >
+                      {direction > 0 ? "↑" : direction < 0 ? "↓" : "→"}
+                    </span>
                     {fmtPosition(t.to_position)}
                   </td>
                   <td className="trade-number">
@@ -83,7 +92,10 @@ export function TradesTable({ trades }: Props) {
             const direction = to - from;
             const directionLabel = direction > 0 ? "INCREASE" : direction < 0 ? "DECREASE" : "UNCHANGED";
             return (
-              <article className="dashboard-trade-card" key={t.id}>
+              <article
+                className={`dashboard-trade-card ${direction > 0 ? "dashboard-trade-card--up" : direction < 0 ? "dashboard-trade-card--down" : "dashboard-trade-card--flat"}`}
+                key={t.id}
+              >
                 <div className="dashboard-trade-card__head">
                   <time>{fmtTime(t.timestamp)}</time>
                   <span className={direction > 0 ? "trade-to--up" : direction < 0 ? "trade-to--down" : ""}>

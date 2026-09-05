@@ -178,12 +178,6 @@ export function Dashboard({ initial }: DashboardProps) {
             </div>
           </section>
 
-          <PerformanceChart
-            snapshots={sortedSnapshots}
-            range={range}
-            onRangeChange={handleRangeChange}
-          />
-
           <section className="dashboard-result-window" aria-label="Window results">
             <div className="dashboard-result-window__head">
               <span>WINDOW RESULTS</span>
@@ -196,6 +190,12 @@ export function Dashboard({ initial }: DashboardProps) {
               <span>LAST PRICE <strong>{fmtUSD(lastPrice)}</strong></span>
             </div>
           </section>
+
+          <PerformanceChart
+            snapshots={sortedSnapshots}
+            range={range}
+            onRangeChange={handleRangeChange}
+          />
         </section>
 
         <section className="dashboard-section dashboard-trades dashboard-trades--minimal" aria-label="Trades">
@@ -207,6 +207,11 @@ export function Dashboard({ initial }: DashboardProps) {
         </section>
 
         <footer className="dashboard-footer dashboard-footer--minimal">
+          <nav className="dashboard-footer__links dashboard-footer__links--result" aria-label="Resources">
+            <Link href="/homepage">Company overview ↗</Link>
+            <a href="https://github.com/shinji-ogasa/UniDream" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
+            <a href="https://huggingface.co/spaces/ShinjiAA/unidream-space" target="_blank" rel="noopener noreferrer">HF Space ↗</a>
+          </nav>
           <span>PAPER · {SYMBOL} · {TIMEFRAME}</span>
           <span>{fmtTime(lastTimestamp)} · {modelName}</span>
         </footer>

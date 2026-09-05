@@ -6755,6 +6755,202 @@ textarea {
   }
 }
 
+/* Result dashboard trade pass: keep the table compact, readable, and
+   directionally scannable without making it another large content card. */
+.dashboard-shell--result-only .dashboard-trades--minimal {
+  gap: 8px;
+  margin-top: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.dashboard-shell--result-only .dashboard-trades__simple-head {
+  min-height: 28px;
+  color: var(--ink-soft);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+}
+
+.dashboard-shell--result-only .dashboard-trades__simple-head span:last-child {
+  color: var(--ink-muted);
+  font-size: 9px;
+  letter-spacing: 0.04em;
+}
+
+.dashboard-shell--result-only .dashboard-trades-table__scroll {
+  overflow-x: auto;
+  border: 1px solid rgba(184, 204, 232, 0.16);
+  border-radius: 12px;
+  background: rgba(7, 13, 21, 0.66);
+}
+
+.dashboard-shell--result-only .dashboard-trades-table table {
+  min-width: 0;
+  font-size: 12px;
+}
+
+.dashboard-shell--result-only .dashboard-trades-table th,
+.dashboard-shell--result-only .dashboard-trades-table td {
+  padding: 10px 12px;
+}
+
+.dashboard-shell--result-only .dashboard-trades-table thead th {
+  color: var(--ink-soft);
+  font-size: 9px;
+}
+
+.dashboard-shell--result-only .dashboard-trades-table tbody tr {
+  transition: background-color 160ms ease;
+}
+
+.dashboard-shell--result-only .dashboard-trades-table tbody tr:hover {
+  background: rgba(29, 224, 234, 0.06);
+}
+
+.dashboard-shell--result-only .dashboard-trades-table tbody tr.trade-row--up {
+  background: linear-gradient(90deg, rgba(185, 239, 109, 0.1), transparent 34%);
+}
+
+.dashboard-shell--result-only .dashboard-trades-table tbody tr.trade-row--down {
+  background: linear-gradient(90deg, rgba(255, 125, 139, 0.1), transparent 34%);
+}
+
+.dashboard-shell--result-only .dashboard-trades-table tbody tr.trade-row--up td:first-child {
+  border-left: 3px solid var(--lime);
+}
+
+.dashboard-shell--result-only .dashboard-trades-table tbody tr.trade-row--down td:first-child {
+  border-left: 3px solid var(--danger);
+}
+
+.dashboard-shell--result-only .trade-direction {
+  display: inline-flex;
+  width: 22px;
+  height: 22px;
+  margin-right: 6px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  vertical-align: -2px;
+}
+
+.dashboard-shell--result-only .trade-row--up .trade-direction {
+  color: var(--lime);
+  background: rgba(185, 239, 109, 0.14);
+}
+
+.dashboard-shell--result-only .trade-row--down .trade-direction {
+  color: var(--danger);
+  background: rgba(255, 125, 139, 0.14);
+}
+
+.dashboard-shell--result-only .trade-row--flat .trade-direction {
+  color: var(--ink-muted);
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.dashboard-shell--result-only .dashboard-trades-table__footer {
+  min-height: 40px;
+  font-size: 10px;
+}
+
+.dashboard-shell--result-only .dashboard-footer--minimal {
+  flex-wrap: wrap;
+  row-gap: 3px;
+}
+
+.dashboard-shell--result-only .dashboard-footer__links--result {
+  display: flex;
+  flex: 1 1 100%;
+  gap: 8px 18px;
+  min-height: 28px;
+  align-items: center;
+  color: var(--ink-soft);
+}
+
+.dashboard-shell--result-only .dashboard-footer__links--result a {
+  min-height: 28px;
+  color: var(--ink-soft);
+  font-size: 10px;
+  transition: color 160ms ease;
+}
+
+.dashboard-shell--result-only .dashboard-footer__links--result a:hover {
+  color: var(--cyan);
+}
+
+@media (max-width: 560px) {
+  .dashboard-shell--result-only .dashboard-trades-table__scroll {
+    overflow: visible;
+    border: 0;
+    background: transparent;
+  }
+
+  .dashboard-shell--result-only .dashboard-trade-card {
+    gap: 8px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: rgba(7, 13, 21, 0.72);
+  }
+
+  .dashboard-shell--result-only .dashboard-trade-card--up {
+    border-color: rgba(185, 239, 109, 0.36);
+    background: linear-gradient(105deg, rgba(185, 239, 109, 0.1), rgba(7, 13, 21, 0.72) 58%);
+  }
+
+  .dashboard-shell--result-only .dashboard-trade-card--down {
+    border-color: rgba(255, 125, 139, 0.36);
+    background: linear-gradient(105deg, rgba(255, 125, 139, 0.1), rgba(7, 13, 21, 0.72) 58%);
+  }
+
+  .dashboard-shell--result-only .dashboard-trade-card__head {
+    font-size: 11px;
+  }
+
+  .dashboard-shell--result-only .dashboard-trade-card__head span {
+    font-size: 10px;
+    font-weight: 600;
+  }
+
+  .dashboard-shell--result-only .dashboard-trade-card dl {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px 12px;
+  }
+
+  .dashboard-shell--result-only .dashboard-trade-card dt {
+    font-size: 8px;
+  }
+
+  .dashboard-shell--result-only .dashboard-trade-card dd {
+    font-size: 11px;
+  }
+
+  .dashboard-shell--result-only .dashboard-footer--minimal {
+    align-items: flex-start;
+    flex-direction: row;
+  }
+
+  .dashboard-shell--result-only .dashboard-footer__links--result {
+    gap: 0 12px;
+    min-height: 26px;
+  }
+
+  .dashboard-shell--result-only .dashboard-footer__links--result a {
+    min-height: 26px;
+    font-size: 9px;
+  }
+
+  .dashboard-shell--result-only .dashboard-footer--minimal > span {
+    font-size: 8px;
+  }
+}
+
 /* Final visual QA adjustments: keep the comparison fully visible and make
    the chart legend and percent scale readable without decoding the UI. */
 .dashboard-shell--result-only .dashboard-chart__header-side {
