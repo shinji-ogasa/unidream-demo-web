@@ -177,9 +177,27 @@ export function Dashboard({ initial }: DashboardProps) {
               <span>{TIMEFRAME}</span>
               <time dateTime={lastTimestamp ?? undefined}>{fmtTime(lastTimestamp)}</time>
             </div>
-            <div className="dashboard-result-stage__equity" aria-label="Current equity comparison">
-              <span>AI {fmtUSD(equity)}</span>
-              <span>B&amp;H {fmtUSD(bnhEquity)}</span>
+          </div>
+
+          <div className="dashboard-result-stage__summary">
+            <div className="dashboard-result-panel__hero">
+              <span>AI EQUITY</span>
+              <strong>{fmtUSD(equity)}</strong>
+              <em className={`dashboard-result-panel__pnl dashboard-result-panel__pnl--${pnlTone}`}>
+                {pnl >= 0 ? "+" : ""}{pnl.toFixed(2)}%
+              </em>
+            </div>
+
+            <div className="dashboard-result-panel__compare">
+              <ResultMetric label="AI" value={fmtUSD(equity)} detail={fmtPercent(metrics.stratReturn, 2, true)} tone={pnlTone} />
+              <ResultMetric label="B&amp;H" value={fmtUSD(bnhEquity)} detail={fmtPercent(bnhPnl / 100, 2, true)} />
+              <ResultMetric label="ALPHAEX" value={fmtPercent(metrics.alphaEx, 2, true)} detail={`${metrics.bars.toLocaleString()} bars`} tone={metrics.alphaEx >= 0 ? "good" : "bad"} />
+            </div>
+
+            <div className="dashboard-result-panel__signal">
+              <span>SIGNAL</span>
+              <strong className={`dashboard-result-panel__signal--${signalTone}`}>{prediction?.signal ?? "—"}</strong>
+              <small>target {currentPosition.toFixed(3)} · {fmtUSD(lastPrice)}</small>
             </div>
           </div>
 
@@ -190,26 +208,7 @@ export function Dashboard({ initial }: DashboardProps) {
               range={range}
               onRangeChange={handleRangeChange}
             />
-            <aside className="dashboard-result-panel">
-              <div className="dashboard-result-panel__hero">
-                <span>AI EQUITY</span>
-                <strong>{fmtUSD(equity)}</strong>
-                <em className={`dashboard-result-panel__pnl dashboard-result-panel__pnl--${pnlTone}`}>
-                  {pnl >= 0 ? "+" : ""}{pnl.toFixed(2)}%
-                </em>
-              </div>
-
-              <div className="dashboard-result-panel__compare">
-                <ResultMetric label="AI" value={fmtUSD(equity)} detail={fmtPercent(metrics.stratReturn, 2, true)} tone={pnlTone} />
-                <ResultMetric label="B&amp;H" value={fmtUSD(bnhEquity)} detail={fmtPercent(bnhPnl / 100, 2, true)} />
-                <ResultMetric label="ALPHAEX" value={fmtPercent(metrics.alphaEx, 2, true)} detail={`${metrics.bars.toLocaleString()} bars`} tone={metrics.alphaEx >= 0 ? "good" : "bad"} />
-              </div>
-
-              <div className="dashboard-result-panel__signal">
-                <span>SIGNAL</span>
-                <strong className={`dashboard-result-panel__signal--${signalTone}`}>{prediction?.signal ?? "—"}</strong>
-                <small>target {currentPosition.toFixed(3)} · {fmtUSD(lastPrice)}</small>
-              </div>
+            <aside className="dashboard-result-panel dashboard-result-panel--side">
 
               <PositionGauge
                 position={currentPosition}
@@ -235,12 +234,9 @@ export function Dashboard({ initial }: DashboardProps) {
           </div>
         </section>
 
-        <section className="dashboard-section dashboard-trades dashboard-trades--minimal" aria-labelledby="trades-title">
-          <div className="dashboard-section__heading">
-            <div>
-              <p className="dashboard-kicker">TRADES</p>
-              <h2 id="trades-title">Execution</h2>
-            </div>
+        <section className="dashboard-section dashboard-trades dashboard-trades--minimal" aria-label="Trades">
+          <div className="dashboard-trades__simple-head">
+            <span>TRADES</span>
             <span>{trades.length} fills</span>
           </div>
           <TradesTable trades={trades} />
