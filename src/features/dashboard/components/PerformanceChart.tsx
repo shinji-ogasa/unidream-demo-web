@@ -14,7 +14,6 @@ import {
 } from "recharts";
 
 import { tickLabel } from "@/lib/aggregate";
-import { buildBuyAndHoldEquity } from "@/lib/metrics";
 import { INITIAL_EQUITY, SYMBOL, TIMEFRAME, type EquitySnapshot } from "@/lib/types";
 
 type Range = { startIndex: number; endIndex: number };
@@ -45,9 +44,9 @@ function formatPerformance(value: number): string {
 export function PerformanceChart({ snapshots, range, onRangeChange }: Props) {
   const data: Row[] = useMemo(() => {
     if (snapshots.length === 0) return [];
-    const bnhEquities = buildBuyAndHoldEquity(snapshots, INITIAL_EQUITY);
     const strategyStart = snapshots[0]?.equity ?? INITIAL_EQUITY;
-    const bnhStart = bnhEquities[0] ?? INITIAL_EQUITY;
+    // AlphaEx compares the strategy return with the raw B&H price return.
+    const bnhStart = snapshots[0]?.price ?? 0;
     const rows: Row[] = [];
     for (const s of snapshots) {
       const t = new Date(s.timestamp).getTime();
@@ -55,7 +54,7 @@ export function PerformanceChart({ snapshots, range, onRangeChange }: Props) {
         t,
         label: tickLabel(t),
         equity: returnPercent(s.equity, strategyStart),
-        bnh: returnPercent(bnhEquities[rows.length] ?? bnhStart, bnhStart),
+        bnh: returnPercent(s.price, bnhStart),
       });
     }
     return rows;

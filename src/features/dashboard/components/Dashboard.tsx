@@ -6,7 +6,7 @@ import Link from "next/link";
 
 import { ANNUALIZATION, sortedAscending } from "@/lib/aggregate";
 import { fmtPercent, fmtTime, fmtUSD, pnlPercent } from "@/lib/format";
-import { buildBuyAndHoldEquity, computeMetrics } from "@/lib/metrics";
+import { computeMetrics } from "@/lib/metrics";
 import {
   INITIAL_EQUITY,
   SYMBOL,
@@ -100,17 +100,28 @@ export function Dashboard({ initial }: DashboardProps) {
   const lastPrice = state?.last_price ?? prediction?.latest_close ?? null;
   const lastTimestamp = state?.last_timestamp ?? prediction?.latest_timestamp ?? null;
   const bnhEquity = useMemo(() => {
-    const values = buildBuyAndHoldEquity(sortedSnapshots, INITIAL_EQUITY);
-    return values.at(-1) ?? INITIAL_EQUITY;
+    // Keep the headline benchmark on the same price-return basis as AlphaEx
+    // and the comparison chart, so the sign is not changed by cost treatment.
+    const firstPrice = sortedSnapshots[0]?.price;
+    const lastPrice = sortedSnapshots.at(-1)?.price;
+    if (
+      typeof firstPrice !== "number" ||
+      typeof lastPrice !== "number" ||
+      !Number.isFinite(firstPrice) ||
+      !Number.isFinite(lastPrice) ||
+      firstPrice <= 0 ||
+      lastPrice <= 0
+    ) {
+      return INITIAL_EQUITY;
+    }
+    return INITIAL_EQUITY * lastPrice / firstPrice;
   }, [sortedSnapshots]);
   const pnl = pnlPercent(equity, INITIAL_EQUITY);
   const bnhPnl = pnlPercent(bnhEquity, INITIAL_EQUITY);
-  const equityDelta = equity - bnhEquity;
-  const equityDeltaPercent = equityDelta / INITIAL_EQUITY;
   const pnlTone: "good" | "bad" | "default" =
     pnl > 0.001 ? "good" : pnl < -0.001 ? "bad" : "default";
   const deltaTone: "good" | "bad" | "default" =
-    equityDelta > 0.005 ? "good" : equityDelta < -0.005 ? "bad" : "default";
+    metrics.alphaEx > 0.00001 ? "good" : metrics.alphaEx < -0.00001 ? "bad" : "default";
   const signalKey = (prediction?.signal ?? "").toLowerCase();
   const signalTone = SIGNAL_TONE[signalKey] ?? "default";
   const modelName = initial.contract.model;
@@ -171,11 +182,11 @@ export function Dashboard({ initial }: DashboardProps) {
             </div>
 
             <div className="dashboard-result-summary__delta">
-              <span>CURRENT VS B&amp;H</span>
+              <span>VS B&amp;H</span>
               <strong className={`dashboard-result-summary__delta--${deltaTone}`}>
-                {fmtPercent(equityDeltaPercent, 2, true)}
+                {fmtPercent(metrics.alphaEx, 2, true)}
               </strong>
-              <small>{fmtUSD(Math.abs(equityDelta))} · AI − B&amp;H</small>
+              <small>AI − B&amp;H · window return</small>
             </div>
           </section>
 
