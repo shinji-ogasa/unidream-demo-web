@@ -8,23 +8,20 @@ import {
   Line,
   ReferenceLine,
   ResponsiveContainer,
-  Scatter,
   Tooltip,
   XAxis,
   YAxis,
 } from "recharts";
 
 import { tickLabel } from "@/lib/aggregate";
-import { fmtUSD } from "@/lib/format";
 import { buildBuyAndHoldEquity } from "@/lib/metrics";
-import { INITIAL_EQUITY, SYMBOL, TIMEFRAME, type EquitySnapshot, type Trade } from "@/lib/types";
+import { INITIAL_EQUITY, SYMBOL, TIMEFRAME, type EquitySnapshot } from "@/lib/types";
 
 type Range = { startIndex: number; endIndex: number };
 
 type Props = {
   // snapshots is expected to be sorted ascending at 15m granularity.
   snapshots: EquitySnapshot[];
-  trades: Trade[];
   range: Range | null;
   onRangeChange: (range: Range) => void;
 };
@@ -34,46 +31,36 @@ type Row = {
   label: string;
   equity: number;
   bnh: number;
-  buyMarker: number | null;
-  sellMarker: number | null;
 };
 
-export function PerformanceChart({ snapshots, trades, range, onRangeChange }: Props) {
+function returnIndex(value: number, start: number): number {
+  if (!Number.isFinite(value) || !Number.isFinite(start) || start <= 0) return 100;
+  return (value / start) * 100;
+}
+
+function formatIndex(value: number): string {
+  const change = value - 100;
+  return `${change >= 0 ? "+" : ""}${change.toFixed(2)}%`;
+}
+
+export function PerformanceChart({ snapshots, range, onRangeChange }: Props) {
   const data: Row[] = useMemo(() => {
     if (snapshots.length === 0) return [];
     const bnhEquities = buildBuyAndHoldEquity(snapshots, INITIAL_EQUITY);
-    const sortedTrades = [...trades].sort(
-      (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime(),
-    );
-    let tIdx = 0;
-    let prevT = -Infinity;
+    const strategyStart = snapshots[0]?.equity ?? INITIAL_EQUITY;
+    const bnhStart = bnhEquities[0] ?? INITIAL_EQUITY;
     const rows: Row[] = [];
     for (const s of snapshots) {
       const t = new Date(s.timestamp).getTime();
-      let buyMarker: number | null = null;
-      let sellMarker: number | null = null;
-      while (tIdx < sortedTrades.length) {
-        const tr = sortedTrades[tIdx];
-        const trT = new Date(tr.timestamp).getTime();
-        if (trT > t) break;
-        if (trT > prevT) {
-          if (tr.to_position > tr.from_position) buyMarker = s.equity;
-          else if (tr.to_position < tr.from_position) sellMarker = s.equity;
-        }
-        tIdx += 1;
-      }
-      prevT = t;
       rows.push({
         t,
         label: tickLabel(t),
-        equity: s.equity,
-        bnh: bnhEquities[rows.length] ?? 0,
-        buyMarker,
-        sellMarker,
+        equity: returnIndex(s.equity, strategyStart),
+        bnh: returnIndex(bnhEquities[rows.length] ?? bnhStart, bnhStart),
       });
     }
     return rows;
-  }, [snapshots, trades]);
+  }, [snapshots]);
 
   const lastIdx = Math.max(0, data.length - 1);
   const safeStart = range
@@ -93,7 +80,7 @@ export function PerformanceChart({ snapshots, trades, range, onRangeChange }: Pr
           </div>
           <h2>AI <span className="dashboard-chart__vs">vs</span> B&amp;H</h2>
         </div>
-        <span className="dashboard-panel__meta">NET EQUITY</span>
+        <span className="dashboard-panel__meta">RETURN INDEX · START 100</span>
       </div>
       <div className="dashboard-chart__canvas">
         {data.length === 0 ? (
@@ -115,7 +102,7 @@ export function PerformanceChart({ snapshots, trades, range, onRangeChange }: Pr
                 tick={{ fill: "#a1a8b3", fontSize: 13 }}
                 stroke="#222831"
                 domain={["auto", "auto"]}
-                tickFormatter={(v: number) => `$${Math.round(v).toLocaleString()}`}
+                tickFormatter={(v: number) => Math.round(v).toString()}
                 width={72}
               />
               <Tooltip
@@ -128,22 +115,11 @@ export function PerformanceChart({ snapshots, trades, range, onRangeChange }: Pr
                 }}
                 labelStyle={{ color: "#8b95a5", fontSize: 12 }}
                 formatter={(v: number, name: string) => {
-                  if (name === "buyMarker") return [fmtUSD(v), "buy"];
-                  if (name === "sellMarker") return [fmtUSD(v), "sell"];
-                  if (name === "bnh") return [fmtUSD(v), "B&H (net entry)"];
-                  return [fmtUSD(v), "strategy"];
+                  if (name === "bnh") return [formatIndex(v), "B&H"];
+                  return [formatIndex(v), "AI"];
                 }}
               />
-              <ReferenceLine y={INITIAL_EQUITY} stroke="#3a4150" strokeDasharray="4 4" />
-              <Line
-                type="monotone"
-                dataKey="bnh"
-                stroke="rgba(255,255,255,0.25)"
-                strokeWidth={1.5}
-                dot={false}
-                isAnimationActive={false}
-                name="bnh"
-              />
+              <ReferenceLine y={100} stroke="#3a4150" strokeDasharray="4 4" />
               <Line
                 type="monotone"
                 dataKey="equity"
@@ -153,19 +129,15 @@ export function PerformanceChart({ snapshots, trades, range, onRangeChange }: Pr
                 isAnimationActive={false}
                 name="equity"
               />
-              <Scatter
-                dataKey="buyMarker"
-                fill="#5266eb"
-                shape={UpTriangle}
+              <Line
+                type="monotone"
+                dataKey="bnh"
+                stroke="rgba(226,232,240,0.86)"
+                strokeWidth={1.8}
+                strokeDasharray="6 4"
+                dot={false}
                 isAnimationActive={false}
-                legendType="none"
-              />
-              <Scatter
-                dataKey="sellMarker"
-                fill="#ff6467"
-                shape={DownTriangle}
-                isAnimationActive={false}
-                legendType="none"
+                name="bnh"
               />
               <Brush
                 dataKey="label"
@@ -189,10 +161,8 @@ export function PerformanceChart({ snapshots, trades, range, onRangeChange }: Pr
         )}
       </div>
       <div className="dashboard-chart__legend">
-        <LegendSwatch color="#02b8cc" label="strategy" />
-        <LegendSwatch color="rgba(255,255,255,0.25)" label="B&H (net entry cost)" />
-        <LegendTriangle color="#5266eb" label="buy" up />
-        <LegendTriangle color="#ff6467" label="sell" />
+        <LegendSwatch color="#02b8cc" label="AI" />
+        <LegendSwatch color="rgba(226,232,240,0.66)" label="B&H" />
       </div>
     </section>
   );
@@ -204,54 +174,5 @@ function LegendSwatch({ color, label }: { color: string; label: string }) {
       <span className="inline-block w-5 h-[3px] rounded" style={{ background: color }} />
       <span>{label}</span>
     </span>
-  );
-}
-
-function LegendTriangle({ color, label, up }: { color: string; label: string; up?: boolean }) {
-  return (
-    <span className="flex items-center gap-2">
-      <svg width={12} height={12} viewBox="0 0 12 12" aria-hidden="true">
-        {up ? (
-          <polygon points="6,1 1,11 11,11" fill={color} />
-        ) : (
-          <polygon points="6,11 1,1 11,1" fill={color} />
-        )}
-      </svg>
-      <span>{label}</span>
-    </span>
-  );
-}
-
-type ShapeProps = {
-  cx?: number;
-  cy?: number;
-  fill?: string;
-};
-
-function UpTriangle(props: ShapeProps) {
-  const { cx, cy, fill } = props;
-  if (cx == null || cy == null) return <g />;
-  const size = 6;
-  return (
-    <polygon
-      points={`${cx},${cy - size} ${cx - size},${cy + size} ${cx + size},${cy + size}`}
-      fill={fill}
-      stroke="#0b0d10"
-      strokeWidth={0.8}
-    />
-  );
-}
-
-function DownTriangle(props: ShapeProps) {
-  const { cx, cy, fill } = props;
-  if (cx == null || cy == null) return <g />;
-  const size = 6;
-  return (
-    <polygon
-      points={`${cx},${cy + size} ${cx - size},${cy - size} ${cx + size},${cy - size}`}
-      fill={fill}
-      stroke="#0b0d10"
-      strokeWidth={0.8}
-    />
   );
 }

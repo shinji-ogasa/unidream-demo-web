@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { ANNUALIZATION, sortedAscending } from "@/lib/aggregate";
-import { fmtPercent, fmtTime, fmtUSD, pnlPercent } from "@/lib/format";
+import { fmtTime, fmtUSD, pnlPercent } from "@/lib/format";
 import { buildBuyAndHoldEquity, computeMetrics } from "@/lib/metrics";
 import {
   INITIAL_EQUITY,
@@ -15,13 +15,9 @@ import {
 import { useLiveDashboard, type DashboardInitialData } from "@/features/dashboard/hooks/useLiveDashboard";
 
 import { Countdown } from "./Countdown";
-import { LongShortBar } from "./LongShortBar";
 import { MetricsRow } from "./MetricsRow";
 import { PerformanceChart } from "./PerformanceChart";
-import { PositionGauge } from "./PositionGauge";
 import { TradesTable } from "./TradesTable";
-
-const POSITION_HISTORY_BARS = 96;
 
 const SIGNAL_TONE: Record<string, "good" | "bad" | "warn" | "default"> = {
   overweight: "good",
@@ -34,23 +30,6 @@ type Range = { startIndex: number; endIndex: number };
 type DashboardProps = {
   initial: DashboardInitialData;
 };
-
-type ResultMetricProps = {
-  label: string;
-  value: string;
-  detail: string;
-  tone?: "default" | "good" | "bad" | "warn";
-};
-
-function ResultMetric({ label, value, detail, tone = "default" }: ResultMetricProps) {
-  return (
-    <div className={`dashboard-result-metric dashboard-result-metric--${tone}`}>
-      <span>{label}</span>
-      <strong>{value}</strong>
-      <small>{detail}</small>
-    </div>
-  );
-}
 
 function fullRange(length: number): Range | null {
   if (length === 0) return null;
@@ -116,14 +95,7 @@ export function Dashboard({ initial }: DashboardProps) {
     return computeMetrics(slice, trades, ANNUALIZATION);
   }, [sortedSnapshots, trades, range]);
 
-  const positionHistory = useMemo(
-    () => sortedSnapshots.slice(-POSITION_HISTORY_BARS).map((s) => s.position),
-    [sortedSnapshots],
-  );
-
   const equity = state?.equity ?? INITIAL_EQUITY;
-  const cash = state?.cash ?? INITIAL_EQUITY;
-  const assetQty = state?.asset_qty ?? 0;
   const currentPosition = state?.current_position ?? 0;
   const lastPrice = state?.last_price ?? prediction?.latest_close ?? null;
   const lastTimestamp = state?.last_timestamp ?? prediction?.latest_timestamp ?? null;
@@ -133,8 +105,11 @@ export function Dashboard({ initial }: DashboardProps) {
   }, [sortedSnapshots]);
   const pnl = pnlPercent(equity, INITIAL_EQUITY);
   const bnhPnl = pnlPercent(bnhEquity, INITIAL_EQUITY);
+  const equityDelta = equity - bnhEquity;
   const pnlTone: "good" | "bad" | "default" =
     pnl > 0.001 ? "good" : pnl < -0.001 ? "bad" : "default";
+  const deltaTone: "good" | "bad" | "default" =
+    equityDelta > 0.005 ? "good" : equityDelta < -0.005 ? "bad" : "default";
   const signalKey = (prediction?.signal ?? "").toLowerCase();
   const signalTone = SIGNAL_TONE[signalKey] ?? "default";
   const modelName = initial.contract.model;
@@ -179,59 +154,48 @@ export function Dashboard({ initial }: DashboardProps) {
             </div>
           </div>
 
-          <div className="dashboard-result-stage__summary">
-            <div className="dashboard-result-panel__hero">
+          <section className="dashboard-result-summary" aria-label="Current equity result">
+            <div className="dashboard-result-summary__hero">
               <span>AI EQUITY</span>
               <strong>{fmtUSD(equity)}</strong>
-              <em className={`dashboard-result-panel__pnl dashboard-result-panel__pnl--${pnlTone}`}>
+              <em className={`dashboard-result-summary__change dashboard-result-summary__change--${pnlTone}`}>
                 {pnl >= 0 ? "+" : ""}{pnl.toFixed(2)}%
               </em>
             </div>
 
-            <div className="dashboard-result-panel__compare">
-              <ResultMetric label="AI" value={fmtUSD(equity)} detail={fmtPercent(metrics.stratReturn, 2, true)} tone={pnlTone} />
-              <ResultMetric label="B&amp;H" value={fmtUSD(bnhEquity)} detail={fmtPercent(bnhPnl / 100, 2, true)} />
-              <ResultMetric label="ALPHAEX" value={fmtPercent(metrics.alphaEx, 2, true)} detail={`${metrics.bars.toLocaleString()} bars`} tone={metrics.alphaEx >= 0 ? "good" : "bad"} />
+            <div className="dashboard-result-summary__benchmark">
+              <span>B&amp;H</span>
+              <strong>{fmtUSD(bnhEquity)}</strong>
+              <small>{bnhPnl >= 0 ? "+" : ""}{bnhPnl.toFixed(2)}%</small>
             </div>
 
-            <div className="dashboard-result-panel__signal">
-              <span>SIGNAL</span>
-              <strong className={`dashboard-result-panel__signal--${signalTone}`}>{prediction?.signal ?? "—"}</strong>
-              <small>target {currentPosition.toFixed(3)} · {fmtUSD(lastPrice)}</small>
+            <div className="dashboard-result-summary__delta">
+              <span>VS B&amp;H</span>
+              <strong className={`dashboard-result-summary__delta--${deltaTone}`}>
+                {equityDelta >= 0 ? "+" : ""}{fmtUSD(equityDelta)}
+              </strong>
+              <small>current equity</small>
             </div>
-          </div>
+          </section>
 
-          <div className="dashboard-result-stage__grid">
-            <PerformanceChart
-              snapshots={sortedSnapshots}
-              trades={trades}
-              range={range}
-              onRangeChange={handleRangeChange}
-            />
-            <aside className="dashboard-result-panel dashboard-result-panel--side">
+          <PerformanceChart
+            snapshots={sortedSnapshots}
+            range={range}
+            onRangeChange={handleRangeChange}
+          />
 
-              <PositionGauge
-                position={currentPosition}
-                equity={equity}
-                cash={cash}
-                assetQty={assetQty}
-                positionHistory={positionHistory}
-              />
-              <LongShortBar
-                longPct={metrics.longPct}
-                shortPct={metrics.shortPct}
-                flatPct={metrics.flatPct}
-              />
-            </aside>
-          </div>
-
-          <div className="dashboard-result-stage__metrics">
-            <div className="dashboard-result-stage__metrics-head">
-              <span>WINDOW</span>
+          <section className="dashboard-result-window" aria-label="Window results">
+            <div className="dashboard-result-window__head">
+              <span>WINDOW RESULTS</span>
               <small>{metrics.bars.toLocaleString()} BARS · {metrics.trades} TRADES</small>
             </div>
             <MetricsRow metrics={metrics} />
-          </div>
+            <div className="dashboard-result-window__state">
+              <span>POSITION <strong>{currentPosition.toFixed(3)}</strong></span>
+              <span>SIGNAL <strong className={`dashboard-result-window__signal--${signalTone}`}>{prediction?.signal ?? "—"}</strong></span>
+              <span>LAST PRICE <strong>{fmtUSD(lastPrice)}</strong></span>
+            </div>
+          </section>
         </section>
 
         <section className="dashboard-section dashboard-trades dashboard-trades--minimal" aria-label="Trades">
