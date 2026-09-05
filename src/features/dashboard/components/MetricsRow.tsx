@@ -40,27 +40,27 @@ export function MetricsRow({ metrics }: Props) {
   return (
     <div className="dashboard-metrics-grid">
       <Cell
-        label="Alpha (excess)"
+        label="ALPHAEX"
         value={fmtPercent(metrics.alphaEx, 2, true)}
-        hint={`window · strat ${fmtPercent(metrics.stratReturn, 2, true)} · B&H ${fmtPercent(metrics.bnhReturn, 2, true)}`}
+        hint={`AI ${fmtPercent(metrics.stratReturn, 2, true)} · B&H ${fmtPercent(metrics.bnhReturn, 2, true)}`}
         tone={tone(metrics.alphaEx, true)}
       />
       <Cell
-        label="Sharpe Δ"
-        value={fmtSigned(metrics.sharpeDelta, 2)}
-        hint={`annualized log-return · strat ${metrics.sharpeStrat.toFixed(2)} · B&H ${metrics.sharpeBnh.toFixed(2)}`}
-        tone={tone(metrics.sharpeDelta, true)}
-      />
-      <Cell
-        label="MaxDD Δ (abs)"
+        label="MAXDD Δ"
         value={fmtPercent(metrics.maxDDDelta, 2, true)}
-        hint={`negative is better · strat ${fmtPercent(metrics.maxDDStrat)} · B&H ${fmtPercent(metrics.maxDDBnh)}`}
+        hint={`lower is better · AI ${fmtPercent(metrics.maxDDStrat)} · B&H ${fmtPercent(metrics.maxDDBnh)}`}
         tone={tone(metrics.maxDDDelta, false)}
       />
       <Cell
-        label="Position turnover"
+        label="SHARPE Δ"
+        value={fmtSigned(metrics.sharpeDelta, 2)}
+        hint={`AI ${metrics.sharpeStrat.toFixed(2)} · B&H ${metrics.sharpeBnh.toFixed(2)}`}
+        tone={tone(metrics.sharpeDelta, true)}
+      />
+      <Cell
+        label="TURNOVER"
         value={metrics.turnover.toFixed(2)}
-        hint={`sum |Δposition| · ${metrics.trades} trades · ${metrics.bars} bars`}
+        hint={`${metrics.trades} trades · ${metrics.bars} bars`}
       />
     </div>
   );

@@ -6,7 +6,7 @@ import Link from "next/link";
 
 import { ANNUALIZATION, sortedAscending } from "@/lib/aggregate";
 import { fmtPercent, fmtTime, fmtUSD, pnlPercent } from "@/lib/format";
-import { computeMetrics } from "@/lib/metrics";
+import { buildBuyAndHoldEquity, computeMetrics } from "@/lib/metrics";
 import {
   INITIAL_EQUITY,
   SYMBOL,
@@ -19,7 +19,6 @@ import { LongShortBar } from "./LongShortBar";
 import { MetricsRow } from "./MetricsRow";
 import { PerformanceChart } from "./PerformanceChart";
 import { PositionGauge } from "./PositionGauge";
-import { StatCard } from "./StatCard";
 import { TradesTable } from "./TradesTable";
 
 const POSITION_HISTORY_BARS = 96;
@@ -36,13 +35,30 @@ type DashboardProps = {
   initial: DashboardInitialData;
 };
 
+type ResultMetricProps = {
+  label: string;
+  value: string;
+  detail: string;
+  tone?: "default" | "good" | "bad" | "warn";
+};
+
+function ResultMetric({ label, value, detail, tone = "default" }: ResultMetricProps) {
+  return (
+    <div className={`dashboard-result-metric dashboard-result-metric--${tone}`}>
+      <span>{label}</span>
+      <strong>{value}</strong>
+      <small>{detail}</small>
+    </div>
+  );
+}
+
 function fullRange(length: number): Range | null {
   if (length === 0) return null;
   return { startIndex: 0, endIndex: length - 1 };
 }
 
 export function Dashboard({ initial }: DashboardProps) {
-  const { prediction, state, snapshots, trades, contract } = useLiveDashboard(initial);
+  const { prediction, state, snapshots, trades } = useLiveDashboard(initial);
   const sortedSnapshots = useMemo(() => sortedAscending(snapshots), [snapshots]);
   const [range, setRange] = useState<Range | null>(() =>
     fullRange(sortedAscending(initial.snapshots).length),
@@ -111,18 +127,20 @@ export function Dashboard({ initial }: DashboardProps) {
   const currentPosition = state?.current_position ?? 0;
   const lastPrice = state?.last_price ?? prediction?.latest_close ?? null;
   const lastTimestamp = state?.last_timestamp ?? prediction?.latest_timestamp ?? null;
+  const bnhEquity = useMemo(() => {
+    const values = buildBuyAndHoldEquity(sortedSnapshots, INITIAL_EQUITY);
+    return values.at(-1) ?? INITIAL_EQUITY;
+  }, [sortedSnapshots]);
   const pnl = pnlPercent(equity, INITIAL_EQUITY);
+  const bnhPnl = pnlPercent(bnhEquity, INITIAL_EQUITY);
   const pnlTone: "good" | "bad" | "default" =
     pnl > 0.001 ? "good" : pnl < -0.001 ? "bad" : "default";
   const signalKey = (prediction?.signal ?? "").toLowerCase();
   const signalTone = SIGNAL_TONE[signalKey] ?? "default";
-  // Some public rows contain a long JSON artifact in model_version. The
-  // source contract is the stable display label and keeps layout bounded.
-  const modelName = contract.model;
-  const costs = contract.tradingCosts;
+  const modelName = initial.contract.model;
 
   return (
-    <main className="dashboard-shell">
+    <main className="dashboard-shell dashboard-shell--result-only">
       <div className="dashboard-shell__ambient" aria-hidden="true" />
 
       <div className="dashboard-container">
@@ -141,154 +159,96 @@ export function Dashboard({ initial }: DashboardProps) {
             </Link>
             <span className="dashboard-header__divider" aria-hidden="true" />
             <div className="dashboard-header__context">
-              <span>UNIDREAM / B&amp;H RELATIVE</span>
-              <strong>{SYMBOL} · {TIMEFRAME}</strong>
+              <span>{SYMBOL} / {TIMEFRAME}</span>
             </div>
           </div>
 
           <div className="dashboard-header__status">
+            <span className="dashboard-live"><i aria-hidden="true" /> PAPER / LIVE</span>
             <span className="dashboard-model"><small>MODEL</small>{modelName}</span>
             <Countdown />
           </div>
         </header>
 
-        <div className="dashboard-alert">
-          <span className="dashboard-alert__dot" aria-hidden="true" />
-          <p>This is a research demo, not financial advice. Virtual paper-trading only.</p>
-          <Link href="/homepage">Company overview <span aria-hidden="true">↗</span></Link>
-        </div>
-
-        <section className="dashboard-intro" aria-labelledby="dashboard-title">
-          <div className="dashboard-intro__copy">
-            <p className="dashboard-kicker">LIVE RESULT / SAME BASELINE</p>
-            <h1 id="dashboard-title">B&amp;H = 1.0。<br /><em>AIの差分を見る。</em></h1>
-            <p className="dashboard-intro__lead">
-              チャートのAI equityとBuy &amp; Holdを同じ時間軸で重ね、positionと直近の観測時刻まで一度に確認します。
-              ここで表示するのは仮想ペーパートレードの観測値です。
-            </p>
-          </div>
-
-          <div className="dashboard-intro__readout" role="group" aria-label="Current B&H overlay readout">
-            <div>
-              <span>BASELINE / B&amp;H</span>
-              <strong>1.0000</strong>
-              <small>reference position</small>
+        <section className="dashboard-result-stage" aria-label="UniDream demo result">
+          <div className="dashboard-result-stage__topline">
+            <div className="dashboard-result-stage__identity">
+              <strong>{SYMBOL}</strong>
+              <span>{TIMEFRAME}</span>
+              <time dateTime={lastTimestamp ?? undefined}>{fmtTime(lastTimestamp)}</time>
             </div>
-            <div>
-              <span>CURRENT TARGET</span>
-              <strong>{currentPosition.toFixed(3)}</strong>
-              <small>live strategy position</small>
-            </div>
-            <div>
-              <span>LAST CLOSED BAR</span>
-              <strong>{fmtTime(lastTimestamp)}</strong>
-              <small>{SYMBOL} · {TIMEFRAME}</small>
+            <div className="dashboard-result-stage__equity" aria-label="Current equity comparison">
+              <span>AI {fmtUSD(equity)}</span>
+              <span>B&amp;H {fmtUSD(bnhEquity)}</span>
             </div>
           </div>
-        </section>
 
-        <section className="dashboard-primary-grid" aria-label="Performance and current position">
-          <div className="dashboard-primary-grid__chart">
+          <div className="dashboard-result-stage__grid">
             <PerformanceChart
               snapshots={sortedSnapshots}
               trades={trades}
               range={range}
               onRangeChange={handleRangeChange}
             />
+            <aside className="dashboard-result-panel">
+              <div className="dashboard-result-panel__hero">
+                <span>AI EQUITY</span>
+                <strong>{fmtUSD(equity)}</strong>
+                <em className={`dashboard-result-panel__pnl dashboard-result-panel__pnl--${pnlTone}`}>
+                  {pnl >= 0 ? "+" : ""}{pnl.toFixed(2)}%
+                </em>
+              </div>
+
+              <div className="dashboard-result-panel__compare">
+                <ResultMetric label="AI" value={fmtUSD(equity)} detail={fmtPercent(metrics.stratReturn, 2, true)} tone={pnlTone} />
+                <ResultMetric label="B&amp;H" value={fmtUSD(bnhEquity)} detail={fmtPercent(bnhPnl / 100, 2, true)} />
+                <ResultMetric label="ALPHAEX" value={fmtPercent(metrics.alphaEx, 2, true)} detail={`${metrics.bars.toLocaleString()} bars`} tone={metrics.alphaEx >= 0 ? "good" : "bad"} />
+              </div>
+
+              <div className="dashboard-result-panel__signal">
+                <span>SIGNAL</span>
+                <strong className={`dashboard-result-panel__signal--${signalTone}`}>{prediction?.signal ?? "—"}</strong>
+                <small>target {currentPosition.toFixed(3)} · {fmtUSD(lastPrice)}</small>
+              </div>
+
+              <PositionGauge
+                position={currentPosition}
+                equity={equity}
+                cash={cash}
+                assetQty={assetQty}
+                positionHistory={positionHistory}
+              />
+              <LongShortBar
+                longPct={metrics.longPct}
+                shortPct={metrics.shortPct}
+                flatPct={metrics.flatPct}
+              />
+            </aside>
           </div>
-          <aside className="dashboard-primary-grid__aside">
-            <PositionGauge
-              position={currentPosition}
-              equity={equity}
-              cash={cash}
-              assetQty={assetQty}
-              positionHistory={positionHistory}
-            />
-            <LongShortBar
-              longPct={metrics.longPct}
-              shortPct={metrics.shortPct}
-              flatPct={metrics.flatPct}
-            />
-          </aside>
+
+          <div className="dashboard-result-stage__metrics">
+            <div className="dashboard-result-stage__metrics-head">
+              <span>WINDOW</span>
+              <small>{metrics.bars.toLocaleString()} BARS · {metrics.trades} TRADES</small>
+            </div>
+            <MetricsRow metrics={metrics} />
+          </div>
         </section>
 
-        <section className="dashboard-kpi-grid" aria-label="Live account snapshot">
-          <StatCard
-            label="Equity"
-            value={fmtUSD(equity)}
-            hint={`PnL ${pnl >= 0 ? "+" : ""}${pnl.toFixed(2)}% from start`}
-            tone={pnlTone}
-          />
-          <StatCard
-            label="Cash"
-            value={fmtUSD(cash)}
-            hint={`asset_qty ${assetQty.toFixed(6)}`}
-          />
-          <StatCard label="Last price" value={fmtUSD(lastPrice)} hint={fmtTime(lastTimestamp)} />
-          <StatCard
-            label="Latest signal"
-            value={prediction?.signal ?? "—"}
-            hint={`raw position ${prediction?.position?.toFixed(3) ?? "—"}`}
-            tone={signalTone}
-          />
-        </section>
-
-        <section className="dashboard-section" aria-labelledby="metrics-title">
+        <section className="dashboard-section dashboard-trades dashboard-trades--minimal" aria-labelledby="trades-title">
           <div className="dashboard-section__heading">
             <div>
-              <p className="dashboard-kicker">WINDOW METRICS</p>
-              <h2 id="metrics-title">B&amp;Hとの差分を、同じ窓で読む。</h2>
+              <p className="dashboard-kicker">TRADES</p>
+              <h2 id="trades-title">Execution</h2>
             </div>
-            <span>selected chart window · {metrics.bars.toLocaleString()} bars</span>
-          </div>
-          <MetricsRow metrics={metrics} />
-        </section>
-
-        <section className="dashboard-section dashboard-trades" aria-labelledby="trades-title">
-          <div className="dashboard-section__heading">
-            <div>
-              <p className="dashboard-kicker">EXECUTION TRACE</p>
-              <h2 id="trades-title">Recent trades</h2>
-            </div>
-            <span>paper fills · latest first</span>
+            <span>{trades.length} fills</span>
           </div>
           <TradesTable trades={trades} />
         </section>
 
-        <section className="dashboard-contract" aria-labelledby="contract-title">
-          <div className="dashboard-section__heading">
-            <div>
-              <p className="dashboard-kicker">PROVENANCE / DISPLAY CONTRACT</p>
-              <h2 id="contract-title">推論を、表示契約まで戻れる形にする。</h2>
-            </div>
-            <span className="dashboard-contract__badge">SOURCE-CONFIGURED</span>
-          </div>
-
-          <dl className="dashboard-contract__grid">
-            <div><dt>MODEL</dt><dd>{contract.model}</dd></div>
-            <div><dt>SCHEMA</dt><dd>{contract.featureSchema}</dd></div>
-            <div><dt>PARITY</dt><dd>{contract.featureParity}</dd></div>
-            <div><dt>DERIVATIVES</dt><dd>{contract.derivativeInputs}</dd></div>
-            <div><dt>CUTOFF</dt><dd>{contract.observationCutoff}</dd></div>
-            <div><dt>WRITE PATH</dt><dd>{contract.atomicCommit}</dd></div>
-            <div>
-              <dt>COSTS</dt>
-              <dd>fee {(costs.fee_rate * 10_000).toFixed(1)}bps · spread {costs.spread_bps.toFixed(1)}bps · slippage {costs.slippage_bps.toFixed(1)}bps</dd>
-            </div>
-          </dl>
-          <p className="dashboard-contract__note">
-            These fields describe the deployed source contract. The current public rows do not persist per-row provenance or a live health verdict.
-          </p>
-        </section>
-
-        <footer className="dashboard-footer">
-          <div className="dashboard-footer__links">
-            <a href="https://github.com/shinji-ogasa/UniDream" target="_blank" rel="noopener noreferrer">Research repo ↗</a>
-            <a href="https://huggingface.co/spaces/ShinjiAA/unidream-space" target="_blank" rel="noopener noreferrer">Inference Space ↗</a>
-            <Link href="/homepage">Company overview ↗</Link>
-          </div>
-          <p>Data: Binance public API · Inference: UniDream HF Space · Storage &amp; realtime: Supabase</p>
-          <p>Last closed bar {fmtTime(lastTimestamp)} · recorded {fmtTime(prediction?.created_at)} · Alpha (window excess) {fmtPercent(metrics.alphaEx, 2, true)}</p>
+        <footer className="dashboard-footer dashboard-footer--minimal">
+          <span>PAPER · {SYMBOL} · {TIMEFRAME}</span>
+          <span>{fmtTime(lastTimestamp)} · {modelName}</span>
         </footer>
       </div>
     </main>

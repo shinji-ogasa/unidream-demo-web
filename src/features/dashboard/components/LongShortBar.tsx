@@ -13,7 +13,7 @@ export function LongShortBar({ longPct, shortPct, flatPct }: Props) {
     <div className="dashboard-exposure">
       <div className="dashboard-panel__label">
         <span className="dashboard-panel__dot dashboard-panel__dot--warning" />
-        <span>Long / Short / Flat</span>
+        <span>EXPOSURE</span>
       </div>
       <div className="dashboard-exposure__bar">
         {longW > 0 && (
@@ -40,15 +40,15 @@ export function LongShortBar({ longPct, shortPct, flatPct }: Props) {
       </div>
       <div className="dashboard-exposure__legend">
         <div className="dashboard-exposure__legend-item dashboard-exposure__legend-item--long">
-          <span>long</span>
+          <span>LONG</span>
           <strong>{longW.toFixed(1)}%</strong>
         </div>
         <div className="dashboard-exposure__legend-item dashboard-exposure__legend-item--flat">
-          <span>flat</span>
+          <span>FLAT</span>
           <strong>{flatW.toFixed(1)}%</strong>
         </div>
         <div className="dashboard-exposure__legend-item dashboard-exposure__legend-item--short">
-          <span>short</span>
+          <span>SHORT</span>
           <strong>{shortW.toFixed(1)}%</strong>
         </div>
       </div>

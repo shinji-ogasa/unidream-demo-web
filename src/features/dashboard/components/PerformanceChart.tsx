@@ -17,7 +17,7 @@ import {
 import { tickLabel } from "@/lib/aggregate";
 import { fmtUSD } from "@/lib/format";
 import { buildBuyAndHoldEquity } from "@/lib/metrics";
-import { INITIAL_EQUITY, type EquitySnapshot, type Trade } from "@/lib/types";
+import { INITIAL_EQUITY, SYMBOL, TIMEFRAME, type EquitySnapshot, type Trade } from "@/lib/types";
 
 type Range = { startIndex: number; endIndex: number };
 
@@ -89,11 +89,11 @@ export function PerformanceChart({ snapshots, trades, range, onRangeChange }: Pr
         <div>
           <div className="dashboard-panel__label">
             <span className="dashboard-panel__dot dashboard-panel__dot--cyan" />
-            <span>Performance vs Buy &amp; Hold</span>
+            <span>{SYMBOL} / {TIMEFRAME}</span>
           </div>
-          <h2>Net equity, same window</h2>
+          <h2>AI <span className="dashboard-chart__vs">vs</span> B&amp;H</h2>
         </div>
-        <span className="dashboard-panel__meta">15m bars · entry cost included</span>
+        <span className="dashboard-panel__meta">NET EQUITY</span>
       </div>
       <div className="dashboard-chart__canvas">
         {data.length === 0 ? (
