@@ -12,6 +12,30 @@ type Props = {
   trades: Trade[];
 };
 
+type Direction = "up" | "down" | "flat";
+
+function getDirection(from: number, to: number): Direction {
+  if (to > from) return "up";
+  if (to < from) return "down";
+  return "flat";
+}
+
+function getDirectionLabel(direction: Direction): string {
+  if (direction === "up") return "INCREASE";
+  if (direction === "down") return "DECREASE";
+  return "UNCHANGED";
+}
+
+function getDirectionGlyph(direction: Direction): string {
+  if (direction === "up") return "↑";
+  if (direction === "down") return "↓";
+  return "→";
+}
+
+function roundedPosition(value: number): number {
+  return Math.round(value * 10000) / 10000;
+}
+
 export function TradesTable({ trades }: Props) {
   const [page, setPage] = useState(0);
   const totalPages = Math.max(1, Math.ceil(trades.length / PAGE_SIZE));
@@ -30,52 +54,53 @@ export function TradesTable({ trades }: Props) {
   return (
     <div className="dashboard-trades-table">
       <div className="dashboard-trades-table__scroll">
-        <table>
+        <table aria-label="Trade executions">
           <thead>
             <tr>
-              <th>time</th>
-              <th>from</th>
-              <th>to</th>
-              <th>price</th>
-              <th>notional</th>
-              <th title="Fee + half-spread + slippage in quote currency">
+              <th scope="col">time</th>
+              <th scope="col">position change</th>
+              <th scope="col">price</th>
+              <th scope="col">notional</th>
+              <th scope="col" title="Fee + half-spread + slippage in quote currency">
                 cost (USDT)
               </th>
             </tr>
           </thead>
           <tbody>
             {visible.map((t) => {
-              const from = Math.round(t.from_position * 10000) / 10000;
-              const to = Math.round(t.to_position * 10000) / 10000;
-              const direction = to - from;
+              const from = roundedPosition(t.from_position);
+              const to = roundedPosition(t.to_position);
+              const direction = getDirection(from, to);
+              const directionLabel = getDirectionLabel(direction);
+
               return (
-                <tr
-                  className={`trade-row ${direction > 0 ? "trade-row--up" : direction < 0 ? "trade-row--down" : "trade-row--flat"}`}
-                  key={t.id}
-                >
+                <tr className={`trade-row trade-row--${direction}`} key={t.id}>
                   <td className="trade-time">
-                    {fmtTime(t.timestamp)}
-                  </td>
-                  <td className="trade-from">
-                    {fmtPosition(t.from_position)}
-                  </td>
-                  <td className={`trade-to ${direction > 0 ? "trade-to--up" : direction < 0 ? "trade-to--down" : ""}`}>
-                    <span
-                      className="trade-direction"
-                      aria-label={direction > 0 ? "increase" : direction < 0 ? "decrease" : "unchanged"}
-                    >
-                      {direction > 0 ? "↑" : direction < 0 ? "↓" : "→"}
-                    </span>
-                    {fmtPosition(t.to_position)}
-                  </td>
-                  <td className="trade-number">
-                    {fmtUSD(t.price)}
-                  </td>
-                  <td className="trade-number">
-                    {fmtNumber(t.trade_notional)}
+                    <time dateTime={t.timestamp}>{fmtTime(t.timestamp)}</time>
                   </td>
                   <td
-                    className="trade-number"
+                    className={`trade-transition trade-transition--${direction}`}
+                    aria-label={`${directionLabel}: ${fmtPosition(from)} to ${fmtPosition(to)}`}
+                  >
+                    <span
+                      className={`trade-direction trade-direction--${direction}`}
+                      aria-hidden="true"
+                    >
+                      {getDirectionGlyph(direction)}
+                    </span>
+                    <span className="trade-transition__content">
+                      <span className="trade-transition__values">
+                        <span>{fmtPosition(from)}</span>
+                        <span className="trade-transition__arrow" aria-hidden="true">→</span>
+                        <strong>{fmtPosition(to)}</strong>
+                      </span>
+                      <span className="trade-transition__label">{directionLabel}</span>
+                    </span>
+                  </td>
+                  <td className="trade-number">{fmtUSD(t.price)}</td>
+                  <td className="trade-number">{fmtNumber(t.trade_notional)}</td>
+                  <td
+                    className={`trade-number ${t.fee === 0 ? "trade-number--zero" : ""}`}
                     title="Legacy fee column; all-in quote transaction cost"
                   >
                     {fmtUSD(t.fee)}
@@ -85,49 +110,77 @@ export function TradesTable({ trades }: Props) {
             })}
           </tbody>
         </table>
-        <div className="dashboard-trades-table__mobile" role="group" aria-label="Recent trades mobile view">
+
+        <div className="dashboard-trades-table__mobile" role="list" aria-label="Recent trade executions">
           {visible.map((t) => {
-            const from = Math.round(t.from_position * 10000) / 10000;
-            const to = Math.round(t.to_position * 10000) / 10000;
-            const direction = to - from;
-            const directionLabel = direction > 0 ? "INCREASE" : direction < 0 ? "DECREASE" : "UNCHANGED";
+            const from = roundedPosition(t.from_position);
+            const to = roundedPosition(t.to_position);
+            const direction = getDirection(from, to);
+            const directionLabel = getDirectionLabel(direction);
+
             return (
               <article
-                className={`dashboard-trade-card ${direction > 0 ? "dashboard-trade-card--up" : direction < 0 ? "dashboard-trade-card--down" : "dashboard-trade-card--flat"}`}
+                className={`dashboard-trade-card dashboard-trade-card--${direction}`}
                 key={t.id}
+                aria-label={`${directionLabel} trade at ${fmtTime(t.timestamp)}`}
+                role="listitem"
               >
                 <div className="dashboard-trade-card__head">
-                  <time>{fmtTime(t.timestamp)}</time>
-                  <span className={direction > 0 ? "trade-to--up" : direction < 0 ? "trade-to--down" : ""}>
+                  <time dateTime={t.timestamp}>{fmtTime(t.timestamp)}</time>
+                  <span className={`trade-card-status trade-card-status--${direction}`}>
+                    <span className="trade-card-status__glyph" aria-hidden="true">
+                      {getDirectionGlyph(direction)}
+                    </span>
                     {directionLabel}
                   </span>
                 </div>
-                <dl>
-                  <div><dt>FROM</dt><dd>{fmtPosition(from)}</dd></div>
-                  <div><dt>TO</dt><dd className={direction > 0 ? "trade-to--up" : direction < 0 ? "trade-to--down" : ""}>{fmtPosition(to)}</dd></div>
-                  <div><dt>PRICE</dt><dd>{fmtUSD(t.price)}</dd></div>
-                  <div><dt>NOTIONAL</dt><dd>{fmtNumber(t.trade_notional)}</dd></div>
-                  <div><dt>COST</dt><dd>{fmtUSD(t.fee)}</dd></div>
+
+                <div className="dashboard-trade-card__position">
+                  <span className="dashboard-trade-card__eyebrow">POSITION CHANGE</span>
+                  <span className="dashboard-trade-card__values">
+                    <span>{fmtPosition(from)}</span>
+                    <span className="dashboard-trade-card__arrow" aria-hidden="true">→</span>
+                    <strong>{fmtPosition(to)}</strong>
+                  </span>
+                </div>
+
+                <dl className="dashboard-trade-card__metrics">
+                  <div>
+                    <dt>PRICE</dt>
+                    <dd>{fmtUSD(t.price)}</dd>
+                  </div>
+                  <div>
+                    <dt>NOTIONAL</dt>
+                    <dd>{fmtNumber(t.trade_notional)}</dd>
+                  </div>
+                  <div>
+                    <dt>COST</dt>
+                    <dd className={t.fee === 0 ? "dashboard-trade-card__zero" : ""}>
+                      {fmtUSD(t.fee)}
+                    </dd>
+                  </div>
                 </dl>
               </article>
             );
           })}
         </div>
       </div>
+
       <div className="dashboard-trades-table__footer">
-        <span>
+        <span className="dashboard-trades-table__range">
           {startIdx + 1}–{showingTo} of {trades.length}
         </span>
-        <div className="dashboard-pagination">
+        <div className="dashboard-pagination" aria-label="Trade pages">
           <button
             type="button"
             onClick={() => setPage((p) => Math.max(0, p - 1))}
             disabled={safePage === 0}
             className="dashboard-pagination__button"
+            aria-label="Previous trades"
           >
-            ← prev
+            ← <span>prev</span>
           </button>
-          <span className="dashboard-pagination__count">
+          <span className="dashboard-pagination__count" aria-live="polite">
             {safePage + 1} / {totalPages}
           </span>
           <button
@@ -135,8 +188,9 @@ export function TradesTable({ trades }: Props) {
             onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
             disabled={safePage >= totalPages - 1}
             className="dashboard-pagination__button"
+            aria-label="Next trades"
           >
-            next →
+            <span>next</span> →
           </button>
         </div>
       </div>
