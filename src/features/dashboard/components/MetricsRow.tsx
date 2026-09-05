@@ -40,7 +40,7 @@ export function MetricsRow({ metrics }: Props) {
   return (
     <div className="dashboard-metrics-grid">
       <Cell
-        label="ALPHAEX"
+        label="WINDOW ALPHAEX"
         value={fmtPercent(metrics.alphaEx, 2, true)}
         hint={`AI ${fmtPercent(metrics.stratReturn, 2, true)} · B&H ${fmtPercent(metrics.bnhReturn, 2, true)}`}
         tone={tone(metrics.alphaEx, true)}

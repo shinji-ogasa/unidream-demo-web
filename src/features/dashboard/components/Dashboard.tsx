@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { ANNUALIZATION, sortedAscending } from "@/lib/aggregate";
-import { fmtTime, fmtUSD, pnlPercent } from "@/lib/format";
+import { fmtPercent, fmtTime, fmtUSD, pnlPercent } from "@/lib/format";
 import { buildBuyAndHoldEquity, computeMetrics } from "@/lib/metrics";
 import {
   INITIAL_EQUITY,
@@ -106,6 +106,7 @@ export function Dashboard({ initial }: DashboardProps) {
   const pnl = pnlPercent(equity, INITIAL_EQUITY);
   const bnhPnl = pnlPercent(bnhEquity, INITIAL_EQUITY);
   const equityDelta = equity - bnhEquity;
+  const equityDeltaPercent = equityDelta / INITIAL_EQUITY;
   const pnlTone: "good" | "bad" | "default" =
     pnl > 0.001 ? "good" : pnl < -0.001 ? "bad" : "default";
   const deltaTone: "good" | "bad" | "default" =
@@ -170,11 +171,11 @@ export function Dashboard({ initial }: DashboardProps) {
             </div>
 
             <div className="dashboard-result-summary__delta">
-              <span>VS B&amp;H</span>
+              <span>CURRENT VS B&amp;H</span>
               <strong className={`dashboard-result-summary__delta--${deltaTone}`}>
-                {equityDelta >= 0 ? "+" : ""}{fmtUSD(equityDelta)}
+                {fmtPercent(equityDeltaPercent, 2, true)}
               </strong>
-              <small>current equity</small>
+              <small>{fmtUSD(Math.abs(equityDelta))} · AI − B&amp;H</small>
             </div>
           </section>
 
