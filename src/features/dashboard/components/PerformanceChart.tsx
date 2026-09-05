@@ -33,14 +33,13 @@ type Row = {
   bnh: number;
 };
 
-function returnIndex(value: number, start: number): number {
-  if (!Number.isFinite(value) || !Number.isFinite(start) || start <= 0) return 100;
-  return (value / start) * 100;
+function returnPercent(value: number, start: number): number {
+  if (!Number.isFinite(value) || !Number.isFinite(start) || start <= 0) return 0;
+  return ((value / start) - 1) * 100;
 }
 
-function formatIndex(value: number): string {
-  const change = value - 100;
-  return `${change >= 0 ? "+" : ""}${change.toFixed(2)}%`;
+function formatPerformance(value: number): string {
+  return `${value >= 0 ? "+" : ""}${value.toFixed(2)}%`;
 }
 
 export function PerformanceChart({ snapshots, range, onRangeChange }: Props) {
@@ -55,8 +54,8 @@ export function PerformanceChart({ snapshots, range, onRangeChange }: Props) {
       rows.push({
         t,
         label: tickLabel(t),
-        equity: returnIndex(s.equity, strategyStart),
-        bnh: returnIndex(bnhEquities[rows.length] ?? bnhStart, bnhStart),
+        equity: returnPercent(s.equity, strategyStart),
+        bnh: returnPercent(bnhEquities[rows.length] ?? bnhStart, bnhStart),
       });
     }
     return rows;
@@ -80,7 +79,13 @@ export function PerformanceChart({ snapshots, range, onRangeChange }: Props) {
           </div>
           <h2>AI <span className="dashboard-chart__vs">vs</span> B&amp;H</h2>
         </div>
-        <span className="dashboard-panel__meta">RETURN INDEX · START 100</span>
+        <div className="dashboard-chart__header-side">
+          <div className="dashboard-chart__legend" aria-label="Chart legend">
+            <LegendSwatch color="#02b8cc" label="AI" />
+            <LegendSwatch color="rgba(226,232,240,0.86)" label="B&amp;H" dashed />
+          </div>
+          <span className="dashboard-panel__meta">RETURN % · START 0</span>
+        </div>
       </div>
       <div className="dashboard-chart__canvas">
         {data.length === 0 ? (
@@ -102,8 +107,8 @@ export function PerformanceChart({ snapshots, range, onRangeChange }: Props) {
                 tick={{ fill: "#a1a8b3", fontSize: 13 }}
                 stroke="#222831"
                 domain={["auto", "auto"]}
-                tickFormatter={(v: number) => Math.round(v).toString()}
-                width={72}
+                tickFormatter={(v: number) => `${v > 0 ? "+" : ""}${Math.round(v)}%`}
+                width={64}
               />
               <Tooltip
                 contentStyle={{
@@ -115,11 +120,11 @@ export function PerformanceChart({ snapshots, range, onRangeChange }: Props) {
                 }}
                 labelStyle={{ color: "#8b95a5", fontSize: 12 }}
                 formatter={(v: number, name: string) => {
-                  if (name === "bnh") return [formatIndex(v), "B&H"];
-                  return [formatIndex(v), "AI"];
+                  if (name === "bnh") return [formatPerformance(v), "B&H"];
+                  return [formatPerformance(v), "AI"];
                 }}
               />
-              <ReferenceLine y={100} stroke="#3a4150" strokeDasharray="4 4" />
+              <ReferenceLine y={0} stroke="#3a4150" strokeDasharray="4 4" />
               <Line
                 type="monotone"
                 dataKey="equity"
@@ -160,18 +165,17 @@ export function PerformanceChart({ snapshots, range, onRangeChange }: Props) {
           </ResponsiveContainer>
         )}
       </div>
-      <div className="dashboard-chart__legend">
-        <LegendSwatch color="#02b8cc" label="AI" />
-        <LegendSwatch color="rgba(226,232,240,0.66)" label="B&H" />
-      </div>
     </section>
   );
 }
 
-function LegendSwatch({ color, label }: { color: string; label: string }) {
+function LegendSwatch({ color, label, dashed = false }: { color: string; label: string; dashed?: boolean }) {
   return (
     <span className="flex items-center gap-2">
-      <span className="inline-block w-5 h-[3px] rounded" style={{ background: color }} />
+      <span
+        className="inline-block w-5 h-[3px] rounded"
+        style={{ background: dashed ? `repeating-linear-gradient(90deg, ${color} 0 5px, transparent 5px 8px)` : color }}
+      />
       <span>{label}</span>
     </span>
   );
