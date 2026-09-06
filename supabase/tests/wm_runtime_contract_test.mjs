@@ -7,7 +7,7 @@ if(!process.env.WM_RUNTIME_FIXTURE) throw Error('WM_RUNTIME_FIXTURE must name a 
 const bytes=await readFile(process.env.WM_RUNTIME_FIXTURE),fixture=JSON.parse(bytes);
 assert.equal(fixture.diagnostic_only,true);
 const sh=x=>createHash('sha256').update(x).digest('hex');
-const migrations=await Promise.all(['20260906054107_btc_research_demo.sql','20260906073004_wm_research_demo.sql','20260906110000_wm_historical_backfill.sql'].map(async name=>({name,body:await readFile(new URL('../migrations/'+name,import.meta.url),'utf8')})));
+const migrations=await Promise.all(['20260906054107_btc_research_demo.sql','20260906073004_wm_research_demo.sql','20260906120000_wm_historical_backfill.sql'].map(async name=>({name,body:await readFile(new URL('../migrations/'+name,import.meta.url),'utf8')})));
 const cases=[];
 for(const [name,{previous,transition:p}]of Object.entries(fixture.cases)){
  assert.ok(Date.now()<Date.parse(p.event_ts)+900000,'fixture expired: regenerate a fresh synthetic origin');
