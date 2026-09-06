@@ -21,6 +21,7 @@ type ChartPoint = {
   time: number;
   strategy: number;
   benchmark: number;
+  markers?: EventMarker[];
 };
 
 type MarkerKind = "fill" | "intent" | "expired";
@@ -167,10 +168,25 @@ export function BtcPerformanceChart({
   const visibleEventMarkers = eventMarkers.filter(
     (marker) => marker.index >= safeStart && marker.index <= safeEnd,
   );
+  const chartData = useMemo<ChartPoint[]>(() => {
+    const markersByIndex = new Map<number, EventMarker[]>();
+    for (const marker of visibleEventMarkers) {
+      const markers = markersByIndex.get(marker.index) ?? [];
+      markers.push(marker);
+      markersByIndex.set(marker.index, markers);
+    }
+    return points.map((point, index) => ({
+      ...point,
+      markers: markersByIndex.get(index) ?? [],
+    }));
+  }, [points, visibleEventMarkers]);
+  const markerSlotCount = chartData.reduce(
+    (max, point) => Math.max(max, point.markers?.length ?? 0),
+    0,
+  );
   // Recharts includes child-level data (the event marker Scatter) when it
-  // derives an axis domain. The marker list can contain only one timestamp,
-  // which would collapse every performance point onto one vertical line.
-  // Anchor the domain to the actual performance series and current Brush span.
+  // derives an axis domain. Keep every Scatter on the same chart dataset so
+  // the performance series remains the source for both axes and the tooltip.
   const xDomain: [number, number] | ["dataMin", "dataMax"] = points.length > 0
     ? [points[safeStart]?.time ?? 0, points[safeEnd]?.time ?? 0]
     : ["dataMin", "dataMax"];
@@ -215,7 +231,7 @@ export function BtcPerformanceChart({
         ) : (
           <ResponsiveContainer width="100%" height="100%">
             <ComposedChart
-              data={points}
+              data={chartData}
               margin={{ top: 12, right: 16, bottom: 8, left: 0 }}
             >
               <defs>
@@ -278,13 +294,15 @@ export function BtcPerformanceChart({
                 dot={false}
                 isAnimationActive={false}
               />
-              <Scatter
-                data={visibleEventMarkers}
-                dataKey="y"
-                name="events"
-                shape={<EventMarkerShape />}
-                isAnimationActive={false}
-              />
+              {Array.from({ length: markerSlotCount }, (_, markerSlot) => (
+                <Scatter
+                  key={`event-marker-slot-${markerSlot}`}
+                  dataKey={(point: ChartPoint) => point.markers?.[markerSlot]?.y ?? null}
+                  name="events"
+                  shape={<EventMarkerShape markerSlot={markerSlot} />}
+                  isAnimationActive={false}
+                />
+              ))}
               <Brush
                 dataKey="time"
                 height={24}
@@ -320,19 +338,19 @@ export function BtcPerformanceChart({
 function EventMarkerShape({
   cx,
   cy,
-  kind,
-  direction,
   payload,
+  markerSlot,
 }: {
   cx?: number;
   cy?: number;
-  kind?: MarkerKind;
-  direction?: MarkerDirection;
-  payload?: { kind?: MarkerKind; direction?: MarkerDirection };
+  payload?: ChartPoint;
+  markerSlot: number;
 }) {
   if (typeof cx !== "number" || typeof cy !== "number") return null;
-  const markerKind = kind ?? payload?.kind;
-  const markerDirection = direction ?? payload?.direction ?? "flat";
+  const marker = payload?.markers?.[markerSlot];
+  if (!marker) return null;
+  const markerKind = marker.kind;
+  const markerDirection = marker.direction;
   if (markerKind === "intent") {
     return (
       <polygon
