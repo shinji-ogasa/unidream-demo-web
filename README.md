@@ -307,6 +307,39 @@ npm run backfill -- --reset --max-steps 200
 - 途中で Ctrl+C しても完了済み RPC transaction は DB に入っている。再開したいときは `--reset` を付けずにもう一度叩けば、`last_timestamp` 以降だけ続きから処理される
 - ライブ Cron が動いている最中に backfill を走らせると `strategy_state` の取り合いになるので、Cron は止めてから流すこと
 
+## トップ画面 `/` の WM+RL backfill
+
+現在のトップ画面が読む `btc_demo_*` の履歴を作る場合は、レガシー用の
+`npm run backfill` ではなく、専用のリプレイを使う。
+
+```powershell
+# WM+RL の現在の登録 run だけを再構築する（/legacy の表は変更しない）
+npm run backfill:wm -- --reset --days 5
+
+# 途中停止後は --reset を付けず、保存済み state から再開する
+npm run backfill:wm -- --days 5
+
+# 通信・RPC の疎通確認用に最初の数 tick だけ実行する
+npm run backfill:wm -- --reset --days 5 --max-steps 8
+```
+
+実行前に `run-wm-research-demo-15m` のライブ Cron を一時停止する。`--reset` は
+`btc_demo_state`、`btc_demo_snapshots`、`btc_demo_forecasts`、`btc_demo_events` のうち
+現在の WM run に紐づく行だけを消して、HF `/v4/btc/backfill` の同一モデル・同一会計
+契約で15分ごとに再構築する。`btc_demo_runs` の登録情報とレガシー表は保持される。
+
+最初に `supabase db push` または SQL Editor で
+`20260906110000_wm_historical_backfill.sql` を適用する。この migration は既存の
+ライブ検証を再利用し、履歴リプレイ用の期限バイパスを service role 専用RPCに分離する。
+バックフィル用の時刻や約定をブラウザから指定できるAPIではない。
+
+`--days N` はN日分の15分グリッドを再生し、各tickにWMが要求する8704本の過去バーを
+渡す。ただし現在のbundleには `production_cutoff = 2026-09-01T00:00:00Z` があるため、
+cutoffより前のデータを同じ公開runへ混ぜることはできない。2026-09-06時点で安全に
+再生できるのは約5日分で、30日分はcutoffから30日経過後に実行できる。Binanceの履歴取得後は
+HF推論とRPC書き込みを時系列順に行うため、所要時間は通信・推論速度に依存する。途中で止まっても、
+完了済みのtransactionは残り、同じコマンドを `--reset` なしで再実行できる。
+
 ## Dashboard の比較・コスト契約
 
 デモの quote-currency コストは研究系の既定値に固定している。

@@ -3,7 +3,7 @@ import { readFile } from 'node:fs/promises';
 const { PGlite } = await import(process.env.PGLITE_IMPORT ?? '@electric-sql/pglite');
 const db=new PGlite();
 await db.exec('create role anon; create role authenticated; create role service_role bypassrls;');
-for(const name of ['20260906054107_btc_research_demo.sql','20260906073004_wm_research_demo.sql']) await db.exec(await readFile(new URL('../migrations/'+name,import.meta.url),'utf8'));
+for(const name of ['20260906054107_btc_research_demo.sql','20260906073004_wm_research_demo.sql','20260906110000_wm_historical_backfill.sql']) await db.exec(await readFile(new URL('../migrations/'+name,import.meta.url),'utf8'));
 const run='btc-wm31-ac-20260906-paper-v1',bundle='btc-wm31-ac-20260906',family='wm_market31_ac';
 const h='a'.repeat(64),f='b'.repeat(64),e='c'.repeat(64),bar=900000;
 const t=Math.floor(Date.now()/bar)*bar,iso=x=>new Date(x).toISOString(),ns=x=>(BigInt(x)*1000000n).toString();
@@ -87,7 +87,15 @@ const stored=(await db.query('select diagnostics,forecast_kind from btc_demo_for
 await db.exec('delete from btc_demo_events;delete from btc_demo_forecasts;delete from btc_demo_snapshots;delete from btc_demo_state;');
 await rejects(envelope(state(t-bar)),/next-open deadline/);
 await rejects(envelope(state(t+bar)),/clock or version/);
+// Historical replay has an explicit service-only wrapper; the live RPC still
+// rejects the same stale transition.
+const historicalBefore=state(t-3*bar);
+const historicalNext=state(t-3*bar,1);
+const historical=envelope(historicalNext);historical.write_mode='backfill';
+await db.query('insert into btc_demo_state(run_id,version,last_open_ts,state) values($1,1,$2,$3)',[run,historicalBefore.last_open_ts,historicalBefore]);
+assert.equal((await db.query('select record_wm_demo_backfill_transition($1::jsonb) result',[historical])).rows[0].result.status,'applied');tests++;
 // No new current open means no initial synthetic benchmark state.
+await db.exec('delete from btc_demo_state;');
 const noOpen=envelope(state());Object.assign(noOpen.state.bridge_state.deferred,{open_observed:false,timely_current_open:null,receipt:null});await rejects(noOpen,/initial event/);
 // Halted canonical accounting can persist zero display NAV without a fake snapshot.
 await db.query('insert into btc_demo_state(run_id,version,last_open_ts,state) values($1,1,$2,$3)',[run,before.last_open_ts,before]);
@@ -106,6 +114,7 @@ await assert.rejects(()=>call(initial),/permission denied/);tests++;
 await assert.rejects(()=>db.query('delete from btc_demo_state'),/permission denied/);tests++;
 await db.exec('reset role');
 assert.equal((await db.query("select has_function_privilege('service_role','record_wm_demo_transition(jsonb)','EXECUTE') yes,has_function_privilege('authenticated','record_wm_demo_transition(jsonb)','EXECUTE') no")).rows[0].no,false);tests++;
-assert.equal((await db.query("select count(*)::int n from pg_proc where proname in ('record_wm_demo_transition','record_btc_demo_transition')")).rows[0].n,2);tests++;
+assert.equal((await db.query("select count(*)::int n from pg_proc where proname in ('record_wm_demo_transition','record_wm_demo_backfill_transition','record_btc_demo_transition')")).rows[0].n,3);tests++;
+assert.equal((await db.query("select has_function_privilege('service_role','record_wm_demo_backfill_transition(jsonb)','EXECUTE') yes,has_function_privilege('authenticated','record_wm_demo_backfill_transition(jsonb)','EXECUTE') no")).rows[0].no,false);tests++;
 await assert.rejects(()=>db.query('insert into btc_demo_forecasts(run_id,decision_ts,available,action_eligible,mu,variance,bundle_sha256,feature_contract_sha256,execution_contract_sha256,data) values($1,now(),true,true,null,null,$2,$3,$4,$5)',[run,h,f,e,{}]),/check constraint/);tests++;
 console.log(JSON.stringify({status:'pass',tests,engine:'PGlite PostgreSQL',scope:'both actual migrations; WM schema/deadline/clock/state/hash/rollback/idempotency/legacy constraints/RLS; no external mutation'}));await db.close();

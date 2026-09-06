@@ -9,6 +9,7 @@
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "backfill": "tsx scripts/backfill-history.ts",
+    "backfill:wm": "tsx scripts/backfill-wm-history.ts",
     "test:btc-db": "node supabase/tests/btc_transition_test.mjs",
     "test:btc-edge": "npx --yes deno@2.9.6 test supabase/functions/run-btc-research-demo"
   },
