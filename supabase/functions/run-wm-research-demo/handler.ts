@@ -5,6 +5,29 @@ export const BUNDLE_ID = "btc-wm31-ac-20260906";
 export const MODEL_FAMILY = "wm_market31_ac";
 const BAR_MS = 900_000;
 type Json = Record<string, any>;
+type RequestLabel =
+  | "read btc_demo_runs"
+  | "read btc_demo_state"
+  | "HF health"
+  | "HF predict"
+  | "BTC transaction";
+type Stage =
+  | "read registered run and state"
+  | "verify HF model contract"
+  | "collect completed market bars and current open"
+  | "compute canonical HF transition"
+  | "persist atomic transition";
+
+class SafeRequestFailure extends Error {
+  constructor(
+    readonly request_label: RequestLabel,
+    readonly http_status: number | null,
+    readonly failure_kind: "http_status" | "transport" | "invalid_json",
+  ) {
+    super("Upstream request failed");
+    this.name = "SafeRequestFailure";
+  }
+}
 type Config = {
   projectUrl: string;
   projectKey: string;
@@ -65,16 +88,27 @@ export function createHandler(config: Config, dependencies: Dependencies = {}) {
   async function json(
     url: string,
     options: RequestInit,
-    label: string,
+    label: RequestLabel,
   ): Promise<Json | Json[]> {
-    const response = await fetcher(url, {
-      ...options,
-      signal: AbortSignal.timeout(45_000),
-    });
-    if (!response.ok) throw new Error(`${label}: HTTP ${response.status}`);
-    return await response.json();
+    let response: Response;
+    try {
+      response = await fetcher(url, {
+        ...options,
+        signal: AbortSignal.timeout(45_000),
+      });
+    } catch {
+      throw new SafeRequestFailure(label, null, "transport");
+    }
+    if (!response.ok) {
+      throw new SafeRequestFailure(label, response.status, "http_status");
+    }
+    try {
+      return await response.json();
+    } catch {
+      throw new SafeRequestFailure(label, response.status, "invalid_json");
+    }
   }
-  const read = (table: string) =>
+  const read = (table: "btc_demo_runs" | "btc_demo_state") =>
     json(
       `${project}/rest/v1/${table}?run_id=eq.${RUN_ID}&select=*`,
       { headers: restHeaders },
@@ -98,7 +132,7 @@ export function createHandler(config: Config, dependencies: Dependencies = {}) {
         { status: 503 },
       );
     }
-    let stage = "read registered run and state";
+    let stage: Stage = "read registered run and state";
     try {
       // Event time comes only from this server, never from caller input.
       const eventMs = Math.floor(now() / BAR_MS) * BAR_MS;
@@ -228,17 +262,27 @@ export function createHandler(config: Config, dependencies: Dependencies = {}) {
         timely: transition.data?.timely ?? false,
       });
     } catch (error) {
-      // Do not echo remote response bodies or credentials to callers/logs.
+      // Only fixed labels, numeric HTTP status and fixed failure categories.
+      // Never inspect remote bodies, URLs, headers, error messages or names.
+      const upstream = error instanceof SafeRequestFailure
+        ? {
+          request_label: error.request_label,
+          http_status: error.http_status,
+          failure_kind: error.failure_kind,
+        }
+        : null;
       console.error(
         JSON.stringify({
           scope: "wm_research_demo",
           stage,
-          reason: error instanceof Error ? error.name : "Error",
+          reason: upstream ? "upstream_request" : "contract_or_collection",
+          ...(upstream ?? {}),
         }),
       );
       return Response.json({
         ok: false,
         stage,
+        ...(upstream ?? {}),
         error:
           "WM research transition failed; state was not partially committed",
       }, { status: 502 });

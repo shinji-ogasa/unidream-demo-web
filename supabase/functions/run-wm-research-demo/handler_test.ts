@@ -60,7 +60,19 @@ function setup(o: any = {}) {
     const url = String(input);
     calls.push({ url, init });
     if (o.fail && url.includes(o.fail)) {
-      return Response.json({ secret: "never echo" }, { status: 500 });
+      if (o.failKind === "transport") {
+        const error = new Error("sensitive transport body " + cfg.apiKey);
+        error.name = "sensitive transport name " + cfg.projectKey;
+        throw error;
+      }
+      if (o.failKind === "invalid_json") {
+        return new Response("not JSON; never echo " + cfg.apiKey, {
+          status: 200,
+        });
+      }
+      return Response.json({ secret: "never echo " + cfg.apiKey }, {
+        status: o.failStatus ?? 500,
+      });
     }
     if (url.includes("btc_demo_runs")) {
       return Response.json(o.noRun ? [] : [o.run ?? run]);
@@ -264,5 +276,53 @@ Deno.test("ns transport is lossless across JSON; raw integers and noncanonical s
     assert.throws(() =>
       assertNsStrings({ policy: { last_timestamp_ns: bad } })
     );
+  }
+});
+
+Deno.test("WM upstream telemetry exposes only fixed labels status and categories", async () => {
+  const logged: string[] = [];
+  const original = console.error;
+  console.error = (...items: unknown[]) => logged.push(items.join(" "));
+  try {
+    for (
+      const [failKind, failStatus, expectedKind, expectedStatus] of [
+        ["http_status", 422, "http_status", 422],
+        ["transport", undefined, "transport", null],
+        ["invalid_json", undefined, "invalid_json", 200],
+      ] as const
+    ) {
+      const x = setup({ fail: "/predict", failKind, failStatus });
+      const response = await x.handler(req());
+      assert.equal(response.status, 502);
+      const body = await response.json();
+      assert.equal(body.stage, "compute canonical HF transition");
+      assert.equal(body.request_label, "HF predict");
+      assert.equal(body.http_status, expectedStatus);
+      assert.equal(body.failure_kind, expectedKind);
+      assert.ok(!x.calls.some((call) => call.url.includes("record_wm")));
+      const log = JSON.parse(logged.at(-1)!);
+      assert.deepEqual(log, {
+        scope: "wm_research_demo",
+        stage: "compute canonical HF transition",
+        reason: "upstream_request",
+        request_label: "HF predict",
+        http_status: expectedStatus,
+        failure_kind: expectedKind,
+      });
+      const encoded = JSON.stringify(body) + logged.join(" ");
+      for (
+        const secret of [
+          cfg.apiKey,
+          cfg.projectKey,
+          "never echo",
+          "sensitive",
+          cfg.spaceUrl,
+        ]
+      ) {
+        assert.ok(!encoded.includes(secret));
+      }
+    }
+  } finally {
+    console.error = original;
   }
 });
