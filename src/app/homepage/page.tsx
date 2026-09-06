@@ -3,8 +3,8 @@ import type { Metadata } from "next";
 import MarketingPage from "@/features/marketing/MarketingPage";
 
 export const metadata: Metadata = {
-  title: "UniDream — B&HをAIで再設計する",
-  description: "Buy & Holdを基準に、AIオーバーレイとB&H-relative evidenceを検証する研究開発プロダクト。",
+  title: "UniDream — 長期投資をAIで再設計",
+  description: "Buy & Holdを基準に、市場状態を理解するAIの判断レイヤーを重ねるUniDreamの研究・デモ。",
 };
 
 export default function HomepageRoute() {
