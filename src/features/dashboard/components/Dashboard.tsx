@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { ANNUALIZATION, sortedAscending } from "@/lib/aggregate";
-import { fmtPercent, fmtTime, fmtUSD, pnlPercent } from "@/lib/format";
+import { fmtExactNumber, fmtPercent, fmtTime, fmtUSD, pnlPercent } from "@/lib/format";
 import { computeMetrics } from "@/lib/metrics";
 import {
   INITIAL_EQUITY,
@@ -197,7 +197,7 @@ export function Dashboard({ initial }: DashboardProps) {
             </div>
             <MetricsRow metrics={metrics} />
             <div className="dashboard-result-window__state">
-              <span>POSITION <strong>{currentPosition.toFixed(3)}</strong></span>
+              <span>POSITION <strong>{fmtExactNumber(currentPosition)}</strong></span>
               <span>SIGNAL <strong className={`dashboard-result-window__signal--${signalTone}`}>{prediction?.signal ?? "—"}</strong></span>
               <span>LAST PRICE <strong>{fmtUSD(lastPrice)}</strong></span>
             </div>

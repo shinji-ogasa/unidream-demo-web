@@ -66,3 +66,18 @@ test("unchanged exposure has no new transaction cost while mark-to-market update
   assert.equal(held.next.asset_qty, 100);
   assert.ok(Math.abs(held.next.equity - 10_994.5) < 1e-12);
 });
+
+test("preserves every model target digit in the stored position and fill", () => {
+  const target = 0.9998030662536621;
+  const entered = applyFill(flatState, target, 100);
+
+  assert.equal(entered.next.current_position, target);
+  assert.equal(entered.trade?.to_position, target);
+
+  const held = applyFill(
+    { ...flatState, ...entered.next, current_position: target },
+    target,
+    101,
+  );
+  assert.equal(held.trade, null);
+});

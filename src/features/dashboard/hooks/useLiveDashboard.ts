@@ -92,7 +92,7 @@ export function useLiveDashboard(initial: DashboardInitialData) {
         },
         (payload) => {
           const next = payload.new as Trade;
-          if (Math.round(next.from_position * 10000) === Math.round(next.to_position * 10000)) return;
+          if (next.from_position === next.to_position) return;
           setTrades((previous) => {
             if (previous.some((trade) => trade.id === next.id)) return previous;
             return [...previous, next]

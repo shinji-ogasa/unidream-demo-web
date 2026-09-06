@@ -7642,6 +7642,279 @@ textarea {
 .btc-marketing-release-note a { display: block; margin-top: 7px; color: #8ecfd5; }
 @media (max-width: 600px) { .btc-marketing-release-note { margin-inline: 16px; padding: 14px 18px; font-size: 11px; } }
 
+/* Live BTC surface: make connection freshness, event state, and chart context
+   readable at a glance without turning the paper run into a marketing card. */
+.btc-release-shell .dashboard-header__status {
+  gap: 7px;
+  flex-wrap: wrap;
+}
+
+.btc-status {
+  gap: 6px;
+}
+
+.btc-status i,
+.btc-live-strip__connection i {
+  width: 6px;
+  height: 6px;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: #98a8b8;
+  content: "";
+}
+
+.btc-status--subscribed i,
+.btc-live-strip--subscribed .btc-live-strip__connection i {
+  background: #b9ef6d;
+  box-shadow: 0 0 0 3px rgba(185, 239, 109, 0.12), 0 0 14px rgba(185, 239, 109, 0.75);
+  animation: btc-live-pulse 1.8s ease-in-out infinite;
+}
+
+.btc-status--polling i,
+.btc-live-strip--polling .btc-live-strip__connection i {
+  background: #e5b765;
+}
+
+.btc-status--state {
+  color: #8fc1c6;
+}
+
+.btc-live-strip {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 20px;
+  padding: 9px 13px;
+  border: 1px solid rgba(2, 184, 204, 0.2);
+  border-radius: 8px;
+  background: linear-gradient(90deg, rgba(2, 184, 204, 0.08), rgba(14, 24, 35, 0.72));
+  color: #7f92a5;
+  font: 9px/1.5 "SFMono-Regular", Consolas, monospace;
+  letter-spacing: 0.08em;
+}
+
+.btc-live-strip > span {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.btc-live-strip strong {
+  color: #c9d7e2;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+.btc-live-strip__connection {
+  color: #b9efc4;
+}
+
+.btc-live-strip--polling .btc-live-strip__connection {
+  color: #e5c88d;
+}
+
+.btc-chart__header {
+  align-items: flex-start;
+}
+
+.btc-chart__header-side {
+  display: grid;
+  min-width: 0;
+  justify-items: end;
+  gap: 7px;
+}
+
+.btc-chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 5px 14px;
+  color: #d6dce5;
+  font: 10px/1.5 "SFMono-Regular", Consolas, monospace;
+}
+
+.btc-chart-legend__strategy { color: #02b8cc; }
+.btc-chart-legend__benchmark { color: #d6dce5; }
+.btc-chart-legend__events { color: #b9ef6d; }
+
+.btc-chart__meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 5px 12px;
+  color: #7f92a5;
+  font: 9px/1.5 "SFMono-Regular", Consolas, monospace;
+}
+
+.btc-chart__meta strong {
+  color: #b9ef6d;
+  font-weight: 400;
+}
+
+.btc-event-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.btc-event-summary__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 8px;
+  border: 1px solid #2b3643;
+  border-radius: 5px;
+  color: #9eacb9;
+  font: 10px/1.4 "SFMono-Regular", Consolas, monospace;
+}
+
+.btc-event-summary__item strong {
+  font-weight: 500;
+}
+
+.btc-event-summary__item--intent strong { color: #02b8cc; }
+.btc-event-summary__item--fill strong { color: #b9ef6d; }
+.btc-event-summary__item--expired strong { color: #e5b765; }
+
+.btc-events tbody tr {
+  transition: background-color 160ms ease;
+}
+
+.btc-events tbody tr:hover {
+  background: rgba(2, 184, 204, 0.055);
+}
+
+.btc-events td:nth-child(2) {
+  display: table-cell;
+}
+
+.btc-events td:nth-child(2) small {
+  margin-left: 7px;
+  color: #647484;
+  font-size: 9px;
+}
+
+.btc-event-badge {
+  display: inline-flex;
+  min-width: 46px;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 6px;
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  font-size: 10px;
+  line-height: 1.2;
+}
+
+.btc-event-badge--intent { color: #02b8cc; background: rgba(2, 184, 204, 0.07); }
+.btc-event-badge--fill { color: #b9ef6d; background: rgba(185, 239, 109, 0.07); }
+.btc-event-badge--expired { color: #e5b765; background: rgba(229, 183, 101, 0.07); }
+.btc-event-badge--state,
+.btc-event-badge--decision { color: #9eacb9; background: rgba(158, 172, 185, 0.06); }
+
+.btc-events-footer {
+  display: flex;
+  min-height: 42px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: #7f92a5;
+  font: 10px/1.5 "SFMono-Regular", Consolas, monospace;
+}
+
+.btc-events-pagination {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.btc-events-pagination button {
+  min-height: 34px;
+  padding: 0 10px;
+  border: 1px solid #34404d;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.025);
+  color: #b8c6d2;
+  cursor: pointer;
+  font: inherit;
+}
+
+.btc-events-pagination button:hover:not(:disabled) {
+  border-color: rgba(2, 184, 204, 0.65);
+  background: rgba(2, 184, 204, 0.08);
+  color: #ecf2f7;
+}
+
+.btc-events-pagination button:disabled {
+  cursor: not-allowed;
+  opacity: 0.35;
+}
+
+.btc-events-pagination strong {
+  min-width: 42px;
+  color: #c9d7e2;
+  font-weight: 400;
+  text-align: center;
+}
+
+@keyframes btc-live-pulse {
+  0%, 100% { opacity: 0.75; transform: scale(0.9); }
+  50% { opacity: 1; transform: scale(1.1); }
+}
+
+@media (max-width: 560px) {
+  .btc-live-strip {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px 12px;
+    font-size: 8px;
+  }
+
+  .btc-live-strip > span:nth-child(even) {
+    justify-content: flex-end;
+  }
+
+  .btc-chart__header {
+    flex-direction: column;
+    gap: 9px;
+  }
+
+  .btc-chart__header-side {
+    width: 100%;
+    justify-items: start;
+  }
+
+  .btc-chart-legend,
+  .btc-chart__meta {
+    justify-content: flex-start;
+    font-size: 8px;
+  }
+
+  .btc-events-footer {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .btc-events-pagination {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .btc-event-badge {
+    min-width: 42px;
+    padding-inline: 5px;
+    font-size: 9px;
+  }
+
+  .btc-events td:nth-child(2) small {
+    display: none;
+  }
+}
+
 /* Vision-first homepage: explain the product thesis before the implementation details. */
 .vision-page {
   --vision-surface: rgba(11, 20, 31, 0.82);

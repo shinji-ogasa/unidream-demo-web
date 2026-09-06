@@ -72,7 +72,7 @@ export async function loadInitialDashboard() {
   const prediction = (predRes.data?.[0] as Prediction | undefined) ?? null;
   const state = (stateRes.data as StrategyState | null) ?? null;
   const trades = ((tradesRes.data ?? []) as Trade[]).filter(
-    (trade) => Math.round(trade.from_position * 10000) !== Math.round(trade.to_position * 10000),
+    (trade) => trade.from_position !== trade.to_position,
   );
   // These declarations describe the code/deployment contract. The current
   // public schema does not persist per-row provenance, so the client labels

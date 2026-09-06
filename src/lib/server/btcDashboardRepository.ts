@@ -14,6 +14,7 @@ import {
 
 const PAGE_SIZE = 1000;
 const SNAPSHOT_LIMIT = 10_000;
+const EVENT_LIMIT = 1_000;
 
 export async function loadBtcDashboard(): Promise<BtcDashboardData> {
   const empty: BtcDashboardData = {
@@ -62,7 +63,7 @@ export async function loadBtcDashboard(): Promise<BtcDashboardData> {
         .select("*")
         .eq("run_id", BTC_RUN_ID)
         .order("timestamp", { ascending: false })
-        .limit(100),
+        .limit(EVENT_LIMIT),
     ]);
     if ([runRes, stateRes, forecastRes, eventRes].some((r) => r.error))
       return { ...empty, readStatus: "unavailable" };

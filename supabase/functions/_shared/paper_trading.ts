@@ -101,8 +101,7 @@ export function applyFill(
   const equityAtPrice = previous.cash + previous.asset_qty * price;
   const targetAssetQty = (targetPosition * equityAtPrice) / price;
   const deltaQty = targetAssetQty - previous.asset_qty;
-  const positionUnchanged =
-    Math.round(targetPosition * 1e6) === Math.round(previous.current_position * 1e6);
+  const positionUnchanged = targetPosition === previous.current_position;
 
   if (positionUnchanged) {
     return {
@@ -116,7 +115,9 @@ export function applyFill(
     };
   }
 
-  const currentPosition = Math.round(targetPosition * 1e6) / 1e6;
+  // Preserve every finite digit emitted by the model. The target is bounded
+  // by clampTargetPosition, but it is not quantized before the fill is saved.
+  const currentPosition = targetPosition;
   const tradeNotional = Math.abs(deltaQty) * price;
   const positionDelta = Math.abs(currentPosition - previous.current_position);
   const transactionCosts = computeTransactionCosts(positionDelta, equityAtPrice, costs);

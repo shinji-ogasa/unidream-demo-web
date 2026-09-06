@@ -6,14 +6,32 @@ export function fmtNumber(n: number | null | undefined, digits = 2): string {
   });
 }
 
+/**
+ * Render a model/action number without applying a display precision cap.
+ *
+ * JSON numbers are already IEEE-754 values by the time they reach the UI, so
+ * String(n) is the shortest representation that round-trips to that exact
+ * value. Unlike toFixed/toLocaleString with maximumFractionDigits, it does
+ * not silently discard model output digits.
+ */
+export function fmtExactNumber(n: number | null | undefined): string {
+  if (n === null || n === undefined || !Number.isFinite(n)) return "—";
+  const raw = String(n);
+  if (/[eE]/.test(raw)) return raw;
+  const [integer, fraction] = raw.split(".");
+  const groupedInteger = Number(integer).toLocaleString("en-US", {
+    maximumFractionDigits: 0,
+  });
+  return fraction ? `${groupedInteger}.${fraction}` : groupedInteger;
+}
+
 export function fmtUSD(n: number | null | undefined, digits = 2): string {
   if (n === null || n === undefined || !Number.isFinite(n)) return "—";
   return `$${fmtNumber(n, digits)}`;
 }
 
 export function fmtPosition(n: number | null | undefined): string {
-  if (n === null || n === undefined || !Number.isFinite(n)) return "—";
-  return (Math.round(n * 10000) / 10000).toFixed(4);
+  return fmtExactNumber(n);
 }
 
 export function fmtTime(ts: string | null | undefined): string {

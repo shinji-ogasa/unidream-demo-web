@@ -1,4 +1,4 @@
-import { fmtNumber, fmtUSD } from "@/lib/format";
+import { fmtExactNumber, fmtNumber, fmtUSD } from "@/lib/format";
 
 type Props = {
   position: number;
@@ -64,7 +64,7 @@ export function PositionGauge({
         </div>
         <div className="dashboard-position__details">
           <span>target</span>
-          <strong>{position.toFixed(3)}</strong>
+          <strong>{fmtExactNumber(position)}</strong>
           <span>cash</span>
           <strong>{fmtUSD(cash)}</strong>
           <span>qty</span>

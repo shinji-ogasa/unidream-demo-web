@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -13,7 +13,7 @@ import {
   type BtcReleaseEvidence,
   type BtcEvent,
 } from "@/lib/btc-release";
-import { fmtNumber, fmtTime, fmtUSD } from "@/lib/format";
+import { fmtExactNumber, fmtTime, fmtUSD } from "@/lib/format";
 import { useBtcDashboard } from "./useBtcDashboard";
 import { BtcPerformanceChart } from "./BtcPerformanceChart";
 
@@ -69,6 +69,40 @@ function fillDetails(event: BtcEvent): Record<string, unknown> {
     ? value as Record<string, unknown> : {};
 }
 
+const EVENT_PAGE_SIZE = 10;
+
+type EventTone = "intent" | "fill" | "expired" | "state" | "decision";
+
+type EventView = {
+  event: BtcEvent;
+  label: string;
+  tone: EventTone;
+  details: Record<string, unknown>;
+};
+
+function viewEvent(event: BtcEvent): EventView {
+  if (event.kind === "intent") {
+    return { event, label: "注文", tone: "intent", details: event.details };
+  }
+  if (event.kind === "fill") {
+    return { event, label: "約定", tone: "fill", details: event.details };
+  }
+  if (event.kind === "expired") {
+    return { event, label: "期限切れ", tone: "expired", details: event.details };
+  }
+  if (event.kind === "account") {
+    const details = fillDetails(event);
+    if (details.status === "filled") {
+      return { event, label: "約定", tone: "fill", details };
+    }
+    if (details.status === "expired_missing_open") {
+      return { event, label: "期限切れ", tone: "expired", details };
+    }
+    return { event, label: "保有更新", tone: "state", details };
+  }
+  return { event, label: "判断", tone: "decision", details: event.details };
+}
+
 export function BtcDashboard({
   initial,
   evidence,
@@ -79,6 +113,7 @@ export function BtcDashboard({
   const live = useBtcDashboard(initial);
   const state = live.state?.state;
   const [now, setNow] = useState<number | null>(null);
+  const [eventPage, setEventPage] = useState(0);
   useEffect(() => {
     setNow(Date.now());
     const timer = setInterval(() => setNow(Date.now()), 30_000);
@@ -124,13 +159,40 @@ export function BtcDashboard({
   )
     ? evidence.source_report_url
     : null;
-  const eventLabels = {
-    fill: "約定",
-    intent: "次の始値への注文",
-    expired: "期限切れ",
-    account: "確定足・約定処理",
-    decision: "RLの判断",
-  };
+  const eventRows = useMemo(() => live.events.map(viewEvent), [live.events]);
+  const totalEventPages = Math.max(
+    1,
+    Math.ceil(eventRows.length / EVENT_PAGE_SIZE),
+  );
+  const safeEventPage = Math.min(eventPage, totalEventPages - 1);
+  const eventStart = safeEventPage * EVENT_PAGE_SIZE;
+  const visibleEventRows = eventRows.slice(
+    eventStart,
+    eventStart + EVENT_PAGE_SIZE,
+  );
+  const eventEnd = Math.min(eventStart + EVENT_PAGE_SIZE, eventRows.length);
+  const eventCounts = useMemo(
+    () =>
+      eventRows.reduce(
+        (counts, row) => {
+          if (row.tone === "intent") counts.intent += 1;
+          if (row.tone === "fill") counts.fill += 1;
+          if (row.tone === "expired") counts.expired += 1;
+          return counts;
+        },
+        { intent: 0, fill: 0, expired: 0 },
+      ),
+    [eventRows],
+  );
+  useEffect(() => {
+    setEventPage((current) => Math.min(current, totalEventPages - 1));
+  }, [totalEventPages]);
+  const connectionLabel =
+    live.connection === "subscribed"
+      ? "LIVE / realtime"
+      : live.connection === "polling"
+        ? "POLLING / 30s"
+        : "CONNECTING";
 
   return (
     <main className="dashboard-shell dashboard-shell--result-only btc-release-shell">
@@ -164,9 +226,35 @@ export function BtcDashboard({
               <small>MODEL</small>
               {BTC_MODEL_LABEL}
             </span>
-            <span className="btc-status">{status}</span>
+            <span
+              className={`btc-status btc-status--${live.connection}`}
+              aria-live="polite"
+            >
+              <i aria-hidden="true" />
+              {connectionLabel}
+            </span>
+            <span className="btc-status btc-status--state">{status}</span>
           </div>
         </header>
+
+        <div
+          className={`btc-live-strip btc-live-strip--${live.connection}`}
+          role="status"
+          aria-live="polite"
+        >
+          <span className="btc-live-strip__connection">
+            <i aria-hidden="true" /> {connectionLabel}
+          </span>
+          <span>
+            LAST BAR <strong>{fmtTime(state?.last_mark_ts)}</strong>
+          </span>
+          <span>
+            EVENT FEED <strong>{live.events.length}</strong>
+          </span>
+          <span>
+            SYNC <strong>{fmtTime(live.checkedAt)}</strong>
+          </span>
+        </div>
 
         <section
           className="btc-evidence dashboard-panel"
@@ -326,7 +414,7 @@ export function BtcDashboard({
                 state
                   ? state.bridge_state.account.account.last_exposure === null
                     ? "確定足待ち"
-                    : `${fmtNumber(state.bridge_state.account.account.last_exposure, 3)}×`
+                    : `${fmtExactNumber(state.bridge_state.account.account.last_exposure)}×`
                   : "—"
               }
               hint="保有比率は値動きで変化します"
@@ -338,7 +426,7 @@ export function BtcDashboard({
                   ? "—"
                   : state.pending_target == null
                     ? "注文なし"
-                    : `${fmtNumber(state.pending_target, 3)}×`
+                    : `${fmtExactNumber(state.pending_target)}×`
               }
               hint={
                 state?.pending_due_at
@@ -367,7 +455,7 @@ export function BtcDashboard({
           <p className="btc-caption">
             資産と保有量は確定した足までの記録です。RLの判断は次の始値への注文として表示します。B&Hと同じ初期保有で開始し、表示金額は正規化NAVを10,000倍しています。
           </p>
-          <BtcPerformanceChart snapshots={live.snapshots} />
+          <BtcPerformanceChart snapshots={live.snapshots} events={live.events} />
         </section>
 
         <section
@@ -411,7 +499,7 @@ export function BtcDashboard({
             </div>
             <div>
               <dt>RLの目標保有比率</dt>
-              <dd>{!live.forecast ? "判断記録待ち" : live.forecast.target == null ? "変更なし" : `${fmtNumber(live.forecast.target, 3)}×`}</dd>
+              <dd>{!live.forecast ? "判断記録待ち" : live.forecast.target == null ? "変更なし" : `${fmtExactNumber(live.forecast.target)}×`}</dd>
             </div>
             <div>
               <dt>市場データ受信時刻</dt>
@@ -469,7 +557,18 @@ export function BtcDashboard({
         >
           <div className="dashboard-trades__simple-head">
             <span>注文・約定・期限切れ</span>
-            <span>直近{live.events.length}件</span>
+            <span>{live.events.length}件 · 1ページ{EVENT_PAGE_SIZE}件</span>
+          </div>
+          <div className="btc-event-summary" aria-label="Event counts">
+            <span className="btc-event-summary__item btc-event-summary__item--intent">
+              注文 <strong>{eventCounts.intent}</strong>
+            </span>
+            <span className="btc-event-summary__item btc-event-summary__item--fill">
+              約定 <strong>{eventCounts.fill}</strong>
+            </span>
+            <span className="btc-event-summary__item btc-event-summary__item--expired">
+              期限切れ <strong>{eventCounts.expired}</strong>
+            </span>
           </div>
           {live.events.length === 0 ? (
             <p className="btc-caption">まだ注文・約定の記録はありません。</p>
@@ -485,34 +584,28 @@ export function BtcDashboard({
                   </tr>
                 </thead>
                 <tbody>
-                  {live.events.map((event) => (
-                    <tr key={event.event_id}>
-                      <td>{fmtTime(event.timestamp)}</td>
-                      <td>{event.kind === "account"
-                        ? fillDetails(event).status === "filled" ? "ペーパー約定"
-                          : fillDetails(event).status === "expired_missing_open" ? "期限切れ"
-                          : "保有・確定足"
-                        : eventLabels[event.kind] ?? event.kind}</td>
+                  {visibleEventRows.map((row) => (
+                    <tr key={row.event.event_id}>
+                      <td>{fmtTime(row.event.timestamp)}</td>
                       <td>
-                        {fmtNumber(
+                        <span className={`btc-event-badge btc-event-badge--${row.tone}`}>
+                          {row.label}
+                        </span>
+                        <small>{row.event.kind}</small>
+                      </td>
+                      <td>
+                        {fmtExactNumber(
                           eventValue(
-                            event.kind === "account" ? fillDetails(event) : event.details,
+                            row.details,
                             "due_target",
                             "target",
                             "target_position",
                             "pending_target",
                           ),
-                          3,
                         )}
                       </td>
                       <td>
-                        {fmtNumber(
-                          eventValue(
-                            event.kind === "account" ? fillDetails(event) : event.details,
-                            "exposure_after",
-                          ),
-                          3,
-                        )}
+                        {fmtExactNumber(eventValue(row.details, "exposure_after"))}
                       </td>
                     </tr>
                   ))}
@@ -520,6 +613,32 @@ export function BtcDashboard({
               </table>
             </div>
           )}
+          {live.events.length > 0 ? (
+            <div className="btc-events-footer">
+              <span>
+                {eventStart + 1}–{eventEnd} / {eventRows.length}件
+              </span>
+              <div className="btc-events-pagination" aria-label="Event pages">
+                <button
+                  type="button"
+                  onClick={() => setEventPage((current) => Math.max(0, current - 1))}
+                  disabled={safeEventPage === 0}
+                  aria-label="前のイベント"
+                >
+                  ← 前へ
+                </button>
+                <strong>{safeEventPage + 1} / {totalEventPages}</strong>
+                <button
+                  type="button"
+                  onClick={() => setEventPage((current) => Math.min(totalEventPages - 1, current + 1))}
+                  disabled={safeEventPage >= totalEventPages - 1}
+                  aria-label="次のイベント"
+                >
+                  次へ →
+                </button>
+              </div>
+            </div>
+          ) : null}
         </section>
         <footer className="dashboard-footer dashboard-footer--minimal">
           <nav className="dashboard-footer__links" aria-label="関連ページ">

@@ -1,48 +1,149 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
+  Area,
+  Brush,
   CartesianGrid,
+  ComposedChart,
   Line,
-  LineChart,
   ReferenceLine,
   ResponsiveContainer,
+  Scatter,
   Tooltip,
   XAxis,
   YAxis,
 } from "recharts";
-import type { BtcSnapshot } from "@/lib/btc-release";
+import type { BtcEvent, BtcSnapshot } from "@/lib/btc-release";
 import { fmtTime } from "@/lib/format";
+
+type ChartPoint = {
+  time: number;
+  strategy: number;
+  benchmark: number;
+};
+
+type MarkerKind = "fill" | "intent" | "expired";
+
+type EventMarker = {
+  index: number;
+  time: number;
+  y: number;
+  kind: MarkerKind;
+};
+
+function eventKind(event: BtcEvent): MarkerKind | null {
+  if (event.kind === "fill" || event.kind === "intent" || event.kind === "expired") {
+    return event.kind;
+  }
+  if (event.kind !== "account") return null;
+  const fill = event.details.fill;
+  if (!fill || typeof fill !== "object" || Array.isArray(fill)) return null;
+  const fillRecord = fill as Record<string, unknown>;
+  if (fillRecord.status === "filled") return "fill";
+  if (fillRecord.status === "expired_missing_open") return "expired";
+  return null;
+}
+
+function nearestPointIndex(points: ChartPoint[], timestamp: number): number {
+  let nearest = 0;
+  let distance = Number.POSITIVE_INFINITY;
+  for (let index = 0; index < points.length; index += 1) {
+    const nextDistance = Math.abs(points[index].time - timestamp);
+    if (nextDistance < distance) {
+      nearest = index;
+      distance = nextDistance;
+    }
+  }
+  return nearest;
+}
+
+function chartPercent(value: number): string {
+  return `${value >= 0 ? "+" : ""}${value.toFixed(3)}%`;
+}
 
 export function BtcPerformanceChart({
   snapshots,
+  events,
 }: {
   snapshots: BtcSnapshot[];
+  events: BtcEvent[];
 }) {
-  const points = useMemo(
+  const points = useMemo<ChartPoint[]>(
     () =>
-      snapshots.map((s) => ({
-        time: new Date(s.timestamp).getTime(),
-        strategy: (s.equity - 1) * 100,
-        benchmark: (s.benchmark_equity - 1) * 100,
-      })),
+      snapshots
+        .map((s) => ({
+          time: new Date(s.timestamp).getTime(),
+          strategy: (s.equity - 1) * 100,
+          benchmark: (s.benchmark_equity - 1) * 100,
+        }))
+        .filter(
+          (point) =>
+            Number.isFinite(point.time) &&
+            Number.isFinite(point.strategy) &&
+            Number.isFinite(point.benchmark),
+        ),
     [snapshots],
   );
+  const eventMarkers = useMemo<EventMarker[]>(() => {
+    if (points.length === 0) return [];
+    return events.flatMap((event) => {
+      const kind = eventKind(event);
+      const timestamp = new Date(event.timestamp).getTime();
+      if (!kind || !Number.isFinite(timestamp)) return [];
+      const index = nearestPointIndex(points, timestamp);
+      const point = points[index];
+      return [{ index, time: point.time, y: point.strategy, kind }];
+    });
+  }, [events, points]);
+  const [range, setRange] = useState({ startIndex: 0, endIndex: 0 });
+
+  useEffect(() => {
+    const lastIndex = Math.max(0, points.length - 1);
+    setRange((previous) => {
+      if (points.length <= 1 || (previous.startIndex === 0 && previous.endIndex === 0)) {
+        return { startIndex: 0, endIndex: lastIndex };
+      }
+      const span = Math.min(lastIndex, previous.endIndex - previous.startIndex);
+      return {
+        startIndex: Math.max(0, lastIndex - span),
+        endIndex: lastIndex,
+      };
+    });
+  }, [points.length]);
+
+  const lastIndex = Math.max(0, points.length - 1);
+  const safeStart = Math.max(0, Math.min(range.startIndex, lastIndex));
+  const safeEnd = Math.max(safeStart, Math.min(range.endIndex, lastIndex));
+  const visibleEventMarkers = eventMarkers.filter(
+    (marker) => marker.index >= safeStart && marker.index <= safeEnd,
+  );
+  const latest = points.at(-1);
+  const latestDelta = latest ? latest.strategy - latest.benchmark : null;
+
   return (
     <section
       className="dashboard-chart dashboard-panel btc-chart"
       aria-label="公開後のペーパートレードとB&Hの比較"
     >
-      <div className="dashboard-panel__header">
+      <div className="dashboard-panel__header btc-chart__header">
         <div>
           <div className="dashboard-panel__label">PUBLIC PAPER · START 0%</div>
           <h2>
             WM + RL <span className="dashboard-chart__vs">vs</span> B&amp;H
           </h2>
         </div>
-        <div className="btc-chart-legend">
-          <span>● WM + RL</span>
-          <span>┄ B&amp;H</span>
+        <div className="btc-chart__header-side">
+          <div className="btc-chart-legend" aria-label="Chart legend">
+            <span className="btc-chart-legend__strategy">● WM + RL</span>
+            <span className="btc-chart-legend__benchmark">┄ B&amp;H</span>
+            <span className="btc-chart-legend__events">▲ fills · ◇ orders · × expired</span>
+          </div>
+          <div className="btc-chart__meta">
+            <span>{points.length.toLocaleString()} BARS</span>
+            <span>{latest ? fmtTime(new Date(latest.time).toISOString()) : "—"}</span>
+            {latestDelta !== null ? <strong>Δ {chartPercent(latestDelta)}</strong> : null}
+          </div>
         </div>
       </div>
       <div className="dashboard-chart__canvas">
@@ -57,18 +158,22 @@ export function BtcPerformanceChart({
           </div>
         ) : (
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart
+            <ComposedChart
               data={points}
               margin={{ top: 12, right: 16, bottom: 8, left: 0 }}
             >
+              <defs>
+                <linearGradient id="btcStrategyFill" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#02b8cc" stopOpacity={0.22} />
+                  <stop offset="100%" stopColor="#02b8cc" stopOpacity={0} />
+                </linearGradient>
+              </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#222831" />
               <XAxis
                 dataKey="time"
                 type="number"
                 domain={["dataMin", "dataMax"]}
-                tickFormatter={(value) =>
-                  new Date(value).toISOString().slice(5, 10)
-                }
+                tickFormatter={(value) => new Date(value).toISOString().slice(5, 10)}
                 tick={{ fill: "#a1a8b3", fontSize: 11 }}
                 minTickGap={40}
               />
@@ -83,8 +188,8 @@ export function BtcPerformanceChart({
                   fmtTime(new Date(Number(value)).toISOString())
                 }
                 formatter={(value: number, name: string) => [
-                  `${value >= 0 ? "+" : ""}${value.toFixed(3)}%`,
-                  name === "strategy" ? "WM + RL" : "B&H",
+                  chartPercent(value),
+                  name === "strategy" ? "WM + RL" : name === "benchmark" ? "B&H" : "event",
                 ]}
                 contentStyle={{
                   background: "#13161b",
@@ -93,8 +198,15 @@ export function BtcPerformanceChart({
                 }}
               />
               <ReferenceLine y={0} stroke="#58616f" />
+              <Area
+                type="monotone"
+                dataKey="strategy"
+                stroke="none"
+                fill="url(#btcStrategyFill)"
+                isAnimationActive={false}
+              />
               <Line
-                type="linear"
+                type="monotone"
                 dataKey="benchmark"
                 stroke="#d6dce5"
                 strokeDasharray="6 4"
@@ -103,21 +215,84 @@ export function BtcPerformanceChart({
                 isAnimationActive={false}
               />
               <Line
-                type="linear"
+                type="monotone"
                 dataKey="strategy"
                 stroke="#02b8cc"
-                strokeWidth={2}
+                strokeWidth={2.2}
                 dot={false}
                 isAnimationActive={false}
               />
-            </LineChart>
+              <Scatter
+                data={visibleEventMarkers}
+                dataKey="y"
+                name="events"
+                shape={<EventMarkerShape />}
+                isAnimationActive={false}
+              />
+              <Brush
+                dataKey="time"
+                height={24}
+                stroke="rgba(2,184,204,0.7)"
+                fill="rgba(2,184,204,0.05)"
+                travellerWidth={9}
+                startIndex={safeStart}
+                endIndex={safeEnd}
+                tickFormatter={(value) => new Date(value).toISOString().slice(5, 10)}
+                onChange={(next) => {
+                  if (
+                    typeof next?.startIndex === "number" &&
+                    typeof next?.endIndex === "number"
+                  ) {
+                    setRange({
+                      startIndex: next.startIndex,
+                      endIndex: next.endIndex,
+                    });
+                  }
+                }}
+              />
+            </ComposedChart>
           </ResponsiveContainer>
         )}
       </div>
       <p className="btc-caption">
-        初期NAV
-        1からの変化。約定・借入コストを反映した確定足の値です。最大10,000本を表示し、基準は実行開始時のまま保持します。
+        初期NAV 1からの変化。約定・借入コストを反映した確定足の値です。下部の範囲つまみで期間を絞り、注文・約定・期限切れを同じ時間軸で確認できます。
       </p>
     </section>
+  );
+}
+
+function EventMarkerShape({
+  cx,
+  cy,
+  kind,
+  payload,
+}: {
+  cx?: number;
+  cy?: number;
+  kind?: MarkerKind;
+  payload?: { kind?: MarkerKind };
+}) {
+  if (typeof cx !== "number" || typeof cy !== "number") return null;
+  const markerKind = kind ?? payload?.kind;
+  if (markerKind === "intent") {
+    return <circle cx={cx} cy={cy} r={4.5} fill="#02b8cc" stroke="#071018" strokeWidth={1.5} />;
+  }
+  if (markerKind === "expired") {
+    return (
+      <path
+        d={`M ${cx - 4.5} ${cy - 4.5} L ${cx + 4.5} ${cy + 4.5} M ${cx + 4.5} ${cy - 4.5} L ${cx - 4.5} ${cy + 4.5}`}
+        stroke="#e5b765"
+        strokeWidth={2}
+        strokeLinecap="round"
+      />
+    );
+  }
+  return (
+    <polygon
+      points={`${cx},${cy - 7} ${cx - 6},${cy + 5} ${cx + 6},${cy + 5}`}
+      fill="#b9ef6d"
+      stroke="#071018"
+      strokeWidth={1.5}
+    />
   );
 }

@@ -32,10 +32,6 @@ function getDirectionGlyph(direction: Direction): string {
   return "→";
 }
 
-function roundedPosition(value: number): number {
-  return Math.round(value * 10000) / 10000;
-}
-
 export function TradesTable({ trades }: Props) {
   const [page, setPage] = useState(0);
   const totalPages = Math.max(1, Math.ceil(trades.length / PAGE_SIZE));
@@ -68,8 +64,8 @@ export function TradesTable({ trades }: Props) {
           </thead>
           <tbody>
             {visible.map((t) => {
-              const from = roundedPosition(t.from_position);
-              const to = roundedPosition(t.to_position);
+              const from = t.from_position;
+              const to = t.to_position;
               const direction = getDirection(from, to);
               const directionLabel = getDirectionLabel(direction);
 
@@ -113,8 +109,8 @@ export function TradesTable({ trades }: Props) {
 
         <div className="dashboard-trades-table__mobile" role="list" aria-label="Recent trade executions">
           {visible.map((t) => {
-            const from = roundedPosition(t.from_position);
-            const to = roundedPosition(t.to_position);
+            const from = t.from_position;
+            const to = t.to_position;
             const direction = getDirection(from, to);
             const directionLabel = getDirectionLabel(direction);
 
