@@ -3,7 +3,7 @@ import { readFile } from 'node:fs/promises';
 const { PGlite } = await import(process.env.PGLITE_IMPORT ?? '@electric-sql/pglite');
 const db=new PGlite();
 await db.exec('create role anon; create role authenticated; create role service_role bypassrls;');
-for(const name of ['20260906054107_btc_research_demo.sql','20260906073004_wm_research_demo.sql','20260906120000_wm_historical_backfill.sql']) await db.exec(await readFile(new URL('../migrations/'+name,import.meta.url),'utf8'));
+for(const name of ['20260906054107_btc_research_demo.sql','20260906073004_wm_research_demo.sql','20260906132408_wm_historical_backfill.sql']) await db.exec(await readFile(new URL('../migrations/'+name,import.meta.url),'utf8'));
 const run='btc-wm31-ac-20260906-paper-v1',bundle='btc-wm31-ac-20260906',family='wm_market31_ac';
 const h='a'.repeat(64),f='b'.repeat(64),e='c'.repeat(64),bar=900000;
 const t=Math.floor(Date.now()/bar)*bar,iso=x=>new Date(x).toISOString(),ns=x=>(BigInt(x)*1000000n).toString();

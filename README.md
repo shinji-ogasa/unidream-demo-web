@@ -329,7 +329,7 @@ npm run backfill:wm -- --reset --days 5 --max-steps 8
 契約で15分ごとに再構築する。`btc_demo_runs` の登録情報とレガシー表は保持される。
 
 最初に `supabase db push` または SQL Editor で
-`20260906120000_wm_historical_backfill.sql` を適用する。この migration は既存の
+`20260906132408_wm_historical_backfill.sql` を適用する。この migration は既存の
 ライブ検証を再利用し、履歴リプレイ用の期限バイパスを service role 専用RPCに分離する。
 バックフィル用の時刻や約定をブラウザから指定できるAPIではない。
 
