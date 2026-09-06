@@ -14,6 +14,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import type { TooltipProps } from "recharts";
 import type { BtcEvent, BtcSnapshot } from "@/lib/btc-release";
 import { fmtTime } from "@/lib/format";
 
@@ -256,18 +257,7 @@ export function BtcPerformanceChart({
                 domain={["auto", "auto"]}
               />
               <Tooltip
-                labelFormatter={(value) =>
-                  fmtTime(new Date(Number(value)).toISOString())
-                }
-                formatter={(value: number, name: string) => [
-                  chartPercent(value),
-                  name === "strategy" ? "WM + RL" : name === "benchmark" ? "B&H" : "event",
-                ]}
-                contentStyle={{
-                  background: "#13161b",
-                  border: "1px solid #303843",
-                  fontSize: 12,
-                }}
+                content={<BtcChartTooltip />}
               />
               <ReferenceLine y={0} stroke="#58616f" />
               <Area
@@ -332,6 +322,53 @@ export function BtcPerformanceChart({
         初期NAV 1からの変化。約定・借入コストを反映した確定足の値です。下部の範囲つまみで期間を絞り、注文・約定・期限切れを同じ時間軸で確認できます。
       </p>
     </section>
+  );
+}
+
+function BtcChartTooltip({
+  active,
+  label,
+  payload,
+}: TooltipProps<number, string>) {
+  if (!active || !payload?.length) return null;
+
+  const entries = payload.filter((entry, index, allEntries) => {
+    if (entry.dataKey !== "strategy" && entry.dataKey !== "benchmark") return false;
+    return allEntries.findIndex((candidate) => candidate.dataKey === entry.dataKey) === index;
+  });
+
+  return (
+    <div
+      style={{
+        background: "#13161b",
+        border: "1px solid #303843",
+        fontSize: 12,
+        padding: "8px 10px",
+      }}
+    >
+      <div style={{ color: "#d6dce5", marginBottom: 6 }}>
+        {fmtTime(new Date(Number(label)).toISOString())}
+      </div>
+      {entries.map((entry) => {
+        const value = typeof entry.value === "number" ? entry.value : Number(entry.value);
+        if (!Number.isFinite(value)) return null;
+        const isStrategy = entry.dataKey === "strategy";
+        return (
+          <div
+            key={String(entry.dataKey)}
+            style={{
+              color: isStrategy ? "#02b8cc" : "#d6dce5",
+              display: "flex",
+              gap: 12,
+              justifyContent: "space-between",
+            }}
+          >
+            <span>{isStrategy ? "WM + RL" : "B&H"}</span>
+            <span>{chartPercent(value)}</span>
+          </div>
+        );
+      })}
+    </div>
   );
 }
 
