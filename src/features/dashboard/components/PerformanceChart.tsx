@@ -8,19 +8,27 @@ import {
   Line,
   ReferenceLine,
   ResponsiveContainer,
+  Scatter,
   Tooltip,
   XAxis,
   YAxis,
 } from "recharts";
 
 import { tickLabel } from "@/lib/aggregate";
-import { INITIAL_EQUITY, SYMBOL, TIMEFRAME, type EquitySnapshot } from "@/lib/types";
+import {
+  INITIAL_EQUITY,
+  SYMBOL,
+  TIMEFRAME,
+  type EquitySnapshot,
+  type Trade,
+} from "@/lib/types";
 
 type Range = { startIndex: number; endIndex: number };
 
 type Props = {
   // snapshots is expected to be sorted ascending at 15m granularity.
   snapshots: EquitySnapshot[];
+  trades: Trade[];
   range: Range | null;
   onRangeChange: (range: Range) => void;
 };
@@ -32,6 +40,14 @@ type Row = {
   bnh: number;
 };
 
+type TradeDirection = "up" | "down" | "flat";
+
+type TradeMarker = {
+  x: number;
+  y: number;
+  direction: TradeDirection;
+};
+
 function returnPercent(value: number, start: number): number {
   if (!Number.isFinite(value) || !Number.isFinite(start) || start <= 0) return 0;
   return ((value / start) - 1) * 100;
@@ -41,7 +57,7 @@ function formatPerformance(value: number): string {
   return `${value >= 0 ? "+" : ""}${value.toFixed(2)}%`;
 }
 
-export function PerformanceChart({ snapshots, range, onRangeChange }: Props) {
+export function PerformanceChart({ snapshots, trades, range, onRangeChange }: Props) {
   const data: Row[] = useMemo(() => {
     if (snapshots.length === 0) return [];
     const strategyStart = snapshots[0]?.equity ?? INITIAL_EQUITY;
@@ -60,6 +76,38 @@ export function PerformanceChart({ snapshots, range, onRangeChange }: Props) {
     return rows;
   }, [snapshots]);
 
+  const tradeMarkers: TradeMarker[] = useMemo(() => {
+    if (data.length === 0 || trades.length === 0) return [];
+
+    return trades.flatMap((trade) => {
+      const tradeTime = new Date(trade.timestamp).getTime();
+      if (!Number.isFinite(tradeTime)) return [];
+
+      let nearestIndex = 0;
+      let nearestDistance = Number.POSITIVE_INFINITY;
+      for (let index = 0; index < snapshots.length; index += 1) {
+        const snapshotTime = new Date(snapshots[index]?.timestamp ?? "").getTime();
+        const distance = Math.abs(snapshotTime - tradeTime);
+        if (distance < nearestDistance) {
+          nearestIndex = index;
+          nearestDistance = distance;
+        }
+      }
+
+      const row = data[nearestIndex];
+      if (!row) return [];
+
+      const direction: TradeDirection =
+        trade.to_position > trade.from_position
+          ? "up"
+          : trade.to_position < trade.from_position
+            ? "down"
+            : "flat";
+
+      return [{ x: nearestIndex, y: row.equity, direction }];
+    });
+  }, [data, snapshots, trades]);
+
   const lastIdx = Math.max(0, data.length - 1);
   const safeStart = range
     ? Math.max(0, Math.min(range.startIndex, lastIdx))
@@ -67,6 +115,10 @@ export function PerformanceChart({ snapshots, range, onRangeChange }: Props) {
   const safeEnd = range
     ? Math.max(safeStart, Math.min(range.endIndex, lastIdx))
     : lastIdx;
+  const visibleTradeMarkers = tradeMarkers.filter(
+    (marker) => marker.x >= safeStart && marker.x <= safeEnd,
+  );
+  const tradeAxisEnd = Math.max(safeStart + 1, safeEnd);
 
   return (
     <section className="dashboard-chart dashboard-panel">
@@ -82,6 +134,7 @@ export function PerformanceChart({ snapshots, range, onRangeChange }: Props) {
           <div className="dashboard-chart__legend" aria-label="Chart legend">
             <LegendSwatch color="#02b8cc" label="AI" />
             <LegendSwatch color="rgba(226,232,240,0.86)" label="B&amp;H" dashed />
+            <TradeLegend />
           </div>
           <span className="dashboard-panel__meta">RETURN % · START 0</span>
         </div>
@@ -101,6 +154,14 @@ export function PerformanceChart({ snapshots, range, onRangeChange }: Props) {
                 stroke="#222831"
                 interval="preserveStartEnd"
                 minTickGap={48}
+              />
+              <XAxis
+                xAxisId="trade"
+                type="number"
+                dataKey="x"
+                domain={[safeStart, tradeAxisEnd]}
+                allowDataOverflow
+                hide
               />
               <YAxis
                 tick={{ fill: "#a1a8b3", fontSize: 13 }}
@@ -143,6 +204,15 @@ export function PerformanceChart({ snapshots, range, onRangeChange }: Props) {
                 isAnimationActive={false}
                 name="bnh"
               />
+              <Scatter
+                xAxisId="trade"
+                yAxisId={0}
+                data={visibleTradeMarkers}
+                dataKey="y"
+                name="trades"
+                shape={<TradeMarkerShape />}
+                isAnimationActive={false}
+              />
               <Brush
                 dataKey="label"
                 height={28}
@@ -177,5 +247,41 @@ function LegendSwatch({ color, label, dashed = false }: { color: string; label: 
       />
       <span>{label}</span>
     </span>
+  );
+}
+
+function TradeLegend() {
+  return (
+    <span className="dashboard-chart__trade-legend">
+      <span className="dashboard-chart__trade-legend-mark" aria-hidden="true">
+        <span className="dashboard-chart__trade-legend-mark--up">▲</span>
+        <span className="dashboard-chart__trade-legend-mark--down">▼</span>
+      </span>
+      <span>TRADES</span>
+    </span>
+  );
+}
+
+function TradeMarkerShape({
+  cx,
+  cy,
+  direction,
+}: {
+  cx?: number;
+  cy?: number;
+  direction?: TradeDirection;
+}) {
+  if (typeof cx !== "number" || typeof cy !== "number") return null;
+
+  const isDown = direction === "down";
+  const color = direction === "up" ? "#b9ef6d" : isDown ? "#ff7d8b" : "#a1a8b3";
+  const points = isDown
+    ? `${cx},${cy + 7} ${cx - 6},${cy - 5} ${cx + 6},${cy - 5}`
+    : `${cx},${cy - 7} ${cx - 6},${cy + 5} ${cx + 6},${cy + 5}`;
+
+  return (
+    <g pointerEvents="none">
+      <polygon points={points} fill={color} stroke="#05070b" strokeWidth={1.5} />
+    </g>
   );
 }

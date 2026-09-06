@@ -205,6 +205,7 @@ export function Dashboard({ initial }: DashboardProps) {
 
           <PerformanceChart
             snapshots={sortedSnapshots}
+            trades={trades}
             range={range}
             onRangeChange={handleRangeChange}
           />

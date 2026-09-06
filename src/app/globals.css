@@ -6978,6 +6978,29 @@ textarea {
   width: 20px;
 }
 
+.dashboard-shell--result-only .dashboard-chart__trade-legend {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 20px;
+}
+
+.dashboard-shell--result-only .dashboard-chart__trade-legend-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 1px;
+  font-size: 11px;
+  line-height: 1;
+}
+
+.dashboard-shell--result-only .dashboard-chart__trade-legend-mark--up {
+  color: #b9ef6d;
+}
+
+.dashboard-shell--result-only .dashboard-chart__trade-legend-mark--down {
+  color: #ff7d8b;
+}
+
 .dashboard-shell--result-only .dashboard-panel__meta {
   color: var(--ink-muted);
   font-size: 9px;
@@ -7010,6 +7033,14 @@ textarea {
   .dashboard-shell--result-only .dashboard-chart__legend {
     gap: 8px;
     font-size: 9px;
+  }
+
+  .dashboard-shell--result-only .dashboard-chart__trade-legend {
+    gap: 4px;
+  }
+
+  .dashboard-shell--result-only .dashboard-chart__trade-legend-mark {
+    font-size: 10px;
   }
 
   .dashboard-shell--result-only .dashboard-panel__meta {
