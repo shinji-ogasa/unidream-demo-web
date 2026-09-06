@@ -1,0 +1,18 @@
+{
+  "attempt": 3,
+  "at_unix": 1788687297.932988,
+  "http_status": 200,
+  "response": {
+    "ok": true,
+    "status": "applied",
+    "run_id": "btc-wm31-ac-20260906-paper-v1",
+    "bundle_sha256": "96e4aed9a6f0f94fcc72d8a6f6573078182f4cd4c2c2607c9c465044346565d9",
+    "event_ts": "2026-09-06T09:30:00.000Z",
+    "version": 1,
+    "snapshots": 0,
+    "events": 1,
+    "forecast_available": true,
+    "action_eligible": true,
+    "timely": true
+  }
+}

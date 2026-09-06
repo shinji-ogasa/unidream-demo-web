@@ -1,0 +1,27 @@
+{
+  "at": "2026-09-06T09:36:00Z",
+  "cron": [
+    {
+      "jobid": 1,
+      "active": false,
+      "jobname": "run-unidream-inference-15m",
+      "schedule": "1,16,31,46 * * * *"
+    },
+    {
+      "jobid": 2,
+      "active": true,
+      "jobname": "run-wm-research-demo-15m",
+      "schedule": "0,15,30,45 * * * *"
+    }
+  ],
+  "state": {
+    "run_id": "btc-wm31-ac-20260906-paper-v1",
+    "version": 1,
+    "last_open_ts": "2026-09-06T09:30:00+00:00",
+    "pending_due_at": "2026-09-06T09:45:00+00:00",
+    "pending_target": 0.9998822212219238
+  },
+  "events": 1,
+  "forecasts": 1,
+  "snapshots": 0
+}

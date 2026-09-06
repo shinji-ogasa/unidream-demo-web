@@ -31,13 +31,19 @@
     "seed": 7,
     "improvement_scope": "One period improves; two equal B&H; not trend-independent proof."
   },
-  "production_cutoff": null,
+  "production_cutoff": "2026-09-01T00:00:00+00:00",
   "research_scores_apply_to_production_weights": false,
   "high_probability_generalization_established": false,
   "method": "31-feature World Model -> Behavior Cloning -> learned Imagination Actor-Critic",
-  "status": "qualified_development_recipe_production_refit_pending",
+  "status": "forward_paper_started_waiting_first_scheduled_update",
   "source_report_url": "https://github.com/shinji-ogasa/UniDream/blob/exp/wm-rl-release-20260906/docs/experiments/wm_rl_market31_final_decision_20260906.md",
   "selection_manifest_url": "https://github.com/shinji-ogasa/UniDream/blob/exp/wm-rl-release-20260906/docs/experiments/wm_rl_market31_selection_20260906.json",
   "symbol": "BTCUSDT",
-  "interval": "15m"
+  "interval": "15m",
+  "production_fit_calendar": {
+    "fit_start": "2024-09-01T00:00:00+00:00",
+    "fit_end": "2026-09-01T00:00:00+00:00"
+  },
+  "production_training_run_manifest_sha256": "d8216d429599f78206bc25d0b4b055a719173acf528649f75b356a607ee87610",
+  "production_bundle_sha256": "96e4aed9a6f0f94fcc72d8a6f6573078182f4cd4c2c2607c9c465044346565d9"
 }

@@ -1,0 +1,36 @@
+{
+  "status": "merge_source_preservation_pass",
+  "incoming_exact": [
+    "src/app/homepage/page.tsx",
+    "src/features/dashboard/components/Dashboard.tsx",
+    "src/features/dashboard/components/PerformanceChart.tsx"
+  ],
+  "incoming_css_preserved": true,
+  "protected_WM_paths_unchanged": [
+    "src/app/page.tsx",
+    "src/features/btc-dashboard",
+    "src/lib/btc-release.ts",
+    "src/lib/server/btcDashboardRepository.ts",
+    "src/lib/server/btcReleaseEvidence.ts",
+    "supabase"
+  ],
+  "conflicts_resolved": [
+    "src/features/marketing/MarketingPage.tsx",
+    "src/app/globals.css"
+  ],
+  "resolved_marketing_sha256": "8dbad69c10839e6e3d715ae086ce58ff3dda9199c3c63447658f1d5095a4d574",
+  "resolved_css_sha256": "4c7f20149b78823b86d23ca3a607c87e71ec61f03a0a20779087fa7c15143372",
+  "typecheck": "pass",
+  "read_contract_scenarios": 10,
+  "build": "pass",
+  "pushed": false,
+  "deployed": false,
+  "commit": "5e9321078e6bc47a3fce5cf1ae75dd5e63a2e6a1",
+  "parents": [
+    "12000740e010c95818484c0d66e1c88cb2ee3072",
+    "703f627299d75e7e4c089554980eaa525f529cea"
+  ],
+  "working_tree_clean": true,
+  "diff_check": "pass",
+  "changed_files": 5
+}

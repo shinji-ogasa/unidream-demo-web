@@ -1,0 +1,9 @@
+{
+  "attempt": 2,
+  "at_unix": 1788686765.2369301,
+  "http_status": 502,
+  "response": {
+    "ok": false,
+    "stage": "compute canonical HF transition"
+  }
+}

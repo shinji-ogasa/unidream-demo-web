@@ -1,5 +1,5 @@
 {
-  "stage": "infrastructure_only_model_selection_pending",
+  "stage": "first_real_transition_verified_cron_active",
   "supabase_migration": {
     "name": "wm_research_demo",
     "version": "20260906080006",
@@ -7,21 +7,23 @@
   },
   "edge": {
     "name": "run-wm-research-demo",
-    "version": 1,
-    "sha256": "d5ced5d270e75776f36ff65990328e8d82d7fe9937a7583d424b87158a620650",
+    "version": 2,
+    "sha256": "87869da3ce04612ab904454fd1dde6baf3665f6cc9354a6846e7ab03375f6ae7",
     "unauthenticated_POST": 401,
     "GET": 405,
-    "authorized_model_transition_executed": false
+    "authorized_model_transition_executed": true,
+    "first_successful_state_version": 1
   },
-  "hf_source_commit": "e9572334d396f4f1f5184aa10cc25f7c69635fae",
-  "new_wm_bundle_deployed": false,
-  "wm_run_registered": false,
-  "cron_cutover": false,
+  "hf_source_commit": "2979debe1592d255ff1d65aebfc1b819b08ea763",
+  "new_wm_bundle_deployed": true,
+  "wm_run_registered": true,
+  "cron_cutover": true,
   "web_production_published": false,
-  "hf_verified_at": "2026-09-06T08:47:00Z",
+  "hf_verified_at": "2026-09-06T09:35:05Z",
   "hf_runtime_stage": "RUNNING",
   "hf_runtime_source_matches_repository": true,
   "hf_legacy_health_status": 200,
-  "hf_wm31_health_status": 503,
-  "hf_wm31_health_reason": "missing qualified WM31 bundle"
+  "hf_wm31_health_status": 200,
+  "inference_authentication_configured": true,
+  "initial_failure": "HF inference authentication was absent;503 before model computation. Existing server key configured, firstsuccessful transition after restart."
 }
