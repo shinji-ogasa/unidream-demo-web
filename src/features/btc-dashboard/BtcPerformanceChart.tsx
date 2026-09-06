@@ -167,6 +167,13 @@ export function BtcPerformanceChart({
   const visibleEventMarkers = eventMarkers.filter(
     (marker) => marker.index >= safeStart && marker.index <= safeEnd,
   );
+  // Recharts includes child-level data (the event marker Scatter) when it
+  // derives an axis domain. The marker list can contain only one timestamp,
+  // which would collapse every performance point onto one vertical line.
+  // Anchor the domain to the actual performance series and current Brush span.
+  const xDomain: [number, number] | ["dataMin", "dataMax"] = points.length > 0
+    ? [points[safeStart]?.time ?? 0, points[safeEnd]?.time ?? 0]
+    : ["dataMin", "dataMax"];
   const latest = points.at(-1);
   const latestDelta = latest ? latest.strategy - latest.benchmark : null;
 
@@ -221,7 +228,7 @@ export function BtcPerformanceChart({
               <XAxis
                 dataKey="time"
                 type="number"
-                domain={["dataMin", "dataMax"]}
+                domain={xDomain}
                 tickFormatter={(value) => new Date(value).toISOString().slice(5, 10)}
                 tick={{ fill: "#a1a8b3", fontSize: 11 }}
                 minTickGap={40}
