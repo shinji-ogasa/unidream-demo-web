@@ -18,18 +18,22 @@ test("dashboard exposes the model, parity, cutoff, atomic, and cost contract", (
   });
 });
 
-test("dashboard labels legacy fee values as all-in transaction cost", () => {
+test("dashboard labels legacy fee values and preserves provenance semantics", () => {
   const table = readFileSync(
-    new URL("../../../../src/components/TradesTable.tsx", import.meta.url),
+    new URL("../../../../src/features/dashboard/components/TradesTable.tsx", import.meta.url),
     "utf8",
   );
-  const dashboard = readFileSync(
-    new URL("../../../../src/components/Dashboard.tsx", import.meta.url),
+  const repository = readFileSync(
+    new URL("../../../../src/lib/server/dashboardRepository.ts", import.meta.url),
+    "utf8",
+  );
+  const contract = readFileSync(
+    new URL("../../../../src/lib/contract.ts", import.meta.url),
     "utf8",
   );
   assert.match(table, /cost \(USDT\)/);
   assert.match(table, /Legacy fee column; all-in quote transaction cost/);
-  assert.match(dashboard, /source-configured/);
-  assert.match(dashboard, /per-row provenance/);
+  assert.match(repository, /per-row provenance/);
+  assert.match(repository, /them as configured/);
+  assert.match(contract, /source-contract/);
 });
-
