@@ -375,12 +375,16 @@ function assertTransition(
   run: RunRow,
 ): asserts transition is Transition & { state: Record<string, unknown> } {
   const expectedVersion = typeof previous?.version === "number" ? previous.version : 0;
+  const transitionEventMs = typeof transition.event_ts === "string"
+    ? Date.parse(transition.event_ts)
+    : Number.NaN;
   if (
     transition.ok !== true ||
     transition.run_id !== RUN_ID ||
     transition.bundle_id !== BUNDLE_ID ||
     transition.model_family !== MODEL_FAMILY ||
-    transition.event_ts !== iso(eventMs) ||
+    !Number.isFinite(transitionEventMs) ||
+    transitionEventMs !== eventMs ||
     transition.expected_state_version !== expectedVersion ||
     !transition.state ||
     transition.state.version !== expectedVersion + 1 ||
