@@ -24,12 +24,14 @@ type ChartPoint = {
 };
 
 type MarkerKind = "fill" | "intent" | "expired";
+type MarkerDirection = "up" | "down" | "flat";
 
 type EventMarker = {
   index: number;
   time: number;
   y: number;
   kind: MarkerKind;
+  direction: MarkerDirection;
 };
 
 function eventKind(event: BtcEvent): MarkerKind | null {
@@ -56,6 +58,47 @@ function nearestPointIndex(points: ChartPoint[], timestamp: number): number {
     }
   }
   return nearest;
+}
+
+function recordsForEvent(event: BtcEvent): Record<string, unknown>[] {
+  const records = [event.details];
+  const fill = event.details.fill;
+  if (fill && typeof fill === "object" && !Array.isArray(fill)) {
+    records.push(fill as Record<string, unknown>);
+  }
+  return records;
+}
+
+function numericDetail(records: Record<string, unknown>[], ...keys: string[]): number | null {
+  for (const record of records) {
+    for (const key of keys) {
+      const value = record[key];
+      if (typeof value === "number" && Number.isFinite(value)) return value;
+    }
+  }
+  return null;
+}
+
+function eventDirection(event: BtcEvent): MarkerDirection {
+  const records = recordsForEvent(event);
+  const from = numericDetail(
+    records,
+    "from_position",
+    "exposure_before",
+    "previous_exposure",
+    "known_open_exposure",
+  );
+  const to = numericDetail(
+    records,
+    "to_position",
+    "exposure_after",
+    "current_position",
+    "target_position",
+    "target",
+    "due_target",
+  );
+  if (from === null || to === null || to === from) return "flat";
+  return to > from ? "up" : "down";
 }
 
 function chartPercent(value: number): string {
@@ -93,7 +136,13 @@ export function BtcPerformanceChart({
       if (!kind || !Number.isFinite(timestamp)) return [];
       const index = nearestPointIndex(points, timestamp);
       const point = points[index];
-      return [{ index, time: point.time, y: point.strategy, kind }];
+      return [{
+        index,
+        time: point.time,
+        y: point.strategy,
+        kind,
+        direction: eventDirection(event),
+      }];
     });
   }, [events, points]);
   const [range, setRange] = useState({ startIndex: 0, endIndex: 0 });
@@ -137,7 +186,7 @@ export function BtcPerformanceChart({
           <div className="btc-chart-legend" aria-label="Chart legend">
             <span className="btc-chart-legend__strategy">● WM + RL</span>
             <span className="btc-chart-legend__benchmark">┄ B&amp;H</span>
-            <span className="btc-chart-legend__events">▲ fills · ◇ orders · × expired</span>
+            <span className="btc-chart-legend__events">▲▼ fills · ◇ orders · × expired</span>
           </div>
           <div className="btc-chart__meta">
             <span>{points.length.toLocaleString()} BARS</span>
@@ -265,17 +314,27 @@ function EventMarkerShape({
   cx,
   cy,
   kind,
+  direction,
   payload,
 }: {
   cx?: number;
   cy?: number;
   kind?: MarkerKind;
-  payload?: { kind?: MarkerKind };
+  direction?: MarkerDirection;
+  payload?: { kind?: MarkerKind; direction?: MarkerDirection };
 }) {
   if (typeof cx !== "number" || typeof cy !== "number") return null;
   const markerKind = kind ?? payload?.kind;
+  const markerDirection = direction ?? payload?.direction ?? "flat";
   if (markerKind === "intent") {
-    return <circle cx={cx} cy={cy} r={4.5} fill="#02b8cc" stroke="#071018" strokeWidth={1.5} />;
+    return (
+      <polygon
+        points={`${cx},${cy - 5} ${cx + 5},${cy} ${cx},${cy + 5} ${cx - 5},${cy}`}
+        fill="#02b8cc"
+        stroke="#071018"
+        strokeWidth={1.5}
+      />
+    );
   }
   if (markerKind === "expired") {
     return (
@@ -287,10 +346,14 @@ function EventMarkerShape({
       />
     );
   }
+  const fillColor = markerDirection === "down" ? "#ff7d8b" : markerDirection === "flat" ? "#a1a8b3" : "#b9ef6d";
+  const points = markerDirection === "down"
+    ? `${cx},${cy + 7} ${cx - 6},${cy - 5} ${cx + 6},${cy - 5}`
+    : `${cx},${cy - 7} ${cx - 6},${cy + 5} ${cx + 6},${cy + 5}`;
   return (
     <polygon
-      points={`${cx},${cy - 7} ${cx - 6},${cy + 5} ${cx + 6},${cy + 5}`}
-      fill="#b9ef6d"
+      points={points}
+      fill={fillColor}
       stroke="#071018"
       strokeWidth={1.5}
     />

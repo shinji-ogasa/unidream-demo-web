@@ -7716,6 +7716,40 @@ textarea {
   color: #e5c88d;
 }
 
+.btc-countdown {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  gap: 6px;
+  color: #d6e4ec;
+  white-space: nowrap;
+}
+
+.btc-countdown i {
+  width: 5px;
+  height: 5px;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: #02b8cc;
+  box-shadow: 0 0 10px rgba(2, 184, 204, 0.8);
+}
+
+.btc-countdown__label {
+  color: #8fc1c6;
+}
+
+.btc-countdown strong {
+  color: #f2f6f8;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+}
+
+.btc-countdown small {
+  color: #6f8292;
+  font-size: inherit;
+  letter-spacing: 0;
+}
+
 .btc-chart__header {
   align-items: flex-start;
 }
@@ -7875,6 +7909,10 @@ textarea {
 
   .btc-live-strip > span:nth-child(even) {
     justify-content: flex-end;
+  }
+
+  .btc-live-strip .btc-countdown {
+    justify-content: flex-start;
   }
 
   .btc-chart__header {

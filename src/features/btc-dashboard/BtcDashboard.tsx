@@ -16,6 +16,7 @@ import {
 import { fmtExactNumber, fmtTime, fmtUSD } from "@/lib/format";
 import { useBtcDashboard } from "./useBtcDashboard";
 import { BtcPerformanceChart } from "./BtcPerformanceChart";
+import { BtcCountdown } from "./BtcCountdown";
 
 function points(value: number | null | undefined, digits = 3) {
   return typeof value === "number" && Number.isFinite(value)
@@ -251,6 +252,7 @@ export function BtcDashboard({
           <span>
             EVENT FEED <strong>{live.events.length}</strong>
           </span>
+          <BtcCountdown pendingDueAt={state?.pending_due_at} />
           <span>
             SYNC <strong>{fmtTime(live.checkedAt)}</strong>
           </span>
