@@ -1,0 +1,27 @@
+{
+  "stage": "infrastructure_only_model_selection_pending",
+  "supabase_migration": {
+    "name": "wm_research_demo",
+    "version": "20260906080006",
+    "local_file": "supabase/migrations/20260906073004_wm_research_demo.sql"
+  },
+  "edge": {
+    "name": "run-wm-research-demo",
+    "version": 1,
+    "sha256": "d5ced5d270e75776f36ff65990328e8d82d7fe9937a7583d424b87158a620650",
+    "unauthenticated_POST": 401,
+    "GET": 405,
+    "authorized_model_transition_executed": false
+  },
+  "hf_source_commit": "e9572334d396f4f1f5184aa10cc25f7c69635fae",
+  "new_wm_bundle_deployed": false,
+  "wm_run_registered": false,
+  "cron_cutover": false,
+  "web_production_published": false,
+  "hf_verified_at": "2026-09-06T08:47:00Z",
+  "hf_runtime_stage": "RUNNING",
+  "hf_runtime_source_matches_repository": true,
+  "hf_legacy_health_status": 200,
+  "hf_wm31_health_status": 503,
+  "hf_wm31_health_reason": "missing qualified WM31 bundle"
+}

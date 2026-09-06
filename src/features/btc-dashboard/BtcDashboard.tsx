@@ -102,7 +102,11 @@ export function BtcDashboard({
       : live.readStatus === "unavailable"
         ? "最新データを取得できません"
         : !state
-          ? "初回データ待ち"
+          ? evidence?.minimum_means_met === false
+            ? "採用条件未達・公開保留"
+            : live.run
+              ? "初回データ待ち"
+              : "公開準備中"
           : stale
             ? "更新に遅れがあります"
             : "データ受信済み";
@@ -214,7 +218,7 @@ export function BtcDashboard({
                 <p>
                   <strong>{evidenceData.quarters}四半期の平均</strong> ·{" "}
                   {evidenceData.start.slice(0, 10)} →{" "}
-                  {evidenceData.end_exclusive.slice(0, 10)}。上昇
+                  {evidenceData.end_exclusive.slice(0, 10)}。期首に観測した相場状態は、上昇
                   {evidenceData.regime_counts.bull}・下降
                   {evidenceData.regime_counts.bear}・横ばい
                   {evidenceData.regime_counts.sideways}
@@ -226,7 +230,11 @@ export function BtcDashboard({
                   です。
                 </p>
                 <p>
-                  開発期間で学習と比較を行った成績です。公開用に再学習した重みの実績は、下のペーパートレードで確認できます。相場によらず高い確率で改善するかは、今後の独立した期間で検証します。
+                  開発期間で学習と比較を行った成績です。
+                  {live.run
+                    ? "公開用に再学習した重みの実績は、下のペーパートレードで確認できます。"
+                    : "新しい公開用モデルはまだ稼働していません。"}
+                  相場によらず高い確率で改善するかは、今後の独立した期間で検証します。
                 </p>
               </div>
               <div className="btc-evidence-links">
@@ -238,7 +246,7 @@ export function BtcDashboard({
                 <a href={BTC_EVIDENCE_URL} download>
                   根拠データ JSON ↓
                 </a>
-                <span>{evidence?.minimum_means_met ? "開発期間の最低平均条件を達成" : "開発期間の最低平均条件を検証中"} · 独立した将来検証なし</span>
+                <span>{evidence?.minimum_means_met === true ? "開発期間の最低平均条件を達成" : evidence?.minimum_means_met === false ? "開発期間の最低平均条件は未達" : "開発期間の最低平均条件を検証中"} · 独立した将来検証なし</span>
               </div>
             </>
           ) : (
@@ -269,7 +277,9 @@ export function BtcDashboard({
                     : "公開用データへの接続を確認しています。記録が届くと自動更新します。"
                   : stale
                     ? "下の値は最終受信時点の記録です。直近の市場状況を反映していない可能性があります。"
-                    : "新しい実行の初回記録を待っています。旧モデルの履歴は混ぜません。"}
+                    : evidence?.minimum_means_met === false
+                      ? "今回の候補は採用条件に届かず、新しい公開モデルへの切り替えを保留しています。"
+                      : "新しい実行の初回記録を待っています。旧モデルの履歴は混ぜません。"}
             </p>
           ) : null}
           <div className="dashboard-result-summary">

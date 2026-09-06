@@ -5,17 +5,39 @@
   "candidate_id": "wm_market31_ac",
   "display_name": "UniDream WM + RL",
   "model_family": "wm_market31_ac",
-  "policy_arm": null,
+  "policy_arm": "ac_decay_dd25",
   "learned_rl": true,
-  "minimum_means_met": null,
-  "historical_evidence": null,
+  "minimum_means_met": true,
+  "historical_evidence": {
+    "metric_units": "fraction; multiply by100 for percentage points",
+    "start": "2021-07-19T17:00:00Z",
+    "end_exclusive": "2022-07-19T17:00:00Z",
+    "quarters": 3,
+    "regime_counts": {
+      "bull": 1,
+      "bear": 1,
+      "sideways": 1
+    },
+    "base": {
+      "alpha_ex": 0.0005354918811008765,
+      "maxdd_delta": -0.0006976992669101012
+    },
+    "stress_2x": {
+      "alpha_ex": 0.0005329190768422384,
+      "maxdd_delta": -0.0006954449939503929
+    },
+    "joint_quarters_both_costs": 1,
+    "reused_development": true,
+    "seed": 7,
+    "improvement_scope": "One period improves; two equal B&H; not trend-independent proof."
+  },
   "production_cutoff": null,
   "research_scores_apply_to_production_weights": false,
   "high_probability_generalization_established": false,
   "method": "31-feature World Model -> Behavior Cloning -> learned Imagination Actor-Critic",
-  "status": "validation_in_progress_not_released",
-  "source_report_url": "https://github.com/shinji-ogasa/UniDream/blob/exp/wm-rl-release-20260906/docs/experiments/wm_rl_release_registration_20260906.md",
-  "selection_manifest_url": "https://github.com/shinji-ogasa/UniDream/tree/exp/wm-rl-release-20260906/docs/experiments",
+  "status": "qualified_development_recipe_production_refit_pending",
+  "source_report_url": "https://github.com/shinji-ogasa/UniDream/blob/exp/wm-rl-release-20260906/docs/experiments/wm_rl_market31_final_decision_20260906.md",
+  "selection_manifest_url": "https://github.com/shinji-ogasa/UniDream/blob/exp/wm-rl-release-20260906/docs/experiments/wm_rl_market31_selection_20260906.json",
   "symbol": "BTCUSDT",
   "interval": "15m"
 }
