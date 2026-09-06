@@ -1,0 +1,65 @@
+{
+  "checks": {
+    "browser_errors": 0,
+    "desktop_viewport": [
+      1280,
+      960
+    ],
+    "details_expand_no_overflow": true,
+    "display_static_metrics": [
+      "+4.450pt",
+      "-5.143pt",
+      "+4.248pt",
+      "-5.056pt"
+    ],
+    "framework_overlays": 0,
+    "historical_joint_quarters": "3/8",
+    "legacy_navigation": true,
+    "live_unconfigured_values": "empty; no fabricated chart",
+    "marketing_archive_notice": true,
+    "mobile_viewport": [
+      390,
+      844
+    ],
+    "overflow_both": false,
+    "production_build": true,
+    "synthetic_read_contract_scenarios": 8,
+    "typecheck": true
+  },
+  "evidence_sha256": {
+    "/tmp/btc-accuracy-desktop.png": "ab4dfaf786f56796f5b2da68e4381a661d820ca33adb59a12d0bf458042daac4",
+    "/tmp/btc-accuracy-mobile-details.png": "4b1f8bb9f514d65aff9edf0ba0ee27f1db1c3f5d50c2ba4c57dec4415dcefdf0",
+    "/tmp/btc-accuracy-mobile.png": "4b3cfa826e25c0c157f22ffdea213e86ddecf30bc4a660d44174a3b143ff0181",
+    "/tmp/btc-accuracy-ui-read-contract-test.json": "7c65c4cd81f8b0f05d7d853d412ff861d69baa2fcf1dc4b7ed24c490dd420477",
+    "/tmp/btc-accuracy-ui-read-contract-test.ts": "acbb8fed1031df5ff15ce9974533262e092f20ae00fcfe6b7771e4ce3c4bd12a",
+    "/tmp/btc-accuracy-web-build-final.log": "3cce15e5106f2c91d192ec9bd974b5f168b2a4cb241d88f1b8ca6ff574b81c6d",
+    "/tmp/btc-accuracy-web-typecheck.log": "439803666fa63ef95b987604fbaf45d0863f027cc8aa253c34374b1807dfc8f5"
+  },
+  "limitations": [
+    "Screenshots verify actual unconfigured/empty new-run UI, not a populated production run.",
+    "Real HF/Edge/DB bundle hashes and fresh source timestamps remain a deployment integration check.",
+    "No client writes, no commit, push or deploy performed."
+  ],
+  "passed": true,
+  "runtime_notes": [
+    "Local ignored node_modules symlink to existing main-repo installation.",
+    "Dev server currently port3146 (PTY1682), agent-browser session btc-accuracy-release-ui."
+  ],
+  "schema": "btc-accuracy-web-ui-qa-v1",
+  "source_sha256": {
+    "public/btc-accuracy-release.json": "c0f053fe40f344b5acc4239c42cbd1696c5244d88357d1176ffc643eaf9c35df",
+    "src/app/api/btc-dashboard/route.ts": "8fceef63120ee08c2362a2ecad229cf1eba5d6b66e3ab13965e04af24ef5300c",
+    "src/app/globals.css": "99f15a3b91c302b2268e8472295a484989f867ec9b3853d731810e4f6f596171",
+    "src/app/legacy/page.tsx": "5facc8d9aae3c807f9ef1e357eff3d26cd2e7b73e34eb6e8ae0f978d2077c655",
+    "src/app/page.tsx": "643f3c823613d89fa7d0652e82a03ef8697e8fc7f439834cd86cb2dc53bac29f",
+    "src/features/btc-dashboard/BtcDashboard.tsx": "e8000f2fa7388ad42e48cd6e24dfa6b10f35bb374abee198c638567f790e0bc3",
+    "src/features/btc-dashboard/BtcPerformanceChart.tsx": "b8471ce1fe0be4ddce6f1f6d6e273b94ba3746a8ee2b3eab5b2b1db4b72f21a8",
+    "src/features/btc-dashboard/useBtcDashboard.ts": "ef396f27c9a53542b918af44c2020371ae9850c216a419ea06ce28f955f6255c",
+    "src/features/marketing/MarketingPage.tsx": "c543315166d9ddbbf5ee151c31a6ee2a920b966f20444f72ed8bb88d9647eebb",
+    "src/features/marketing/data.ts": "adb55fa92f8005977dc1baf46958682dded39eb6eb0ec61c40346377a0f99c18",
+    "src/lib/btc-release.ts": "9af34c415790feef898f83adef09aff63dc41df7cdca3b6064d9c1c52694055f",
+    "src/lib/server/btcDashboardRepository.ts": "7583b78b7cea5f71c36d25478a7a3438e73b90c31d960cd1065a9f10119c7db3",
+    "src/lib/server/btcReleaseEvidence.ts": "26799fa0a2ee31983fbced5a7399afa7a15f14925a8584aca545188c08a363bd"
+  },
+  "worktree": "/Users/sophie/Documents/UniDream/.worktrees/accuracy-release-web-20260906"
+}

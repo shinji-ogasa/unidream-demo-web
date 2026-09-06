@@ -1,0 +1,33 @@
+{
+  "status": "pass",
+  "scope": "synthetic HF bridge/_project -> JSON -> actual local WM RPC; no production model/economics/deployment",
+  "fixture_sha256": "a726776c139b280bd5de30b78dd4e8e132b946cc3fd067273e7bcccb2c2c2535",
+  "migrations": {
+    "20260906054107_btc_research_demo.sql": "c816de389b8e61af6749128c1676e3dc2fe433cb7858c3cb6724e6e07667c38a",
+    "20260906073004_wm_research_demo.sql": "4d03d5631e835281e2c21e10cab35011e0c8bae5bcf7444100c3ce5bd66ff260"
+  },
+  "cases": [
+    {
+      "name": "initial",
+      "status": "pass",
+      "state_exact": true,
+      "forecast_diagnostics_exact": true,
+      "idempotent": true,
+      "snapshots": 0,
+      "events": 1,
+      "ns_transport": "canonical decimal strings",
+      "event_ts": "2026-09-06T07:45:00+00:00"
+    },
+    {
+      "name": "second",
+      "status": "pass",
+      "state_exact": true,
+      "forecast_diagnostics_exact": true,
+      "idempotent": true,
+      "snapshots": 1,
+      "events": 2,
+      "ns_transport": "canonical decimal strings",
+      "event_ts": "2026-09-06T07:45:00+00:00"
+    }
+  ]
+}

@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { motion, useInView } from "framer-motion";
 import {
   ArrowDown,
@@ -322,7 +323,7 @@ function StateSection() {
               <div className="state-note">
                 <span className="state-note__marker">17</span>
                 <div>
-                  <span className="micro-label">MARKET STATE INPUT</span>
+                  <span className="micro-label">ARCHIVED PLAN011 INPUT</span>
                   <strong>17 features × 64 bars</strong>
                   <p>BTCUSDT · 15m · z-score window 60d。</p>
                 </div>
@@ -431,7 +432,7 @@ function EvidenceSection() {
             <h2 id="evidence-title">最後に、<br className="display-break" /><em>B&amp;Hとの差分を検証する。</em></h2>
           </Reveal>
           <Reveal className="evidence-section__copy" delay={0.12} x={24} y={0}>
-            <p>目標はB&amp;Hを上回るAlphaExと、より小さいMaxDDΔを同時に満たすこと。現行holdoutは途中の結果として、未達条件も含めて同じ画面に出します。</p>
+            <p>目標はB&amp;Hを上回るAlphaExと、より小さいMaxDDΔを同時に満たすこと。旧Plan011 holdoutは途中の結果として、未達条件も含めて同じ画面に出します。</p>
             <ArrowLink href="https://github.com/shinji-ogasa/UniDream/blob/main/docs/plan011_v31_investor_evidence.md" variant="text">研究レポートの原文を見る</ArrowLink>
           </Reveal>
         </div>
@@ -451,7 +452,7 @@ function EvidenceSection() {
               <strong>{HOLDOUT_SUMMARY.alphaExMean}<small> AlphaEx mean</small></strong>
               <strong>{HOLDOUT_SUMMARY.maxDdDeltaMean}<small> MaxDDΔ mean</small></strong>
             </div>
-            <p>AlphaExは平均プラス。一方、MaxDDΔは負が改善で、現行はDD改善 {HOLDOUT_SUMMARY.improvedDrawdown}。</p>
+            <p>AlphaExは平均プラス。一方、MaxDDΔは負が改善で、旧Plan011はDD改善 {HOLDOUT_SUMMARY.improvedDrawdown}。</p>
           </div>
           <div className="evidence-thesis__read">
             <span className="micro-label">HOW TO READ</span>
@@ -599,7 +600,7 @@ function DemoSection() {
             <span>visual structure only · live values are shown in the dashboard</span>
           </div>
           <div className="demo-stage__float demo-stage__float--one">
-            <span className="micro-label">MODEL</span>
+            <span className="micro-label">ARCHIVED MODEL</span>
             <strong>Plan011 v31</strong>
             <span className="float-state"><StatusDot tone="blue" /> FOLD 23 / AC OVERLAY</span>
           </div>
@@ -644,6 +645,7 @@ export default function MarketingPage() {
     <main id="main-content" className="marketing-shell">
       <SiteHeader />
       <Hero />
+      <aside className="btc-marketing-release-note">このページの構造・検証値は旧Plan011の研究アーカイブです。最新デモのモデルは、World Modelと学習済みRL Actorの検証結果に基づいて更新します。<Link href="/">選定根拠と公開後の比較へ →</Link></aside>
       <StoryRibbon />
       <StateSection />
       <TechnologySection />

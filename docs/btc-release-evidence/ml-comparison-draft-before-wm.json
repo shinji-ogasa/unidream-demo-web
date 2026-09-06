@@ -1,0 +1,111 @@
+{
+  "bundle_id": "btc-perp-reliability-20260906",
+  "candidate_id": "perp_delay0_reliability_utility_risk1",
+  "display_name": "BTC Perp Reliability",
+  "execution": {
+    "borrow_annual": 0.1,
+    "deadband": 0.01,
+    "decision_hours_utc": [
+      0,
+      6,
+      12,
+      18
+    ],
+    "display_capital": 10000.0,
+    "fill_delay_bars": 1,
+    "initial_equity": 1.0,
+    "max_step": 0.08,
+    "missing_forecast": "hold",
+    "one_way_cost": 0.00055,
+    "risk_aversion": 1,
+    "utility_cost_multiplier": 2
+  },
+  "high_probability_generalization_established": false,
+  "historical_evidence": {
+    "additional_test_for_selected_recipe_available": false,
+    "base": {
+      "alpha_ex": 0.04450248796955247,
+      "maxdd_delta": -0.051432486557127496,
+      "trades": 22.75,
+      "turnover": 1.5676173406855132
+    },
+    "end_exclusive": "2023-04-16T13:45:00Z",
+    "joint_quarters_both_costs": 3,
+    "metric_units": "fraction; multiply by100 for percentage points",
+    "quarters": 8,
+    "regime_counts": {
+      "bear": 4,
+      "bull": 2,
+      "sideways": 2
+    },
+    "regimes": {
+      "bear": {
+        "base": {
+          "alpha_ex": 0.02894528670841051,
+          "maxdd_delta": -0.039669842477241146,
+          "trades": 19.0,
+          "turnover": 1.2155992459883784
+        },
+        "joint_positive_quarters_both_costs": 1,
+        "quarters": 4,
+        "stress_2x": {
+          "alpha_ex": 0.02659913987729315,
+          "maxdd_delta": -0.039043106662104504,
+          "trades": 18.75,
+          "turnover": 1.2126477492298156
+        }
+      },
+      "bull": {
+        "base": {
+          "alpha_ex": 0.04062991232730351,
+          "maxdd_delta": -0.04749014549506947,
+          "trades": 37.0,
+          "turnover": 2.6816172561873306
+        },
+        "joint_positive_quarters_both_costs": 1,
+        "quarters": 2,
+        "stress_2x": {
+          "alpha_ex": 0.03776809829676345,
+          "maxdd_delta": -0.04547812571698934,
+          "trades": 37.0,
+          "turnover": 2.681682878302314
+        }
+      },
+      "sideways": {
+        "base": {
+          "alpha_ex": 0.07948946613408536,
+          "maxdd_delta": -0.07890011577895822,
+          "trades": 16.0,
+          "turnover": 1.1576536145779655
+        },
+        "joint_positive_quarters_both_costs": 1,
+        "quarters": 2,
+        "stress_2x": {
+          "alpha_ex": 0.07894578603941571,
+          "maxdd_delta": -0.07867239636157902,
+          "trades": 16.0,
+          "turnover": 1.1578447655554425
+        }
+      }
+    },
+    "reused_development": true,
+    "start": "2021-04-16T13:45:00Z",
+    "stress_2x": {
+      "alpha_ex": 0.042478041022691364,
+      "maxdd_delta": -0.05055918385069434,
+      "trades": 22.625,
+      "turnover": 1.5662057855793468
+    }
+  },
+  "interval": "15m",
+  "method": "Ridge return forecast + HGB variance + scale-only reliability + deterministic utility controller",
+  "production_cutoff": "2026-07-16T13:45:00Z",
+  "production_evaluation_end": "2026-10-16T13:45:00Z",
+  "research_scores_apply_to_production_weights": false,
+  "rl_qualified": false,
+  "run_id": "btc-perp-reliability-20260906",
+  "schema_version": 1,
+  "selection_manifest_url": "https://github.com/shinji-ogasa/UniDream/blob/exp/oracle-feature-frontier-20260905/docs/experiments/btc_accuracy_selection_20260906.json",
+  "source_report_url": "https://github.com/shinji-ogasa/UniDream/blob/exp/oracle-feature-frontier-20260905/docs/experiments/oracle_mean_reliability_results_20260906.md",
+  "symbol": "BTCUSDT"
+}

@@ -1,0 +1,1 @@
+{"passed":true,"scenarios":["ready","wrong_bundle_clears_values","future_forecast_excluded","unregistered_run_empty","read_failure_empty","unconfigured_empty","normalized_money","separate_static_evidence"],"all_queries_run_filtered":true,"snapshot_state_cutoff_checked":true,"real_network":false}

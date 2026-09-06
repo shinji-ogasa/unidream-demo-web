@@ -1,0 +1,21 @@
+{
+  "schema_version": 2,
+  "bundle_id": "btc-wm31-ac-20260906",
+  "run_id": "btc-wm31-ac-20260906-paper-v1",
+  "candidate_id": "wm_market31_ac",
+  "display_name": "UniDream WM + RL",
+  "model_family": "wm_market31_ac",
+  "policy_arm": null,
+  "learned_rl": true,
+  "minimum_means_met": null,
+  "historical_evidence": null,
+  "production_cutoff": null,
+  "research_scores_apply_to_production_weights": false,
+  "high_probability_generalization_established": false,
+  "method": "31-feature World Model -> Behavior Cloning -> learned Imagination Actor-Critic",
+  "status": "validation_in_progress_not_released",
+  "source_report_url": "https://github.com/shinji-ogasa/UniDream/blob/exp/wm-rl-release-20260906/docs/experiments/wm_rl_release_registration_20260906.md",
+  "selection_manifest_url": "https://github.com/shinji-ogasa/UniDream/tree/exp/wm-rl-release-20260906/docs/experiments",
+  "symbol": "BTCUSDT",
+  "interval": "15m"
+}

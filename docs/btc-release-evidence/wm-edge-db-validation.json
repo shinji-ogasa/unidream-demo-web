@@ -1,0 +1,86 @@
+{
+  "status": "pass",
+  "scope": "local-only WM Web DB/Edge implementation; no registration/deployment/Cron/financial fit or evaluation",
+  "run_id": "btc-wm31-ac-20260906-paper-v1",
+  "bundle_id": "btc-wm31-ac-20260906",
+  "model_family": "wm_market31_ac",
+  "owned_files": {
+    "supabase/functions/run-wm-research-demo/collector.ts": "1c48695fe1b9f34873df4acffaa3ba7740406455910d43ef6e0fa1ebf920a11a",
+    "supabase/functions/run-wm-research-demo/collector_test.ts": "ec354a93b6813b94a0e61ccd5fccf3d01ebd4c9ce0824917cf31e24118eb9328",
+    "supabase/functions/run-wm-research-demo/handler.ts": "f7d6d7e341d02400ca1003873f73e73b835a1a605ed2ed72afef3798f02f91c2",
+    "supabase/functions/run-wm-research-demo/handler_test.ts": "aba7a9daac7b9e518567c3a3abd774690fe7b89a2d2735d4504c35e39719f625",
+    "supabase/functions/run-wm-research-demo/index.ts": "fdb9bd3bd241440a4daafd2af9c3298652de36b907cf51fa4463d2b553676e80",
+    "supabase/migrations/20260906073004_wm_research_demo.sql": "4d03d5631e835281e2c21e10cab35011e0c8bae5bcf7444100c3ce5bd66ff260",
+    "supabase/tests/wm_transition_test.mjs": "19a90f39337cf533229af718f91ecc70b71c13eb926a5f6f3014b38417354669",
+    "supabase/tests/wm_runtime_contract_test.mjs": "efb88fcc5a30a40e3cb7846ef5d5308de6f09bf71a145f96139c8825110ee9fb"
+  },
+  "verification": {
+    "new_sql": {
+      "status": "pass",
+      "tests": 61,
+      "engine": "PGlite PostgreSQL",
+      "scope": "both actual migrations; WM schema/deadline/clock/state/hash/rollback/idempotency/legacy constraints/RLS; no external mutation"
+    },
+    "legacy_sql": {
+      "status": "pass",
+      "tests": 29,
+      "engine": "PGlite PostgreSQL",
+      "scope": "real migration and PL/pgSQL transaction/idempotency/CAS/rollback/RLS grants, in-memory only"
+    },
+    "edge_regression_tests": 36,
+    "new_edge_tests": 16,
+    "edge_regression_log_sha256": "9592f20f53b0e37fcf47d67941249b1029ac317e04b8486a2b9f3c687dfa2648",
+    "hf_runtime_to_pg": {
+      "status": "pass",
+      "scope": "synthetic HF bridge/_project -> JSON -> actual local WM RPC; no production model/economics/deployment",
+      "fixture_sha256": "a726776c139b280bd5de30b78dd4e8e132b946cc3fd067273e7bcccb2c2c2535",
+      "migrations": {
+        "20260906054107_btc_research_demo.sql": "c816de389b8e61af6749128c1676e3dc2fe433cb7858c3cb6724e6e07667c38a",
+        "20260906073004_wm_research_demo.sql": "4d03d5631e835281e2c21e10cab35011e0c8bae5bcf7444100c3ce5bd66ff260"
+      },
+      "cases": [
+        {
+          "name": "initial",
+          "status": "pass",
+          "state_exact": true,
+          "forecast_diagnostics_exact": true,
+          "idempotent": true,
+          "snapshots": 0,
+          "events": 1,
+          "ns_transport": "canonical decimal strings",
+          "event_ts": "2026-09-06T07:45:00+00:00"
+        },
+        {
+          "name": "second",
+          "status": "pass",
+          "state_exact": true,
+          "forecast_diagnostics_exact": true,
+          "idempotent": true,
+          "snapshots": 1,
+          "events": 2,
+          "ns_transport": "canonical decimal strings",
+          "event_ts": "2026-09-06T07:45:00+00:00"
+        }
+      ]
+    },
+    "format_check": "Deno fmt5 files pass",
+    "whitespace_check": "git diff --check and all8 own untracked sources pass"
+  },
+  "commands": {
+    "new_sql": "PGLITE_IMPORT=/tmp/btc-db-validation/node_modules/@electric-sql/pglite/dist/index.js node supabase/tests/wm_transition_test.mjs",
+    "edge": "npx --yes deno@2.9.6 test supabase/functions/run-btc-research-demo supabase/functions/run-wm-research-demo",
+    "runtime_to_pg": "PGLITE_IMPORT=/tmp/btc-db-validation/node_modules/@electric-sql/pglite/dist/index.js WM_RUNTIME_FIXTURE=/tmp/wm31-runtime-sql-fixtures.json node supabase/tests/wm_runtime_contract_test.mjs"
+  },
+  "source_contract_notes": [
+    "ns clocks are lossless decimal strings at JSON boundary",
+    "account through prior completed bar, separate current policy and deferred next-open intent",
+    "account/decision event kinds added; legacy fill/intent/expired retained",
+    "strict PostgreSQL clock_timestamp deadline before next-open after row lock and before final write",
+    "complete snapshot cash/BH/DD arithmetic and final projection checked from initial1",
+    "halted account preserves canonical debt with zero display NAV and no fabricated positive snapshot",
+    "immutable registered digest values are required; no production hash invented"
+  ],
+  "runtime_fixture_limitation": "synthetic fixture must be regenerated under current15m origin for real-clock RPC tests; seeded previous state is explicitly synthetic",
+  "supabase_cli": "2.116.0; forward migration created by migration new",
+  "docs_checked": "https://supabase.com/docs/guides/database/functions"
+}

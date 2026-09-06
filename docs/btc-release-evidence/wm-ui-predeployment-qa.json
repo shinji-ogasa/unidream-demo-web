@@ -1,0 +1,20 @@
+{
+  "stage": "local WM31 UI before model selection/deployment",
+  "desktop": {
+    "width": 1280,
+    "scrollWidth": 1280,
+    "screenshot_sha256": "acf42c79b0d3435662d361629cf2237b0a5323d53c42ef87b10b52cd6b2e7a8a"
+  },
+  "mobile": {
+    "width": 390,
+    "scrollWidth": 390,
+    "screenshot_sha256": "dfb8ea9013ad03e262716b2d3d42149ad12cc911b3129d8ccbb8cc0048b959f3"
+  },
+  "blank": false,
+  "error_overlay": false,
+  "browser_errors": [],
+  "model_label": "UniDream WM + RL",
+  "live_state": "new run not yet registered; pending shown without fabricated metrics",
+  "typecheck": "passed",
+  "next_build": "passed"
+}

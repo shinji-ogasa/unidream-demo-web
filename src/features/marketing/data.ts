@@ -16,7 +16,7 @@ export const MARKETING_NAV = [
 ];
 
 export const HERO_READOUTS = [
-  { label: "BUNDLE", value: "PLAN011 / FOLD 23", tone: "blue" },
+  { label: "BUNDLE", value: "ARCHIVED PLAN011 / FOLD 23", tone: "blue" },
   { label: "SCHEMA", value: "17 FEATURES", tone: "cyan" },
   { label: "VERIFY", value: "1.1920929e-7 MAX DIFF", tone: "lime" },
 ] as const;
@@ -24,7 +24,7 @@ export const HERO_READOUTS = [
 export const BUNDLE_CONTRACT = {
   bundle: "plan011_v31_overlay_actor",
   fold: "23",
-  status: "latest_holdout_candidate",
+  status: "archived_holdout_candidate",
   symbol: "BTCUSDT",
   interval: "15m",
   featureCount: 17,

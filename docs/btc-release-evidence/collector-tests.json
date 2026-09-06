@@ -1,0 +1,35 @@
+{
+  "collector_tests": 11,
+  "command": "npx --yes deno@2.9.6 test supabase/functions/run-btc-research-demo/",
+  "duration_ms": 78,
+  "handler_tests": 9,
+  "key_checks": [
+    "8641 aligned closed slots each market in nine fixed chunks, max three concurrent requests/market",
+    "nondecision accounting range and empty-history path",
+    "all-null missing rows retained without interpolation",
+    "current-open timestamp and price only; other live candle fields deliberately ignored",
+    "current-open missing returned as explicit null object for existing-run HF accounting",
+    "receipt timestamp only after all fetches complete",
+    "duplicate/future/out-of-chunk/microsecond/badclose/OHLC/taker/coercion guards",
+    "hung transport bounded even if injected fetch ignores abort"
+  ],
+  "own_files": [
+    "supabase/functions/run-btc-research-demo/collector.ts",
+    "supabase/functions/run-btc-research-demo/collector_test.ts"
+  ],
+  "passed": true,
+  "primary_schema_sources": [
+    "https://developers.binance.com/docs/binance-spot-api-docs/rest-api/market-data-endpoints",
+    "https://developers.binance.com/docs/derivatives/usds-margined-futures/market-data/rest-api/Kline-Candlestick-Data"
+  ],
+  "schema": "btc-collector-focused-tests-v1",
+  "scope": "Injected fetch/clock/timeout tests only. No real market collection, model fit or policy rollout. Request timeout15s, at most one public Spot alternative, no UM alternative/retry; malformed semantics/rate-limit errors never fallback.",
+  "source_sha256": {
+    "supabase/functions/run-btc-research-demo/collector.ts": "47852f73ff6db4a057fa2ba535fdbd82f293d488133d2e7c6a8847cf12e2e641",
+    "supabase/functions/run-btc-research-demo/collector_test.ts": "88dd267c336d1f5979bab65e4f3bccc3336ccba862b8e11cb844087456ed196a",
+    "supabase/functions/run-btc-research-demo/handler.ts": "335098824299b642a6eb44582edfbb21e04a3a9a427ed0e936d1877b126e9afb",
+    "supabase/functions/run-btc-research-demo/handler_test.ts": "29e7fe60c853dd153ac1ee197f207d1615d6733d2fe6d083af438c8c5419cd12"
+  },
+  "test_log_sha256": "0fec38a3cb75bd8f792b6bf1e56b540a8fe67da9bc9675b63adf41fb8ab640d8",
+  "tests": 20
+}

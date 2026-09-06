@@ -7525,3 +7525,88 @@ textarea {
     padding: 0 8px;
   }
 }
+
+/* Isolated BTC release: retain the dashboard's existing typography and panels. */
+.btc-release-shell .dashboard-container { gap: 20px; }
+.btc-release-shell .dashboard-model { white-space: normal; }
+.btc-release-shell .dashboard-header__status { justify-content: flex-end; }
+.btc-release-shell .dashboard-panel,
+.btc-release-shell .dashboard-result-stage { padding: 22px; min-width: 0; }
+.btc-section-heading { display: flex; align-items: center; justify-content: space-between; gap: 18px; }
+.btc-section-heading > div { min-width: 0; }
+.btc-eyebrow { color: #8b98a8; font: 9px "SFMono-Regular", Consolas, monospace; letter-spacing: .13em; }
+.btc-section-heading h1 { margin: 10px 0 0; color: #ecf2f7; font-size: clamp(20px, 2.5vw, 30px); font-weight: 500; line-height: 1.5; letter-spacing: -.04em; }
+.btc-section-heading h2 { margin: 8px 0 0; color: #ecf2f7; font-size: 20px; font-weight: 500; }
+.btc-status { display: inline-flex; flex-shrink: 0; align-items: center; border: 1px solid #34404d; border-radius: 5px; padding: 6px 9px; color: #b0bfcc; font-size: 10px; line-height: 1.4; }
+.btc-description { color: #a6b3c2; font-size: 12px; line-height: 1.9; margin: 14px 0 20px; }
+.btc-evidence-metrics { border-top: 1px solid #27313c; border-bottom: 1px solid #27313c; }
+.btc-release-shell .dashboard-metric-cell { min-width: 0; padding: 20px 14px; }
+.btc-release-shell .dashboard-metric-cell__value { font-size: clamp(23px, 2.4vw, 31px); letter-spacing: -.035em; }
+.btc-release-shell .dashboard-metric-cell__label { line-height: 1.6; min-height: 16px; font-size: 10px; }
+.btc-release-shell .dashboard-metric-cell__hint { white-space: normal; line-height: 1.7; font-size: 10px; }
+.btc-evidence-notes { margin-top: 17px; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.btc-evidence-notes p { color: #95a5b5; font-size: 11px; line-height: 1.9; margin: 0; }
+.btc-evidence-notes strong { color: #d4dfe8; font-weight: 500; }
+.btc-evidence-links { display: flex; gap: 10px 20px; flex-wrap: wrap; margin-top: 17px; color: #7f92a5; font-size: 10px; line-height: 1.7; }
+.btc-evidence-links a { color: #8ccad1; text-decoration: underline; text-underline-offset: 3px; }
+.btc-evidence-links span { margin-left: auto; }
+.btc-release-shell .dashboard-result-summary { margin: 22px 0 14px; }
+.btc-release-shell .dashboard-result-summary__benchmark small { max-width: 180px; line-height: 1.7; }
+.btc-notice { margin: 16px 0; border-left: 2px solid #ad8a50; padding: 10px 13px; background: rgba(146,109,43,.06); color: #c0b294; font-size: 11px; line-height: 1.8; }
+.btc-live-metrics { border-top: 1px solid #27313c; }
+.btc-live-metrics .dashboard-metric-cell__value { font-size: 22px; }
+.btc-state-times { display: flex; flex-wrap: wrap; gap: 10px 24px; color: #8593a2; font-size: 10px; line-height: 1.8; padding: 12px 0; border-top: 1px solid #27313c; }
+.btc-state-times span { display: grid; gap: 3px; }
+.btc-state-times strong { font-weight: 400; color: #b3c0ce; }
+.btc-caption { font-size: 10px; line-height: 1.85; color: #7e90a2; margin: 12px 0 0; }
+.btc-release-shell .btc-chart { margin-top: 20px; padding: 0; }
+.btc-release-shell .btc-chart .dashboard-panel__header { padding: 17px 0; }
+.btc-release-shell .btc-chart .dashboard-chart__canvas { height: 290px; }
+.btc-chart-legend { display: flex; gap: 18px; font: 11px "SFMono-Regular", Consolas, monospace; color: #d6dce5; }
+.btc-chart-legend span:first-child { color: #02b8cc; }
+.btc-release-shell .dashboard-chart__empty { display: flex; flex-direction: column; gap: 14px; align-items: center; justify-content: center; padding: 24px; height: 100%; color: #b1c0ce; text-align: center; font-size: 13px; line-height: 1.8; }
+.btc-release-shell .dashboard-chart__empty small { color: #7e90a2; font-size: 11px; }
+.btc-conditions { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 0; }
+.btc-conditions span { padding: 6px 9px; border: 1px solid #2b3643; border-radius: 4px; color: #b5c4d1; font-size: 10px; }
+.btc-runtime-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; }
+.btc-runtime-grid div { min-width: 0; }
+.btc-runtime-grid dt { color: #7e90a2; font-size: 10px; line-height: 1.6; margin-bottom: 7px; }
+.btc-runtime-grid dd { color: #c2ced8; font-size: 11px; line-height: 1.7; overflow-wrap: anywhere; margin: 0; }
+.btc-provenance { margin-top: 20px; padding-top: 17px; border-top: 1px solid #2b3643; }
+.btc-provenance summary { cursor: pointer; color: #b8c6d2; font-size: 11px; padding: 6px 0; }
+.btc-provenance .btc-runtime-grid { margin-top: 18px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.btc-provenance summary:focus-visible, .btc-release-shell a:focus-visible { outline: 2px solid #02b8cc; outline-offset: 4px; border-radius: 2px; }
+.btc-table-wrap { overflow-x: auto; }
+.btc-events { width: 100%; border-collapse: collapse; font-size: 11px; }
+.btc-events th { color: #7f91a3; text-align: left; font-weight: 400; padding: 10px; white-space: nowrap; }
+.btc-events td { color: #b4c1ce; padding: 11px 10px; border-top: 1px solid #27313c; white-space: nowrap; }
+.btc-release-shell .dashboard-footer { flex-wrap: wrap; gap: 12px; line-height: 1.8; }
+.btc-legacy-banner { display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; background: #14222d; color: #b9cbd8; padding: 14px 24px; font-size: 12px; }
+.btc-legacy-banner a { color: #8cd4da; }
+@media (max-width: 900px) {
+  .btc-runtime-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .btc-evidence-notes { grid-template-columns: 1fr; gap: 10px; }
+  .btc-evidence-links span { margin-left: 0; }
+  .btc-release-shell .dashboard-metric-cell__value { font-size: 23px; }
+  .btc-section-heading { align-items: flex-start; }
+}
+@media (max-width: 560px) {
+  .btc-release-shell .dashboard-panel, .btc-release-shell .dashboard-result-stage { padding: 17px 13px; }
+  .btc-section-heading { flex-direction: column; gap: 11px; }
+  .btc-section-heading h1 { font-size: 21px; }
+  .btc-section-heading h2 { font-size: 18px; }
+  .btc-release-shell .dashboard-header__status { justify-content: space-between; gap: 10px; }
+  .btc-release-shell .dashboard-metrics-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .btc-release-shell .dashboard-metric-cell { padding: 16px 8px; }
+  .btc-release-shell .dashboard-metric-cell__value { font-size: 24px; }
+  .btc-release-shell .dashboard-metric-cell:nth-child(even) { border-right: 0; }
+  .btc-release-shell .dashboard-metric-cell:nth-child(-n+2) { border-bottom: 1px solid #27313c; }
+  .btc-release-shell .btc-live-metrics .dashboard-metric-cell__value { font-size: 21px; }
+  .btc-state-times { display: grid; gap: 10px; }
+  .btc-runtime-grid, .btc-provenance .btc-runtime-grid { grid-template-columns: 1fr; gap: 14px; }
+  .btc-release-shell .btc-chart .dashboard-chart__canvas { height: 235px; }
+  .btc-release-shell .dashboard-footer { display: grid; }
+}
+.btc-marketing-release-note { position: relative; z-index: 2; max-width: 1160px; margin: 20px auto; padding: 18px 24px; border: 1px solid #334553; border-radius: 10px; background: #0e1b26; color: #b5c7d6; font-size: 12px; line-height: 1.9; }
+.btc-marketing-release-note a { display: block; margin-top: 7px; color: #8ecfd5; }
+@media (max-width: 600px) { .btc-marketing-release-note { margin-inline: 16px; padding: 14px 18px; font-size: 11px; } }
