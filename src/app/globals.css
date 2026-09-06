@@ -5169,7 +5169,9 @@ textarea {
 
 @media (max-width: 560px) {
   .dashboard-shell--result-only .dashboard-container {
-    width: min(calc(100% - 28px), 520px);
+    /* Keep the dashboard off the device edge; the cards already carry their
+       own inner padding, so 20px outer gutters preserve a calmer rhythm. */
+    width: min(calc(100% - 40px), 520px);
     gap: 10px;
     padding-top: 12px;
     padding-bottom: 30px;
