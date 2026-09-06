@@ -1,5 +1,5 @@
 {
-  "stage": "first_real_transition_verified_cron_active",
+  "stage": "production_paper_running_scheduled_update_verified",
   "supabase_migration": {
     "name": "wm_research_demo",
     "version": "20260906080006",
@@ -18,12 +18,20 @@
   "new_wm_bundle_deployed": true,
   "wm_run_registered": true,
   "cron_cutover": true,
-  "web_production_published": false,
+  "web_production_published": true,
   "hf_verified_at": "2026-09-06T09:35:05Z",
   "hf_runtime_stage": "RUNNING",
   "hf_runtime_source_matches_repository": true,
   "hf_legacy_health_status": 200,
   "hf_wm31_health_status": 200,
   "inference_authentication_configured": true,
-  "initial_failure": "HF inference authentication was absent;503 before model computation. Existing server key configured, firstsuccessful transition after restart."
+  "initial_failure": "HF inference authentication was absent;503 before model computation. Existing server key configured, firstsuccessful transition after restart.",
+  "web_url": "https://unidream-demo-web.vercel.app",
+  "verified_web_deployment": "https://unidream-demo-ipi5yfh2j-sophies-projects-26e0f7fa.vercel.app",
+  "first_scheduled_event_ts": "2026-09-06T09:45:00Z",
+  "scheduled_update_checked_at": "2026-09-06T09:46:13Z",
+  "state_version": 2,
+  "snapshots": 1,
+  "forecasts": 2,
+  "events": 3
 }

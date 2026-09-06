@@ -1,0 +1,189 @@
+{
+  "schema": "wm31-public-browser-qa-v1",
+  "checked_at": "2026-09-06T09:48:46.375782+00:00",
+  "url": "https://unidream-demo-web.vercel.app",
+  "tool": "agent-browser",
+  "passed": true,
+  "source_ui_commit": "907775b",
+  "viewports": [
+    {
+      "width": 1280,
+      "height": 900,
+      "scroll_width": 1280,
+      "overflow": false,
+      "error_overlay": false,
+      "visually_inspected": true
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "scroll_width": 390,
+      "overflow": false,
+      "error_overlay": false,
+      "visually_inspected": true
+    }
+  ],
+  "console_messages": 0,
+  "page_errors": 0,
+  "initial": {
+    "state_version": 1,
+    "last_open": "2026-09-06T09:30:00+00:00",
+    "last_mark": null,
+    "snapshots": 0,
+    "waiting_for_first_completed_bar": true
+  },
+  "final": {
+    "run": {
+      "run_id": "btc-wm31-ac-20260906-paper-v1",
+      "bundle_id": "btc-wm31-ac-20260906",
+      "bundle_sha256": "96e4aed9a6f0f94fcc72d8a6f6573078182f4cd4c2c2607c9c465044346565d9",
+      "model_family": "wm_market31_ac"
+    },
+    "state": {
+      "version": 2,
+      "last_open_ts": "2026-09-06T09:45:00+00:00",
+      "last_mark_ts": "2026-09-06T09:30:00+00:00",
+      "equity": 0.9986008142763212,
+      "benchmark_equity": 0.9986008142763212,
+      "trades": 0,
+      "pending_target": 0.9998183846473694,
+      "pending_due_at": "2026-09-06T10:00:00+00:00"
+    },
+    "forecast": {
+      "forecast_kind": "wm_rl_actor",
+      "decision_ts": "2026-09-06T09:45:00+00:00",
+      "available": true,
+      "target": 0.999818384647369
+    },
+    "snapshots": 1,
+    "events": 3,
+    "wm_equity_display": "$9,986.01",
+    "benchmark_equity_display": "$9,986.01"
+  },
+  "evidence": {
+    "bundle_id": "btc-wm31-ac-20260906",
+    "minimum_means_met": true,
+    "historical_evidence": {
+      "metric_units": "fraction; multiply by100 for percentage points",
+      "start": "2021-07-19T17:00:00Z",
+      "end_exclusive": "2022-07-19T17:00:00Z",
+      "quarters": 3,
+      "regime_counts": {
+        "bull": 1,
+        "bear": 1,
+        "sideways": 1
+      },
+      "base": {
+        "alpha_ex": 0.0005354918811008765,
+        "maxdd_delta": -0.0006976992669101012
+      },
+      "stress_2x": {
+        "alpha_ex": 0.0005329190768422384,
+        "maxdd_delta": -0.0006954449939503929
+      },
+      "joint_quarters_both_costs": 1,
+      "reused_development": true,
+      "seed": 7,
+      "improvement_scope": "One period improves; two equal B&H; not trend-independent proof."
+    },
+    "displayed_base_alpha_pt": "+0.054pt",
+    "displayed_base_dd_pt": "-0.070pt",
+    "joint_periods_label": "1/3"
+  },
+  "chart": {
+    "received_real_completed_marks": 1,
+    "curve_drawn": false,
+    "caption": "比較曲線は2本目の確定足から表示します。",
+    "expected_minimum_marks_for_curve": 2,
+    "fabricated_marks": false
+  },
+  "homepage": {
+    "url": "https://unidream-demo-web.vercel.app/homepage",
+    "vision_design_preserved": true,
+    "old17feature_plan011_material_explicitly_archived": true,
+    "desktop_and_mobile_overflow": false,
+    "revealed_by_actual_scrolling": true
+  },
+  "legacy": {
+    "url": "https://unidream-demo-web.vercel.app/legacy",
+    "explicit_old_model_banner": true,
+    "backlink_to_current_model": true
+  },
+  "screenshots": [
+    {
+      "path": "/tmp/wm31-public-desktop-initial.png",
+      "sha256": "1ba564d9669d5320f47b41886845c73e57da7a9c2247dc7c0f833c958022ebd8"
+    },
+    {
+      "path": "/tmp/wm31-public-mobile-initial.png",
+      "sha256": "7c9a6c251d51483a7df0a6df98a4e0075078fc683536f0d0b566af1d73330830"
+    },
+    {
+      "path": "/tmp/wm31-public-desktop-final.png",
+      "sha256": "4d515f1bd14e6d4727c4f3785b5fbb58eb51c8434f1039a15ea770c3bbefa162"
+    },
+    {
+      "path": "/tmp/wm31-public-mobile-final.png",
+      "sha256": "f47aaae3f91c52f03c160667ce803fae113f0cad3a7434a7edea9428616e95f4"
+    },
+    {
+      "path": "/tmp/wm31-public-homepage-desktop-revealed.png",
+      "sha256": "99fbecd1f57a609630797cc63ddacde64cb8e11172f3562ad7e508a72fadcc7e"
+    },
+    {
+      "path": "/tmp/wm31-public-homepage-mobile.png",
+      "sha256": "a87b3cfb7b16fba0fa0002c7038816e50728cd31d687532ce4b96efd21bffe24"
+    },
+    {
+      "path": "/tmp/wm31-public-legacy-mobile.png",
+      "sha256": "a1dfed378cdf5dd04ce907381307ca932b373745789c80be520ee68aa18cd1dc"
+    }
+  ],
+  "bindings": [
+    {
+      "path": "/tmp/wm31-public-initial-api.json",
+      "sha256": "614f1e2cd66813e687f3c6e1b87957ebe9cba17563da853bd0c9883f0ab6e1e5"
+    },
+    {
+      "path": "/tmp/wm31-public-final-api.json",
+      "sha256": "7993e3d6278df0032915fe6370a5ecf9e64b5a627e2045a9fe7baf36a65bcef0"
+    },
+    {
+      "path": "/tmp/wm31-public-evidence.json",
+      "sha256": "740538f04e3fe6b4e3267a84f3fab8f74feedbbdb012828c5599592e5a435c95"
+    },
+    {
+      "path": "/tmp/wm31-public-desktop-final-dom.json",
+      "sha256": "d010c08df395ec081a121b971bb1d511f6a489dda3bd230e2d00d6d1ba8d5c24"
+    },
+    {
+      "path": "/tmp/wm31-public-mobile-final-dom.json",
+      "sha256": "5d4e342ac7b47ee12aa2a984e3f7d314b613fae4a13809454cdbf17b28f489ec"
+    },
+    {
+      "path": "/tmp/wm31-public-homepage-dom.json",
+      "sha256": "91428b1433ee20b78bdeab440976164c4571b10303684c89b4d016f52cfe813a"
+    },
+    {
+      "path": "/tmp/wm31-public-homepage-mobile-dom.json",
+      "sha256": "7bec48b5d9ac1c3b352b772b3e1acab911747587b1922caa00e5910efc55a1e6"
+    },
+    {
+      "path": "/tmp/wm31-public-legacy-dom.json",
+      "sha256": "92dc5f678e28af63f469ff063bbad1504a16c3691378054eda99ceac8c9d60b9"
+    },
+    {
+      "path": "/tmp/wm31-public-browser-final-errors.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/tmp/wm31-public-browser-final-console.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "limits": [
+    "Only one live completed mark exists at this check; actual two-point chart curve not yet observed.",
+    "No real orders or historical predictions/fills were created by this browser audit.",
+    "The UI commit was supplied by root and public metrics/identities were independently verified; final documentation-only deployment may follow."
+  ]
+}

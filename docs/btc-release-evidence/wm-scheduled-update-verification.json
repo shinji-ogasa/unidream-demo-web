@@ -1,0 +1,24 @@
+{
+  "state": {
+    "equity": 0.9986008142763212,
+    "run_id": "btc-wm31-ac-20260906-paper-v1",
+    "version": 2,
+    "last_mark_ts": "2026-09-06T09:30:00+00:00",
+    "last_open_ts": "2026-09-06T09:45:00+00:00",
+    "pending_due_at": "2026-09-06T10:00:00+00:00",
+    "pending_target": 0.9998183846473694,
+    "benchmark_equity": 0.9986008142763212
+  },
+  "events": 3,
+  "cron_runs": [
+    {
+      "jobid": 2,
+      "status": "succeeded",
+      "end_time": "2026-09-06T09:45:00.240737+00:00",
+      "start_time": "2026-09-06T09:45:00.181658+00:00"
+    }
+  ],
+  "forecasts": 2,
+  "snapshots": 1,
+  "checked_at": "2026-09-06T09:46:13.053864+00:00"
+}
