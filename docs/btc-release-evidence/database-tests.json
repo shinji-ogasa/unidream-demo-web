@@ -1,0 +1,1 @@
+{"status":"pass","tests":29,"engine":"PGlite PostgreSQL","scope":"real migration and PL/pgSQL transaction/idempotency/CAS/rollback/RLS grants, in-memory only"}

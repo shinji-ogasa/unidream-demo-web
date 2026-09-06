@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "backfill": "tsx scripts/backfill-history.ts"
+    "backfill": "tsx scripts/backfill-history.ts",
+    "test:btc-db": "node supabase/tests/btc_transition_test.mjs",
+    "test:btc-edge": "npx --yes deno@2.9.6 test supabase/functions/run-btc-research-demo"
   },
   "dependencies": {
     "@gsap/react": "^2.1.1",
@@ -27,6 +29,7 @@
     "three": "^0.160.0"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "0.5.8",
     "@types/node": "^20.16.10",
     "@types/react": "^18.3.11",
     "@types/react-dom": "^18.3.0",
