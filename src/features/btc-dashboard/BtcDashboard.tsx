@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import {
   BTC_CANDIDATE_ID,
+  BTC_DISPLAY_CAPITAL,
   BTC_EVIDENCE_URL,
   BTC_MODEL_LABEL,
   BTC_RUN_ID,
@@ -17,6 +18,7 @@ import { fmtExactNumber, fmtTime, fmtUSD } from "@/lib/format";
 import { useBtcDashboard } from "./useBtcDashboard";
 import { BtcPerformanceChart } from "./BtcPerformanceChart";
 import { BtcCountdown } from "./BtcCountdown";
+import { decisionSummary, latestExecution, objectValue, finiteValue } from "@/lib/btc-execution";
 
 function points(value: number | null | undefined, digits = 3) {
   return typeof value === "number" && Number.isFinite(value)
@@ -113,7 +115,12 @@ export function BtcDashboard({
 }) {
   const live = useBtcDashboard(initial);
   const state = live.state?.state;
-  const [now, setNow] = useState<number | null>(null);
+  // Use the serialized server check time for a truthful, hydration-stable
+  // first render; refresh to the browser clock after mounting.
+  const [now, setNow] = useState<number | null>(() => {
+    const checked = Date.parse(initial.checkedAt);
+    return Number.isFinite(checked) ? checked : null;
+  });
   const [eventPage, setEventPage] = useState(0);
   useEffect(() => {
     setNow(Date.now());
@@ -125,6 +132,9 @@ export function BtcDashboard({
     now !== null && lastEvent ? now - new Date(lastEvent).getTime() : null;
   const stale = age !== null && age > 30 * 60_000;
   const readable = live.readStatus === "ready";
+  const decision = decisionSummary(live.forecast, now, readable);
+  const execution = useMemo(() => latestExecution(live.events), [live.events]);
+  const feedback = objectValue(objectValue(live.forecast?.diagnostics.decision).account_feedback);
   const hasMark = !!state?.last_mark_ts;
   const alpha = hasMark && state ? state.equity - state.benchmark_equity : null;
   const dd =
@@ -323,7 +333,9 @@ export function BtcDashboard({
                   開発期間で学習と比較を行った成績です。
                   {live.run
                     ? "公開用に再学習した重みの実績は、下のペーパートレードで確認できます。"
-                    : "新しい公開用モデルはまだ稼働していません。"}
+                    : live.readStatus === "unavailable"
+                      ? "公開後の記録は現在取得できません。"
+                      : "公開用モデルの登録情報を確認しています。"}
                   相場によらず高い確率で改善するかは、今後の独立した期間で検証します。
                 </p>
               </div>
@@ -422,12 +434,12 @@ export function BtcDashboard({
               hint="保有比率は値動きで変化します"
             />
             <Metric
-              label="次の始値への注文"
+              label="次の始値の目標（未約定）"
               value={
                 !state
                   ? "—"
                   : state.pending_target == null
-                    ? "注文なし"
+                    ? "目標なし"
                     : `${fmtExactNumber(state.pending_target)}×`
               }
               hint={
@@ -455,7 +467,7 @@ export function BtcDashboard({
             </span>
           </div>
           <p className="btc-caption">
-            資産と保有量は確定した足までの記録です。RLの判断は次の始値への注文として表示します。B&Hと同じ初期保有で開始し、表示金額は正規化NAVを10,000倍しています。
+            資産と保有量は確定した足までの記録です。RLの目標は注文・約定ではありません。B&Hと同じ初期保有で開始し、表示金額とBTC数量は初期10,000 USDT相当に換算しています。
           </p>
           <BtcPerformanceChart snapshots={live.snapshots} events={live.events} />
         </section>
@@ -480,8 +492,17 @@ export function BtcDashboard({
             <span>欠損時 hold</span>
           </div>
           <p className="btc-description">
-            注文対象は0.50–1.12倍、1回の変更幅は最大0.08。遅延した入力では新しく注文せず、期限を過ぎた注文は持ち越しません。
+            目標は0.50–1.12倍、1回の変更幅は最大0.08。保有との差が0.01未満なら売買しません。遅延した入力では新しく注文せず、期限を過ぎた目標は持ち越しません。
           </p>
+          <div className="dashboard-metrics-grid btc-live-metrics btc-execution-metrics" aria-label="売買判断と数量">
+            <Metric label="最新の売買判断" value={decision.label} hint={decision.reason} />
+            <Metric label="参考売買数量 · BTC" value={decision.quantity === null ? "—" : fmtExactNumber(decision.quantity)}
+              hint={decision.estimated ? "前回確定時点の保有・価格で試算。次の始値で再計算" : "未確認の数量を注文には使いません"} />
+            <Metric label="確定済みのBTC保有量" value={state ? fmtExactNumber(state.units*BTC_DISPLAY_CAPITAL) : "—"}
+              hint="HOLDでも既存のBTC保有を継続します" />
+            <Metric label="直近の実行結果" value={execution?.label ?? "記録待ち"}
+              hint={execution ? `${execution.reason} · ${execution.quantity === null ? "数量未記録" : `${fmtExactNumber(execution.quantity)} BTC`} · ${fmtTime(execution.timestamp)}` : "ペーパー約定のみ。実注文は送信しません"} />
+          </div>
           <dl className="btc-runtime-grid">
             <div>
               <dt>最後の判断時刻</dt>
@@ -493,7 +514,7 @@ export function BtcDashboard({
                 {live.forecast
                   ? live.forecast.available
                     ? live.forecast.action_eligible
-                      ? "予測あり"
+                      ? "目標あり・約定は未確認"
                       : "予測あり・注文受付外"
                     : "予測なし・保有を継続"
                   : "判断記録待ち"}
@@ -508,6 +529,11 @@ export function BtcDashboard({
               <dd>{fmtTime(textField(live.forecast?.data, "received_at"))}</dd>
             </div>
           </dl>
+          <p className="btc-caption">
+            Actorには前の確定足の実保有と約定による変化を戻しています。直前の実行変化：
+            {fmtExactNumber(finiteValue(feedback.executed_delta))}倍 · 評価時刻：{fmtTime(typeof feedback.mark_timestamp === "string" ? feedback.mark_timestamp : null)}。
+            参考数量は未処理の目標や次の始値によって変わります。初期NAV 1の計算を10,000 USDT相当に換算した数量です。
+          </p>
           <p className="btc-caption">
             RLが出した目標保有比率、次の始値での約定、入力の受信時刻を記録します。入力が欠けた時刻の予測や約定を後から補いません。
           </p>

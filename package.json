@@ -11,6 +11,9 @@
     "backfill": "tsx scripts/backfill-history.ts",
     "backfill:wm": "tsx scripts/backfill-wm-history.ts",
     "test:btc-db": "node supabase/tests/btc_transition_test.mjs",
+    "test:wm-ui": "node --import tsx tests/btc-execution.test.cjs",
+    "test:wm-db": "node supabase/tests/wm_transition_test.mjs",
+    "test:wm-edge": "npx --yes deno@2.9.6 test supabase/functions/run-wm-research-demo",
     "test:btc-edge": "npx --yes deno@2.9.6 test supabase/functions/run-btc-research-demo"
   },
   "dependencies": {
