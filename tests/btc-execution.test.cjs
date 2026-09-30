@@ -20,4 +20,7 @@ const filled={...event,details:{fill:{status:'filled',trade_value:-.1},bridge:{o
 assert.equal(latestExecution([filled]).quantity,10);
 assert.match(latestExecution([filled]).label,/SELL/);
 assert.equal(latestExecution([{...filled,details:{fill:filled.details.fill}}]).quantity,null);
-console.log('btc execution UI: 13 assertions passed');
+assert.equal(latestExecution([{...event,details:{fill:{status:'unknown'}}}]).quantity,null);
+assert.equal(decisionSummary({...base,decision_ts:'2026-09-30T08:45:00Z'},now,true).quantity,null);
+assert.equal(decisionSummary({...base,diagnostics:{execution_plan:{...base.diagnostics.execution_plan,quantity_unit:'wrong'}}},now,true).quantity,null);
+console.log('btc execution UI: assertions passed');

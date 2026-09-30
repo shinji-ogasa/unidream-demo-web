@@ -61,8 +61,9 @@ export function latestExecution(events: BtcEvent[]) {
   const value = finiteValue(fill.trade_value);
   const price = finiteValue(bridge.observed_open);
   const didTrade = fill.status === "filled";
-  const quantity = !didTrade ? 0 : value !== null && price !== null && price > 0
+  const noTrade = ["none", "deadband_hold", "expired_missing_open"].includes(String(fill.status));
+  const quantity = noTrade ? 0 : didTrade && value !== null && price !== null && price > 0
     ? Math.abs(value)/price*BTC_DISPLAY_CAPITAL : null;
-  return { timestamp: event.timestamp, label: didTrade ? value === null || value === 0 ? "約定方向を確認中" : value > 0 ? "BUY · 買い約定" : "SELL · 売り約定" : "売買なし",
+  return { timestamp: event.timestamp, label: didTrade ? value === null || value === 0 ? "約定方向を確認中" : value > 0 ? "BUY · 買い約定" : "SELL · 売り約定" : noTrade ? "売買なし" : "実行結果を確認中",
     reason: reasonLabel(fill.status), quantity, didTrade };
 }

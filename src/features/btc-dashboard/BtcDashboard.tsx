@@ -115,7 +115,12 @@ export function BtcDashboard({
 }) {
   const live = useBtcDashboard(initial);
   const state = live.state?.state;
-  const [now, setNow] = useState<number | null>(null);
+  // Use the serialized server check time for a truthful, hydration-stable
+  // first render; refresh to the browser clock after mounting.
+  const [now, setNow] = useState<number | null>(() => {
+    const checked = Date.parse(initial.checkedAt);
+    return Number.isFinite(checked) ? checked : null;
+  });
   const [eventPage, setEventPage] = useState(0);
   useEffect(() => {
     setNow(Date.now());
@@ -328,7 +333,9 @@ export function BtcDashboard({
                   開発期間で学習と比較を行った成績です。
                   {live.run
                     ? "公開用に再学習した重みの実績は、下のペーパートレードで確認できます。"
-                    : "新しい公開用モデルはまだ稼働していません。"}
+                    : live.readStatus === "unavailable"
+                      ? "公開後の記録は現在取得できません。"
+                      : "公開用モデルの登録情報を確認しています。"}
                   相場によらず高い確率で改善するかは、今後の独立した期間で検証します。
                 </p>
               </div>
